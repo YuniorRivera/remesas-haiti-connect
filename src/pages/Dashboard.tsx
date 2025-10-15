@@ -2,14 +2,19 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, Send, Users, BarChart3 } from "lucide-react";
+import { LogOut, Send, Users, BarChart3, History } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const { isAdmin, isAgente, isEmisor, loading: roleLoading } = useUserRole(user?.id);
+  const { language } = useLanguage();
+  const { t } = useTranslation(language);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -36,24 +41,27 @@ const Dashboard = () => {
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div>
             <h1 className="text-2xl font-bold text-primary">Remesas RD-Haití</h1>
-            <p className="text-sm text-muted-foreground">Panel de Control</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard')}</p>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Salir
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              {t('logout')}
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto p-6">
         <div className="mb-6">
           <h2 className="text-3xl font-bold">
-            Bienvenido, {user?.email}
+            {t('welcome')}, {user?.email}
           </h2>
           <p className="text-muted-foreground">
-            {isAdmin && "Administrador del sistema"}
-            {isAgente && !isAdmin && "Agente de remesas"}
-            {isEmisor && !isAdmin && !isAgente && "Cliente"}
+            {isAdmin && t('admin')}
+            {isAgente && !isAdmin && t('agent')}
+            {isEmisor && !isAdmin && !isAgente && t('sender')}
           </p>
         </div>
 
@@ -63,14 +71,14 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="h-5 w-5 text-primary" />
-                  Nueva Remesa
+                  {t('newRemittance')}
                 </CardTitle>
                 <CardDescription>
                   Procesa un nuevo envío de dinero
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Crear Remesa</Button>
+                <Button className="w-full">{t('create')}</Button>
               </CardContent>
             </Card>
           )}
@@ -81,15 +89,19 @@ const Dashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary" />
-                    Gestión de Agentes
+                    {t('agentManagement')}
                   </CardTitle>
                   <CardDescription>
                     Administra tiendas y agentes
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full" variant="outline">
-                    Ver Agentes
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => navigate("/stores")}
+                  >
+                    Ver Tiendas
                   </Button>
                 </CardContent>
               </Card>
@@ -98,7 +110,7 @@ const Dashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-primary" />
-                    Reportes
+                    {t('reports')}
                   </CardTitle>
                   <CardDescription>
                     Analítica y reportes del sistema
@@ -106,7 +118,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <Button className="w-full" variant="outline">
-                    Ver Reportes
+                    {t('reports')}
                   </Button>
                 </CardContent>
               </Card>
@@ -115,13 +127,20 @@ const Dashboard = () => {
 
           <Card className="transition-shadow hover:shadow-md">
             <CardHeader>
-              <CardTitle>Mis Transacciones</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                {t('myTransactions')}
+              </CardTitle>
               <CardDescription>
                 Historial de remesas enviadas
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={() => navigate("/transactions")}
+              >
                 Ver Historial
               </Button>
             </CardContent>
