@@ -206,13 +206,6 @@ export type Database = {
             referencedRelation: "tiendas"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "transacciones_tienda_id_fkey"
-            columns: ["tienda_id"]
-            isOneToOne: false
-            referencedRelation: "tiendas_agent_view"
-            referencedColumns: ["id"]
-          },
         ]
       }
       user_roles: {
@@ -238,42 +231,7 @@ export type Database = {
       }
     }
     Views: {
-      tiendas_agent_view: {
-        Row: {
-          activa: boolean | null
-          agente_id: string | null
-          created_at: string | null
-          direccion: string | null
-          float_disponible: number | null
-          id: string | null
-          nombre: string | null
-          telefono: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          activa?: boolean | null
-          agente_id?: string | null
-          created_at?: string | null
-          direccion?: string | null
-          float_disponible?: number | null
-          id?: string | null
-          nombre?: string | null
-          telefono?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          activa?: boolean | null
-          agente_id?: string | null
-          created_at?: string | null
-          direccion?: string | null
-          float_disponible?: number | null
-          id?: string | null
-          nombre?: string | null
-          telefono?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_transaction_for_agent: {
