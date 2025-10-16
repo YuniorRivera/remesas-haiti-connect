@@ -377,65 +377,143 @@ export default function CreateRemittance() {
         {step === 3 && quote && (
           <Card>
             <CardHeader>
-              <CardTitle>Cotización</CardTitle>
+              <CardTitle>Cotización Detallada</CardTitle>
               <CardDescription>
-                Revisa los detalles antes de confirmar
+                Revisa todos los cálculos antes de confirmar
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2 bg-muted/50 p-4 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span>Monto a enviar:</span>
-                  <span className="font-medium">
-                    ${parseFloat(formData.principal_dop).toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Comisión:</span>
-                  <span className="font-medium">
-                    ${quote.total_client_fees_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Fee Gubernamental (BRH):</span>
-                  <span className="font-medium">
-                    ${quote.gov_fee_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-                <div className="h-px bg-border my-2" />
-                <div className="flex justify-between text-base font-bold">
-                  <span>Total a pagar:</span>
-                  <span className="text-primary">
-                    ${quote.total_client_pays_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2 bg-secondary/20 p-4 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span>Tasa de cambio:</span>
-                  <span className="font-medium">
-                    1 DOP = {quote.fx_client_sell?.toFixed(4)} HTG
-                  </span>
-                </div>
-                <div className="flex justify-between text-base font-bold text-secondary">
-                  <span>Beneficiario recibe:</span>
-                  <span>
-                    {quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG
-                  </span>
+            <CardContent className="space-y-6">
+              {/* Paso 1: Monto y Fees al Cliente */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">1. Monto y Comisiones</h3>
+                <div className="space-y-2 bg-muted/50 p-4 rounded-lg">
+                  <div className="flex justify-between text-sm">
+                    <span>Monto principal:</span>
+                    <span className="font-medium">
+                      ${parseFloat(formData.principal_dop).toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span className="pl-4">• Fee fijo:</span>
+                    <span>${quote.client_fee_fixed_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span className="pl-4">• Fee porcentual:</span>
+                    <span>${quote.client_fee_pct_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Total comisiones cliente:</span>
+                    <span className="font-medium">
+                      ${quote.total_client_fees_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span className="text-green-800 dark:text-green-400">Tu comisión:</span>
-                  <span className="font-bold text-green-600 dark:text-green-400">
-                    ${quote.store_commission_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
+              {/* Paso 2: Fee Gubernamental */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">2. Fee Gubernamental BRH</h3>
+                <div className="space-y-2 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg">
+                  <div className="flex justify-between text-sm">
+                    <span>Fee BRH (${quote.gov_fee_usd} USD):</span>
+                    <span className="font-medium text-amber-700 dark:text-amber-400">
+                      ${quote.gov_fee_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* Paso 3: Total a Pagar */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">3. Total que Paga el Cliente</h3>
+                <div className="space-y-2 bg-primary/10 p-4 rounded-lg border-2 border-primary/20">
+                  <div className="flex justify-between text-base font-bold">
+                    <span>TOTAL A PAGAR:</span>
+                    <span className="text-primary text-lg">
+                      ${quote.total_client_pays_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Paso 4: Conversión FX */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">4. Conversión a Gourdes</h3>
+                <div className="space-y-2 bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
+                  <div className="flex justify-between text-sm">
+                    <span>Tasa de cambio cliente:</span>
+                    <span className="font-medium text-blue-700 dark:text-blue-400">
+                      1 DOP = {quote.fx_client_sell?.toFixed(4)} HTG
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span className="pl-4">HTG antes de partner fee:</span>
+                    <span>{quote.htg_before_partner?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span className="pl-4">• Partner fee:</span>
+                    <span>-{quote.partner_fee_htg?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Paso 5: Monto Final al Beneficiario */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">5. Monto que Recibe el Beneficiario</h3>
+                <div className="space-y-2 bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border-2 border-green-500/20">
+                  <div className="flex justify-between text-base font-bold">
+                    <span className="text-green-800 dark:text-green-400">BENEFICIARIO RECIBE:</span>
+                    <span className="text-green-600 dark:text-green-400 text-lg">
+                      {quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground text-center mt-2">
+                    Canal: {formData.channel === 'MONCASH' ? 'MonCash' : 'SPIH'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Comisión del Agente */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">Tu Comisión</h3>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-green-800 dark:text-green-400">Ganancia por esta transacción:</span>
+                    <span className="font-bold text-green-600 dark:text-green-400 text-lg">
+                      ${quote.store_commission_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detalles Administrativos (solo para admin) */}
+              {quote.platform_gross_margin_dop !== undefined && (
+                <div className="space-y-3 border-t pt-4">
+                  <h3 className="text-sm font-semibold text-primary">Detalles Administrativos</h3>
+                  <div className="space-y-2 bg-slate-50 dark:bg-slate-950/20 p-4 rounded-lg text-xs">
+                    <div className="flex justify-between">
+                      <span>Margen bruto plataforma:</span>
+                      <span className={quote.platform_gross_margin_dop > 0 ? "text-green-600" : "text-red-600"}>
+                        ${quote.platform_gross_margin_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span className="pl-4">• Ingresos totales:</span>
+                      <span>${quote.total_platform_revenue?.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span className="pl-4">• Costos totales:</span>
+                      <span>${quote.total_costs?.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span className="pl-4">• Spread FX revenue:</span>
+                      <span>${quote.fx_spread_rev_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-4">
                 <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
                   Modificar
                 </Button>
