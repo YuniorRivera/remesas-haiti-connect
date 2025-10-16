@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -34,23 +35,85 @@ const App = () => (
         <CookieBanner />
         <BrowserRouter>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/agent-dashboard" element={<AgentDashboard />} />
-            <Route path="/agent-earnings" element={<AgentEarnings />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/admin-operations" element={<AdminOperations />} />
-            <Route path="/admin-reconciliation" element={<AdminReconciliation />} />
-            <Route path="/admin-compliance" element={<AdminCompliance />} />
-            <Route path="/admin-margins" element={<AdminMargins />} />
-            <Route path="/admin-fees" element={<AdminFees />} />
-            <Route path="/remittances/create" element={<CreateRemittance />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/transactions/:id" element={<RemittanceDetail />} />
-            <Route path="/stores" element={<Stores />} />
             <Route path="/legal" element={<Legal />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            
+            {/* Authenticated routes (any role) */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute requireAuth>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/transactions" element={
+              <ProtectedRoute requireAuth>
+                <Transactions />
+              </ProtectedRoute>
+            } />
+            <Route path="/transactions/:id" element={
+              <ProtectedRoute requireAuth>
+                <RemittanceDetail />
+              </ProtectedRoute>
+            } />
+            
+            {/* Agent routes */}
+            <Route path="/agent-dashboard" element={
+              <ProtectedRoute requireAuth allowedRoles={['agent_owner', 'agent_clerk']}>
+                <AgentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/remittances/create" element={
+              <ProtectedRoute requireAuth allowedRoles={['agent_owner', 'agent_clerk']}>
+                <CreateRemittance />
+              </ProtectedRoute>
+            } />
+            <Route path="/agent-earnings" element={
+              <ProtectedRoute requireAuth allowedRoles={['agent_owner', 'agent_clerk']}>
+                <AgentEarnings />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admin routes */}
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/stores" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <Stores />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-operations" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminOperations />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-reconciliation" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminReconciliation />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-margins" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminMargins />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-fees" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminFees />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admin + Compliance routes */}
+            <Route path="/admin-compliance" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin', 'compliance_officer']}>
+                <AdminCompliance />
+              </ProtectedRoute>
+            } />
+            
+            {/* 404 - Must be last */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
