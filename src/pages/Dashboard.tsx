@@ -12,7 +12,7 @@ import { LogOut, Send, Users, BarChart3, History } from "lucide-react";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isAdmin, isAgente, isEmisor, loading: roleLoading } = useUserRole(user?.id);
+  const { isAdmin, isAgent, isComplianceOfficer, isSenderUser, loading: roleLoading } = useUserRole(user?.id);
   const { language } = useLanguage();
   const { t } = useTranslation(language);
 
@@ -60,13 +60,14 @@ const Dashboard = () => {
           </h2>
           <p className="text-muted-foreground">
             {isAdmin && t('admin')}
-            {isAgente && !isAdmin && t('agent')}
-            {isEmisor && !isAdmin && !isAgente && t('sender')}
+            {isComplianceOfficer && !isAdmin && 'Oficial de Cumplimiento'}
+            {isAgent && !isAdmin && !isComplianceOfficer && t('agent')}
+            {isSenderUser && !isAdmin && !isAgent && !isComplianceOfficer && t('sender')}
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {isAgente && (
+          {isAgent && (
             <Card className="transition-shadow hover:shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -147,7 +148,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {!isAdmin && !isAgente && !isEmisor && (
+        {!isAdmin && !isAgent && !isComplianceOfficer && !isSenderUser && (
           <Card className="mt-6 border-destructive/50 bg-destructive/10">
             <CardHeader>
               <CardTitle>Acceso Pendiente</CardTitle>

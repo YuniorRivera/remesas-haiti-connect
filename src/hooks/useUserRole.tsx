@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type AppRole = "admin" | "agente" | "emisor";
+type AppRole = "admin" | "agent_owner" | "agent_clerk" | "compliance_officer" | "sender_user";
 
 export function useUserRole(userId: string | undefined) {
   const [roles, setRoles] = useState<AppRole[]>([]);
@@ -34,8 +34,23 @@ export function useUserRole(userId: string | undefined) {
 
   const hasRole = (role: AppRole) => roles.includes(role);
   const isAdmin = hasRole("admin");
-  const isAgente = hasRole("agente");
-  const isEmisor = hasRole("emisor");
+  const isAgentOwner = hasRole("agent_owner");
+  const isAgentClerk = hasRole("agent_clerk");
+  const isComplianceOfficer = hasRole("compliance_officer");
+  const isSenderUser = hasRole("sender_user");
+  
+  // Convenience groupings
+  const isAgent = isAgentOwner || isAgentClerk;
 
-  return { roles, hasRole, isAdmin, isAgente, isEmisor, loading };
+  return { 
+    roles, 
+    hasRole, 
+    isAdmin, 
+    isAgentOwner,
+    isAgentClerk,
+    isComplianceOfficer,
+    isSenderUser,
+    isAgent,
+    loading 
+  };
 }
