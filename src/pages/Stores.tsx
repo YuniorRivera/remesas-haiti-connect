@@ -3,39 +3,73 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, MapPin, Phone, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, Plus, Edit, Store, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+
+interface Agent {
+  id: string;
+  legal_name: string;
+  trade_name?: string;
+  code?: string;
+  float_balance_dop?: number;
+  daily_limit_dop?: number;
+  is_active?: boolean;
+  created_at: string;
+}
 
 const Stores = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole(user?.id);
-  const { language } = useLanguage();
-  const { t } = useTranslation(language);
-  const [stores, setStores] = useState<any[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
+  const [formData, setFormData] = useState({
+    legal_name: "",
+    trade_name: "",
+    code: "",
+    daily_limit_dop: "",
+    float_balance_dop: "",
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/auth");
     } else if (!roleLoading && !isAdmin) {
       navigate("/dashboard");
-      toast.error("Acceso denegado");
+      toast.error("Acceso denegado. Solo administradores.");
     }
   }, [user, authLoading, isAdmin, roleLoading, navigate]);
 
   useEffect(() => {
     if (user && isAdmin) {
-      fetchStores();
+      fetchAgents();
     }
   }, [user, isAdmin]);
 
-  const fetchStores = async () => {
+  const fetchAgents = async () => {
     try {
       const { data, error } = await supabase
         .from("agents")
@@ -43,18 +77,99 @@ const Stores = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setStores(data || []);
+      setAgents(data || []);
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error("Error al cargar tiendas");
+      console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenDialog = (agent?: Agent) => {
+    if (agent) {
+      setEditingAgent(agent);
+      setFormData({
+        legal_name: agent.legal_name,
+        trade_name: agent.trade_name || "",
+        code: agent.code || "",
+        daily_limit_dop: agent.daily_limit_dop?.toString() || "",
+        float_balance_dop: agent.float_balance_dop?.toString() || "",
+      });
+    } else {
+      setEditingAgent(null);
+      setFormData({
+        legal_name: "",
+        trade_name: "",
+        code: "",
+        daily_limit_dop: "50000",
+        float_balance_dop: "0",
+      });
+    }
+    setDialogOpen(true);
+  };
+
+  const handleSaveAgent = async () => {
+    try {
+      if (!formData.legal_name) {
+        toast.error("Nombre legal es requerido");
+        return;
+      }
+
+      const payload = {
+        legal_name: formData.legal_name.trim(),
+        trade_name: formData.trade_name.trim() || null,
+        trade_name_old: formData.trade_name.trim() || "Sin nombre",
+        address_old: "Por configurar",
+        code: formData.code.trim() || null,
+        daily_limit_dop: parseFloat(formData.daily_limit_dop) || 50000,
+        float_balance_dop: parseFloat(formData.float_balance_dop) || 0,
+        is_active: true,
+      };
+
+      if (editingAgent) {
+        const { error } = await supabase
+          .from("agents")
+          .update(payload)
+          .eq("id", editingAgent.id);
+
+        if (error) throw error;
+        toast.success("Tienda actualizada");
+      } else {
+        const { error } = await supabase
+          .from("agents")
+          .insert([payload]);
+
+        if (error) throw error;
+        toast.success("Tienda creada");
+      }
+
+      setDialogOpen(false);
+      fetchAgents();
+    } catch (error: any) {
+      toast.error(error.message || "Error al guardar tienda");
+    }
+  };
+
+  const handleToggleActive = async (agent: Agent) => {
+    try {
+      const { error } = await supabase
+        .from("agents")
+        .update({ is_active: !agent.is_active })
+        .eq("id", agent.id);
+
+      if (error) throw error;
+      toast.success(agent.is_active ? "Tienda desactivada" : "Tienda activada");
+      fetchAgents();
+    } catch (error: any) {
+      toast.error("Error al cambiar estado");
     }
   };
 
   if (authLoading || roleLoading || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">{t('loading')}</p>
+        <p className="text-muted-foreground">Cargando...</p>
       </div>
     );
   }
@@ -63,14 +178,25 @@ const Stores = () => {
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-card shadow-sm">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-2">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/dashboard")} 
+            className="mb-2"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('dashboard')}
+            Dashboard
           </Button>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-primary">{t('agentManagement')}</h1>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
+            <div>
+              <h1 className="text-2xl font-bold text-primary">
+                Gestión de Tiendas
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Administra agentes y puntos de venta
+              </p>
+            </div>
+            <Button onClick={() => handleOpenDialog()}>
+              <Plus className="mr-2 h-4 w-4" />
               Nueva Tienda
             </Button>
           </div>
@@ -78,52 +204,151 @@ const Stores = () => {
       </header>
 
       <main className="container mx-auto p-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {stores.map((store) => (
-            <Card key={store.id} className="transition-shadow hover:shadow-md">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{store.trade_name || store.legal_name}</CardTitle>
-                  <Badge variant={store.is_active ? "default" : "secondary"}>
-                    {store.is_active ? t('active') : t('inactive')}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                  <span>{store.address}</span>
-                </div>
-                {store.rnc && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    <span>RNC: {store.rnc}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2 rounded-lg bg-secondary/20 p-3">
-                  <DollarSign className="h-5 w-5 text-secondary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('availableFloat')}</p>
-                    <p className="text-lg font-bold text-secondary">
-                      ${parseFloat(store.float_balance_dop || 0).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {stores.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-lg text-muted-foreground">{t('noData')}</p>
-            <Button className="mt-4 gap-2">
-              <Plus className="h-4 w-4" />
-              Crear Primera Tienda
-            </Button>
-          </div>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Store className="h-5 w-5" />
+              Tiendas Registradas ({agents.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {agents.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                No hay tiendas registradas. Crea una nueva para empezar.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre Legal</TableHead>
+                    <TableHead>Nombre Comercial</TableHead>
+                    <TableHead>Código</TableHead>
+                    <TableHead className="text-right">Float Disponible</TableHead>
+                    <TableHead className="text-right">Límite Diario</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {agents.map((agent) => (
+                    <TableRow key={agent.id}>
+                      <TableCell className="font-medium">{agent.legal_name}</TableCell>
+                      <TableCell>{agent.trade_name || "-"}</TableCell>
+                      <TableCell>
+                        <code className="text-xs bg-muted px-2 py-1 rounded">
+                          {agent.code || "-"}
+                        </code>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        <div className="flex items-center justify-end gap-1">
+                          <DollarSign className="h-3 w-3" />
+                          {(agent.float_balance_dop || 0).toLocaleString('es-DO', { minimumFractionDigits: 2 })}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-mono text-sm text-muted-foreground">
+                        {(agent.daily_limit_dop || 0).toLocaleString('es-DO')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={agent.is_active ? "default" : "secondary"}
+                          className="cursor-pointer"
+                          onClick={() => handleToggleActive(agent)}
+                        >
+                          {agent.is_active ? "Activa" : "Inactiva"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenDialog(agent)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </main>
+
+      {/* Dialog para crear/editar */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingAgent ? "Editar Tienda" : "Nueva Tienda"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingAgent 
+                ? "Actualiza los datos de la tienda" 
+                : "Ingresa los datos para registrar una nueva tienda"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="legal_name">Nombre Legal *</Label>
+              <Input
+                id="legal_name"
+                value={formData.legal_name}
+                onChange={(e) => setFormData({ ...formData, legal_name: e.target.value })}
+                placeholder="Empresa ABC, SRL"
+              />
+            </div>
+            <div>
+              <Label htmlFor="trade_name">Nombre Comercial</Label>
+              <Input
+                id="trade_name"
+                value={formData.trade_name}
+                onChange={(e) => setFormData({ ...formData, trade_name: e.target.value })}
+                placeholder="Colmado ABC"
+              />
+            </div>
+            <div>
+              <Label htmlFor="code">Código de Tienda</Label>
+              <Input
+                id="code"
+                value={formData.code}
+                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                placeholder="ABC-001"
+              />
+            </div>
+            <div>
+              <Label htmlFor="daily_limit_dop">Límite Diario (DOP)</Label>
+              <Input
+                id="daily_limit_dop"
+                type="number"
+                step="1000"
+                value={formData.daily_limit_dop}
+                onChange={(e) => setFormData({ ...formData, daily_limit_dop: e.target.value })}
+                placeholder="50000"
+              />
+            </div>
+            <div>
+              <Label htmlFor="float_balance_dop">Float Inicial (DOP)</Label>
+              <Input
+                id="float_balance_dop"
+                type="number"
+                step="100"
+                value={formData.float_balance_dop}
+                onChange={(e) => setFormData({ ...formData, float_balance_dop: e.target.value })}
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveAgent}>
+              {editingAgent ? "Actualizar" : "Crear"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
