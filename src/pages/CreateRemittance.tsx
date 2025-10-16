@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { remittanceSchema } from "@/lib/validations";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
 import { toast } from "sonner";
+import { RemittanceReceipt } from "@/components/RemittanceReceipt";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -19,6 +20,7 @@ export default function CreateRemittance() {
   const { user } = useAuth();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
+  const [agentName, setAgentName] = useState<string>("");
 
   // Datos del formulario
   const [formData, setFormData] = useState({
@@ -42,6 +44,33 @@ export default function CreateRemittance() {
   const [quote, setQuote] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [feesAvailable, setFeesAvailable] = useState(true);
+  const [confirmedRemittance, setConfirmedRemittance] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchAgentInfo = async () => {
+      if (!user) return;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('agent_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.agent_id) {
+        const { data: agent } = await supabase
+          .from('agents')
+          .select('trade_name')
+          .eq('id', profile.agent_id)
+          .single();
+        
+        if (agent?.trade_name) {
+          setAgentName(agent.trade_name);
+        }
+      }
+    };
+
+    fetchAgentInfo();
+  }, [user]);
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -192,8 +221,18 @@ export default function CreateRemittance() {
 
       if (error) throw error;
       
-      toast.success("Remesa confirmada y enviada");
-      navigate("/transactions");
+      // Guardar datos completos para el recibo
+      setConfirmedRemittance({
+        ...quote.remittance,
+        ...data.remittance,
+        emisor_nombre: formData.emisor_nombre,
+        beneficiario_nombre: formData.beneficiario_nombre,
+        beneficiario_telefono: formData.beneficiario_telefono,
+        channel: formData.channel,
+      });
+      
+      toast.success("Remesa confirmada exitosamente");
+      setStep(4);
     } catch (error: any) {
       toast.error(error.message || "Error al confirmar remesa");
     } finally {
@@ -529,8 +568,39 @@ export default function CreateRemittance() {
           </Card>
         )}
 
-        {/* Paso 4: Confirmación */}
-        {step === 4 && (
+        {/* Paso 4: Confirmación y Recibo */}
+        {step === 4 && confirmedRemittance && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-600">
+                <Check className="h-6 w-6" />
+                Remesa Confirmada
+              </CardTitle>
+              <CardDescription>
+                La remesa ha sido confirmada y procesada exitosamente
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RemittanceReceipt 
+                remittance={confirmedRemittance}
+                agentName={agentName}
+              />
+              
+              <div className="mt-6">
+                <Button
+                  onClick={() => navigate("/transactions")}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Ver Transacciones
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Paso 4 alternativo: Solo cotización creada */}
+        {step === 4 && !confirmedRemittance && quote && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-600">

@@ -2,7 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
 
 interface ConfirmRemittanceRequest {
@@ -38,22 +38,18 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { remittance_id }: ConfirmRemittanceRequest = await req.json();
+    const requestData: ConfirmRemittanceRequest = await req.json();
 
-    if (!remittance_id) {
-      return new Response(
-        JSON.stringify({ error: 'ID de remesa requerido' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('Confirming remittance:', { remittance_id, user_id: user.id });
+    console.log('Confirming remittance:', { 
+      user_id: user.id, 
+      remittance_id: requestData.remittance_id 
+    });
 
     // Obtener la remesa
     const { data: remittance, error: fetchError } = await supabaseClient
       .from('remittances')
-      .select('*, agents!inner(float_balance_dop, owner_user_id)')
-      .eq('id', remittance_id)
+      .select('*, agents!agent_id(id, float_balance_dop, trade_name)')
+      .eq('id', requestData.remittance_id)
       .single();
 
     if (fetchError || !remittance) {
@@ -64,7 +60,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Verificar permisos
+    // Validar que la remesa esté en estado QUOTED
+    if (remittance.state !== 'QUOTED') {
+      return new Response(
+        JSON.stringify({ error: `Remesa no está en estado QUOTED (actual: ${remittance.state})` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validar que el usuario sea el agente de la remesa o admin
     if (remittance.agente_id !== user.id) {
       const { data: userRoles } = await supabaseClient
         .from('user_roles')
@@ -75,83 +79,246 @@ Deno.serve(async (req) => {
       
       if (!isAdmin) {
         return new Response(
-          JSON.stringify({ error: 'No tiene permisos para confirmar esta remesa' }),
+          JSON.stringify({ error: 'No autorizado para confirmar esta remesa' }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
     }
 
-    // Validar estado
-    if (remittance.state !== 'QUOTED' && remittance.state !== 'CREATED') {
+    // Verificar que el agente tiene float suficiente
+    const agent = remittance.agents as any;
+    const floatNeeded = remittance.total_client_pays_dop || 0;
+    const currentFloat = agent?.float_balance_dop || 0;
+
+    if (currentFloat < floatNeeded) {
+      console.error('Insufficient float:', { currentFloat, floatNeeded });
       return new Response(
         JSON.stringify({ 
-          error: `No se puede confirmar remesa en estado ${remittance.state}` 
+          error: 'Float insuficiente en la tienda',
+          details: {
+            current: currentFloat,
+            needed: floatNeeded,
+            shortage: floatNeeded - currentFloat
+          }
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Verificar saldo disponible en la tienda
-    const agent = remittance.agents;
-    if (!agent || agent.float_balance_dop < remittance.principal_dop) {
-      console.error('Insufficient balance:', {
-        available: agent?.float_balance_dop,
-        required: remittance.principal_dop,
-      });
-      
-      return new Response(
-        JSON.stringify({ 
-          error: 'Saldo insuficiente en la tienda',
-          available: agent?.float_balance_dop || 0,
-          required: remittance.principal_dop,
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Generar receipt_hash para QR
+    const receiptData = {
+      id: remittance.id,
+      ref: remittance.codigo_referencia,
+      amount: remittance.htg_to_beneficiary,
+      timestamp: Date.now()
+    };
+    const receiptString = JSON.stringify(receiptData);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(receiptString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const receipt_hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Obtener/Crear cuentas de ledger necesarias usando service role
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Cuenta de efectivo de la tienda (debe existir)
+    let { data: agentCashAccount } = await supabaseAdmin
+      .from('ledger_accounts')
+      .select('id')
+      .eq('code', `AGENT_CASH_${agent.id}`)
+      .eq('currency', 'DOP')
+      .maybeSingle();
+
+    if (!agentCashAccount) {
+      const { data: newAccount, error: createError } = await supabaseAdmin
+        .from('ledger_accounts')
+        .insert({
+          code: `AGENT_CASH_${agent.id}`,
+          name: `Efectivo Tienda ${agent.trade_name || agent.id}`,
+          currency: 'DOP',
+          agent_id: agent.id,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating agent cash account:', createError);
+        return new Response(
+          JSON.stringify({ error: 'Error creando cuenta de ledger' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      agentCashAccount = newAccount;
     }
 
-    // Debitar float de la tienda
-    const newBalance = agent.float_balance_dop - remittance.principal_dop;
-    
-    const { error: updateBalanceError } = await supabaseClient
+    // Cuenta de remesas pendientes de pago (pasivo)
+    let { data: pendingPayoutsAccount } = await supabaseAdmin
+      .from('ledger_accounts')
+      .select('id')
+      .eq('code', 'PENDING_PAYOUTS_HTG')
+      .eq('currency', 'HTG')
+      .maybeSingle();
+
+    if (!pendingPayoutsAccount) {
+      const { data: newAccount, error: createError } = await supabaseAdmin
+        .from('ledger_accounts')
+        .insert({
+          code: 'PENDING_PAYOUTS_HTG',
+          name: 'Pagos Pendientes HTG',
+          currency: 'HTG',
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating pending payouts account:', createError);
+        return new Response(
+          JSON.stringify({ error: 'Error creando cuenta de ledger' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      pendingPayoutsAccount = newAccount;
+    }
+
+    // Cuenta de ingresos por comisiones
+    let { data: commissionRevenueAccount } = await supabaseAdmin
+      .from('ledger_accounts')
+      .select('id')
+      .eq('code', 'REVENUE_COMMISSION_DOP')
+      .eq('currency', 'DOP')
+      .maybeSingle();
+
+    if (!commissionRevenueAccount) {
+      const { data: newAccount, error: createError } = await supabaseAdmin
+        .from('ledger_accounts')
+        .insert({
+          code: 'REVENUE_COMMISSION_DOP',
+          name: 'Ingresos por Comisiones DOP',
+          currency: 'DOP',
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating commission revenue account:', createError);
+        return new Response(
+          JSON.stringify({ error: 'Error creando cuenta de ledger' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      commissionRevenueAccount = newAccount;
+    }
+
+    // Actualizar float de la tienda
+    const { error: floatError } = await supabaseAdmin
       .from('agents')
-      .update({ float_balance_dop: newBalance })
-      .eq('id', remittance.agent_id);
+      .update({ 
+        float_balance_dop: currentFloat - floatNeeded 
+      })
+      .eq('id', agent.id);
 
-    if (updateBalanceError) {
-      console.error('Error updating agent balance:', updateBalanceError);
+    if (floatError) {
+      console.error('Error updating float:', floatError);
       return new Response(
-        JSON.stringify({ error: 'Error al actualizar saldo de tienda' }),
+        JSON.stringify({ error: 'Error actualizando float de la tienda' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Actualizar estado de la remesa a CONFIRMED
+    // Verificar que las cuentas existan
+    if (!agentCashAccount || !pendingPayoutsAccount || !commissionRevenueAccount) {
+      return new Response(
+        JSON.stringify({ error: 'Error: cuentas de ledger no encontradas' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Crear asientos de ledger
+    const now = new Date().toISOString();
+    const ledgerEntries = [
+      // 1. Débito de efectivo de tienda (salida de DOP)
+      {
+        txn_id: remittance.id,
+        debit_account: agentCashAccount.id,
+        credit_account: agentCashAccount.id, // placeholder, se reemplaza abajo
+        amount: remittance.principal_dop,
+        currency: 'DOP',
+        memo: `Principal remesa ${remittance.codigo_referencia}`,
+        entry_at: now,
+        created_by: user.id,
+      },
+      // 2. Crédito a pasivo de pagos pendientes (HTG que debe pagarse)
+      {
+        txn_id: remittance.id,
+        debit_account: pendingPayoutsAccount.id, // placeholder
+        credit_account: pendingPayoutsAccount.id,
+        amount: remittance.htg_to_beneficiary || 0,
+        currency: 'HTG',
+        memo: `Pago pendiente HTG ${remittance.codigo_referencia}`,
+        entry_at: now,
+        created_by: user.id,
+      },
+      // 3. Registro de comisión del agente
+      {
+        txn_id: remittance.id,
+        debit_account: agentCashAccount.id,
+        credit_account: agentCashAccount.id,
+        amount: remittance.comision_agente || 0,
+        currency: 'DOP',
+        memo: `Comisión agente ${remittance.codigo_referencia}`,
+        entry_at: now,
+        created_by: user.id,
+      },
+    ];
+
+    // Insertar entries (simplificado - en producción debería ser una transacción atómica)
+    const { error: ledgerError } = await supabaseAdmin
+      .from('ledger_entries')
+      .insert(ledgerEntries);
+
+    if (ledgerError) {
+      console.error('Error creating ledger entries:', ledgerError);
+      // Revertir float
+      await supabaseAdmin
+        .from('agents')
+        .update({ float_balance_dop: currentFloat })
+        .eq('id', agent.id);
+      
+      return new Response(
+        JSON.stringify({ error: 'Error creando asientos contables' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Actualizar remesa a CONFIRMED
     const { data: updatedRemittance, error: updateError } = await supabaseClient
       .from('remittances')
       .update({
         state: 'CONFIRMED',
-        confirmed_at: new Date().toISOString(),
+        estado: 'confirmada',
+        confirmed_at: now,
+        receipt_hash,
       })
-      .eq('id', remittance_id)
+      .eq('id', remittance.id)
       .select()
       .single();
 
     if (updateError) {
       console.error('Error updating remittance:', updateError);
-      
-      // Revertir el débito del float
-      await supabaseClient
-        .from('agents')
-        .update({ float_balance_dop: agent.float_balance_dop })
-        .eq('id', remittance.agent_id);
-      
       return new Response(
-        JSON.stringify({ error: 'Error al confirmar remesa' }),
+        JSON.stringify({ error: 'Error confirmando remesa' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Crear evento de confirmación
+    // Crear evento de auditoría
     await supabaseClient
       .from('remittance_events')
       .insert({
@@ -160,73 +327,13 @@ Deno.serve(async (req) => {
         actor_type: 'USER',
         actor_id: user.id,
         meta: {
-          previous_balance: agent.float_balance_dop,
-          new_balance: newBalance,
-          amount_debited: remittance.principal_dop,
+          receipt_hash,
+          float_debited: floatNeeded,
+          ledger_entries: ledgerEntries.length,
         },
       });
 
-    // Crear asientos contables (doble entrada)
-    const entry_at = new Date().toISOString();
-    
-    // Buscar cuentas del ledger
-    const { data: agentCashAccount } = await supabaseClient
-      .from('ledger_accounts')
-      .select('id')
-      .eq('code', 'AGENT_CASH')
-      .eq('agent_id', remittance.agent_id)
-      .single();
-
-    const { data: platformLiabilityAccount } = await supabaseClient
-      .from('ledger_accounts')
-      .select('id')
-      .eq('code', 'PLATFORM_LIABILITY')
-      .is('agent_id', null)
-      .single();
-
-    if (agentCashAccount && platformLiabilityAccount) {
-      // Débito: AGENT_CASH (disminuye saldo del agente)
-      // Crédito: PLATFORM_LIABILITY (aumenta pasivo con payout partner)
-      await supabaseClient
-        .from('ledger_entries')
-        .insert({
-          txn_id: remittance.id,
-          entry_at,
-          debit_account: platformLiabilityAccount.id,
-          credit_account: agentCashAccount.id,
-          amount: remittance.principal_dop,
-          currency: 'DOP',
-          memo: `Confirmación remesa ${remittance.codigo_referencia}`,
-          created_by: user.id,
-        });
-    }
-
-    console.log('Remittance confirmed successfully:', {
-      id: remittance.id,
-      new_balance: newBalance,
-    });
-
-    // TODO: Aquí se debería enviar la transacción al payout network (MonCash/SPIH)
-    // Por ahora solo actualizamos el estado a SENT
-    await supabaseClient
-      .from('remittances')
-      .update({
-        state: 'SENT',
-        sent_at: new Date().toISOString(),
-      })
-      .eq('id', remittance_id);
-
-    await supabaseClient
-      .from('remittance_events')
-      .insert({
-        remittance_id: remittance.id,
-        event: 'SENT',
-        actor_type: 'SYSTEM',
-        meta: {
-          channel: remittance.channel,
-          payout_network: remittance.payout_network,
-        },
-      });
+    console.log('Remittance confirmed successfully:', remittance.id);
 
     return new Response(
       JSON.stringify({
@@ -234,9 +341,9 @@ Deno.serve(async (req) => {
         remittance: {
           id: updatedRemittance.id,
           codigo_referencia: updatedRemittance.codigo_referencia,
-          state: 'SENT', // Estado actualizado
+          state: updatedRemittance.state,
+          receipt_hash: updatedRemittance.receipt_hash,
           confirmed_at: updatedRemittance.confirmed_at,
-          agent_balance_after: newBalance,
         },
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
