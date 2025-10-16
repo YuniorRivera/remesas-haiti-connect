@@ -38,7 +38,7 @@ const Stores = () => {
   const fetchStores = async () => {
     try {
       const { data, error } = await supabase
-        .from("tiendas")
+        .from("agents")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -83,21 +83,21 @@ const Stores = () => {
             <Card key={store.id} className="transition-shadow hover:shadow-md">
               <CardHeader>
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{store.nombre}</CardTitle>
-                  <Badge variant={store.activa ? "default" : "secondary"}>
-                    {store.activa ? t('active') : t('inactive')}
+                  <CardTitle className="text-lg">{store.trade_name || store.legal_name}</CardTitle>
+                  <Badge variant={store.is_active ? "default" : "secondary"}>
+                    {store.is_active ? t('active') : t('inactive')}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                  <span>{store.direccion}</span>
+                  <span>{store.address}</span>
                 </div>
-                {store.telefono && (
+                {store.rnc && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Phone className="h-4 w-4" />
-                    <span>{store.telefono}</span>
+                    <span>RNC: {store.rnc}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 rounded-lg bg-secondary/20 p-3">
@@ -105,7 +105,7 @@ const Stores = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">{t('availableFloat')}</p>
                     <p className="text-lg font-bold text-secondary">
-                      ${parseFloat(store.float_disponible).toFixed(2)}
+                      ${parseFloat(store.float_balance_dop || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>

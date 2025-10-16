@@ -20,7 +20,7 @@ interface Transaction {
   codigo_referencia: string;
   emisor_nombre: string;
   beneficiario_nombre: string;
-  monto_enviado_dop: number;
+  principal_dop: number;
   monto_recibido_htg: number;
   estado: 'pendiente' | 'completada' | 'cancelada' | 'en_proceso';
   created_at: string;
@@ -82,7 +82,7 @@ export function TransactionsTable({ transactions, showPlatformMargin = false }: 
       format(new Date(tx.created_at), 'dd/MM/yyyy HH:mm'),
       tx.emisor_nombre,
       tx.beneficiario_nombre,
-      tx.monto_enviado_dop.toFixed(2),
+      tx.principal_dop.toFixed(2),
       tx.monto_recibido_htg.toFixed(2),
       (tx.comision_agente || 0).toFixed(2),
       ...(showPlatformMargin ? [(tx.margen_plataforma || 0).toFixed(2)] : []),
@@ -153,7 +153,7 @@ export function TransactionsTable({ transactions, showPlatformMargin = false }: 
                   <TableCell>{tx.emisor_nombre}</TableCell>
                   <TableCell>{tx.beneficiario_nombre}</TableCell>
                   <TableCell className="text-right font-medium">
-                    {tx.monto_enviado_dop.toFixed(2)}
+                    {tx.principal_dop.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     {tx.monto_recibido_htg.toFixed(2)}

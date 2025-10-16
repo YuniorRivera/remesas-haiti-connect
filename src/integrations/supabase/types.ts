@@ -588,7 +588,6 @@ export type Database = {
           id: string
           margen_plataforma: number
           memo: string | null
-          monto_enviado_dop: number
           monto_recibido_htg: number
           origin_cashier_user: string | null
           origin_device_fingerprint: string | null
@@ -609,6 +608,7 @@ export type Database = {
           payout_receipt_num: string | null
           platform_commission_dop: number | null
           platform_gross_margin_dop: number | null
+          principal_dop: number
           quoted_at: string | null
           receipt_hash: string | null
           refunded_at: string | null
@@ -650,7 +650,6 @@ export type Database = {
           id?: string
           margen_plataforma?: number
           memo?: string | null
-          monto_enviado_dop: number
           monto_recibido_htg: number
           origin_cashier_user?: string | null
           origin_device_fingerprint?: string | null
@@ -671,6 +670,7 @@ export type Database = {
           payout_receipt_num?: string | null
           platform_commission_dop?: number | null
           platform_gross_margin_dop?: number | null
+          principal_dop: number
           quoted_at?: string | null
           receipt_hash?: string | null
           refunded_at?: string | null
@@ -712,7 +712,6 @@ export type Database = {
           id?: string
           margen_plataforma?: number
           memo?: string | null
-          monto_enviado_dop?: number
           monto_recibido_htg?: number
           origin_cashier_user?: string | null
           origin_device_fingerprint?: string | null
@@ -733,6 +732,7 @@ export type Database = {
           payout_receipt_num?: string | null
           platform_commission_dop?: number | null
           platform_gross_margin_dop?: number | null
+          principal_dop?: number
           quoted_at?: string | null
           receipt_hash?: string | null
           refunded_at?: string | null

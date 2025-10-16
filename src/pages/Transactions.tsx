@@ -37,7 +37,7 @@ const Transactions = () => {
   const fetchTransactions = async () => {
     try {
       const { data, error } = await supabase
-        .from("transacciones")
+        .from("remittances")
         .select("*")
         .order("created_at", { ascending: false });
 
