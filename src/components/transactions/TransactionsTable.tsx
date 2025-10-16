@@ -24,14 +24,16 @@ interface Transaction {
   monto_recibido_htg: number;
   estado: 'pendiente' | 'completada' | 'cancelada' | 'en_proceso';
   created_at: string;
-  comision: number;
+  comision_agente?: number;
+  margen_plataforma?: number;
 }
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  showPlatformMargin?: boolean;
 }
 
-export function TransactionsTable({ transactions }: TransactionsTableProps) {
+export function TransactionsTable({ transactions, showPlatformMargin = false }: TransactionsTableProps) {
   const [search, setSearch] = useState("");
   const { language } = useLanguage();
   const { t } = useTranslation(language);
@@ -71,6 +73,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
       `${t('amount')} (DOP)`,
       `${t('amount')} (HTG)`,
       t('commission'),
+      ...(showPlatformMargin ? ['Margen Plataforma'] : []),
       t('status')
     ];
     
@@ -81,7 +84,8 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
       tx.beneficiario_nombre,
       tx.monto_enviado_dop.toFixed(2),
       tx.monto_recibido_htg.toFixed(2),
-      tx.comision.toFixed(2),
+      (tx.comision_agente || 0).toFixed(2),
+      ...(showPlatformMargin ? [(tx.margen_plataforma || 0).toFixed(2)] : []),
       getStatusLabel(tx.estado)
     ]);
 
@@ -125,13 +129,17 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
               <TableHead>{t('recipient')}</TableHead>
               <TableHead className="text-right">{t('amount')} (DOP)</TableHead>
               <TableHead className="text-right">{t('amount')} (HTG)</TableHead>
+              <TableHead className="text-right">Comisión</TableHead>
+              {showPlatformMargin && (
+                <TableHead className="text-right">Margen Plataforma</TableHead>
+              )}
               <TableHead>{t('status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredTransactions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={showPlatformMargin ? 9 : 8} className="text-center text-muted-foreground">
                   {t('noData')}
                 </TableCell>
               </TableRow>
@@ -150,6 +158,14 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
                   <TableCell className="text-right font-medium">
                     {tx.monto_recibido_htg.toFixed(2)}
                   </TableCell>
+                  <TableCell className="text-right text-sm">
+                    {(tx.comision_agente || 0).toFixed(2)}
+                  </TableCell>
+                  {showPlatformMargin && (
+                    <TableCell className="text-right text-sm font-medium text-primary">
+                      {(tx.margen_plataforma || 0).toFixed(2)}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Badge className={getStatusColor(tx.estado)}>
                       {getStatusLabel(tx.estado)}

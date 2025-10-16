@@ -23,6 +23,9 @@ export const translations = {
     admin: 'Administrador',
     agent: 'Agente',
     sender: 'Emisor',
+    compliance: 'Oficial de Cumplimiento',
+    agentOwner: 'Propietario de Tienda',
+    agentClerk: 'Empleado de Tienda',
     
     // Transactions
     reference: 'Referencia',
@@ -85,6 +88,9 @@ export const translations = {
     admin: 'Administratè',
     agent: 'Ajan',
     sender: 'Moun k ap Voye',
+    compliance: 'Ofisyè Konfòmite',
+    agentOwner: 'Pwopriyetè Magazen',
+    agentClerk: 'Anplwaye Magazen',
     
     // Transactions
     reference: 'Referans',
@@ -147,6 +153,9 @@ export const translations = {
     admin: 'Administrateur',
     agent: 'Agent',
     sender: 'Émetteur',
+    compliance: 'Agent de Conformité',
+    agentOwner: 'Propriétaire de Magasin',
+    agentClerk: 'Employé de Magasin',
     
     // Transactions
     reference: 'Référence',

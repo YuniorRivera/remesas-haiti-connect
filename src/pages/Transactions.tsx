@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { TransactionsTable } from "@/components/transactions/TransactionsTable";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -12,10 +13,14 @@ import { toast } from "sonner";
 const Transactions = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { isAdmin, isComplianceOfficer } = useUserRole(user?.id);
   const { language } = useLanguage();
   const { t } = useTranslation(language);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Admin and compliance can see platform margins
+  const showPlatformMargin = isAdmin || isComplianceOfficer;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -66,7 +71,7 @@ const Transactions = () => {
       </header>
 
       <main className="container mx-auto p-6">
-        <TransactionsTable transactions={transactions} />
+        <TransactionsTable transactions={transactions} showPlatformMargin={showPlatformMargin} />
       </main>
     </div>
   );
