@@ -31,6 +31,10 @@ import {
   DollarSign,
   LogOut,
   Home,
+  AlertTriangle,
+  Scale,
+  ScrollText,
+  BookOpen,
 } from "lucide-react";
 
 interface AppLayoutProps {
@@ -65,6 +69,10 @@ export function AppLayout({ children }: AppLayoutProps) {
     { title: "Compliance/KYC", url: "/admin-compliance", icon: ShieldCheck },
     { title: "Márgenes", url: "/admin-margins", icon: BarChart3 },
     { title: "Tarifas", url: "/admin-fees", icon: DollarSign },
+    { title: "Límites", url: "/admin-limits", icon: Scale },
+    { title: "Risk Flags", url: "/admin-risk-flags", icon: AlertTriangle },
+    { title: "Audit Log", url: "/admin-audit-log", icon: ScrollText },
+    { title: "Ledger", url: "/admin-ledger", icon: BookOpen },
   ];
 
   // Menu items for Emisor (Sender)
