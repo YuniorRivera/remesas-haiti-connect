@@ -412,6 +412,51 @@ export type Database = {
           },
         ]
       }
+      limits: {
+        Row: {
+          amount_dop: number | null
+          count_limit: number | null
+          created_at: string
+          created_by: string | null
+          effective_from: string
+          effective_until: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          is_active: boolean | null
+          limit_type: string
+          updated_at: string
+        }
+        Insert: {
+          amount_dop?: number | null
+          count_limit?: number | null
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_until?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          is_active?: boolean | null
+          limit_type: string
+          updated_at?: string
+        }
+        Update: {
+          amount_dop?: number | null
+          count_limit?: number | null
+          created_at?: string
+          created_by?: string | null
+          effective_from?: string
+          effective_until?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          is_active?: boolean | null
+          limit_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           agent_id: string | null
@@ -766,6 +811,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      risk_flags: {
+        Row: {
+          auto_generated: boolean | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          entity_id: string
+          entity_type: string
+          flag_type: string
+          id: string
+          metadata: Json | null
+          resolution_notes: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+        }
+        Insert: {
+          auto_generated?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          entity_id: string
+          entity_type: string
+          flag_type: string
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+        }
+        Update: {
+          auto_generated?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          entity_id?: string
+          entity_type?: string
+          flag_type?: string
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
