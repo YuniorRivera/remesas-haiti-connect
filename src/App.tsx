@@ -8,11 +8,13 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AgentDashboard from "./pages/AgentDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import CreateRemittance from "./pages/CreateRemittance";
 import Transactions from "./pages/Transactions";
 import RemittanceDetail from "./pages/RemittanceDetail";
 import Stores from "./pages/Stores";
 import NotFound from "./pages/NotFound";
+import { CookieBanner } from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -22,12 +24,14 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <CookieBanner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/remittances/create" element={<CreateRemittance />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/transactions/:id" element={<RemittanceDetail />} />

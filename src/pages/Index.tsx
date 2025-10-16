@@ -6,7 +6,7 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">Hyflosuppy Tecnology RD-Haití</h1>
+          <h1 className="text-2xl font-bold text-primary">Remesas RD-Haití</h1>
           <Button onClick={() => navigate("/auth")} variant="outline">
             Iniciar Sesión
           </Button>

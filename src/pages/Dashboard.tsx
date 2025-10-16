@@ -94,6 +94,26 @@ const Dashboard = () => {
               <Card className="transition-shadow hover:shadow-md">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Panel de Admin
+                  </CardTitle>
+                  <CardDescription>
+                    Márgenes, GMV y analítica de plataforma
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate("/admin-dashboard")}
+                  >
+                    Ver Métricas
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="transition-shadow hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary" />
                     {t('agentManagement')}
                   </CardTitle>
