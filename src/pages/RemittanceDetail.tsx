@@ -105,6 +105,12 @@ const RemittanceDetail = () => {
     }
   };
 
+  const isValidDate = (dateString: string | undefined): boolean => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date.getTime());
+  };
+
   const getStateColor = (state: string) => {
     const stateMap: Record<string, string> = {
       CREATED: 'bg-gray-500 text-white',
@@ -146,7 +152,7 @@ const RemittanceDetail = () => {
     { key: 'SENT', label: 'Enviada', time: remittance.sent_at },
     { key: 'PAID', label: 'Pagada', time: remittance.paid_at },
     { key: 'SETTLED', label: 'Liquidada', time: remittance.settled_at },
-  ].filter(step => step.time);
+  ].filter(step => step.time && isValidDate(step.time));
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -199,7 +205,9 @@ const RemittanceDetail = () => {
                   <div className="flex-1 pb-4">
                     <div className="font-semibold">{step.label}</div>
                     <div className="text-sm text-muted-foreground">
-                      {step.time && format(new Date(step.time), 'dd/MM/yyyy HH:mm:ss')}
+                      {step.time && isValidDate(step.time) 
+                        ? format(new Date(step.time), 'dd/MM/yyyy HH:mm:ss')
+                        : 'Fecha no disponible'}
                     </div>
                   </div>
                 </div>

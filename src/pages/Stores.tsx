@@ -119,12 +119,13 @@ const Stores = () => {
       const payload = {
         legal_name: formData.legal_name.trim(),
         trade_name: formData.trade_name.trim() || null,
-        trade_name_old: formData.trade_name.trim() || "Sin nombre",
-        address_old: "Por configurar",
         code: formData.code.trim() || null,
         daily_limit_dop: parseFloat(formData.daily_limit_dop) || 50000,
         float_balance_dop: parseFloat(formData.float_balance_dop) || 0,
         is_active: true,
+        // Campos legacy requeridos por la base de datos
+        trade_name_old: formData.trade_name.trim() || formData.legal_name.trim(),
+        address_old: "Pendiente",
       };
 
       if (editingAgent) {

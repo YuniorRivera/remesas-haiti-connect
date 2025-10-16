@@ -41,14 +41,39 @@ export default function CreateRemittance() {
   // Datos de la cotización
   const [quote, setQuote] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [feesAvailable, setFeesAvailable] = useState(true);
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const checkFeesAvailability = async () => {
+    const { data, error } = await supabase
+      .from('fees_matrix')
+      .select('id')
+      .eq('corridor', 'RD->HT')
+      .eq('channel', formData.channel)
+      .eq('is_active', true)
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error checking fees:", error);
+      return;
+    }
+    
+    setFeesAvailable(!!data);
+  };
+
   const handleGetQuote = async () => {
     if (!formData.principal_dop || parseFloat(formData.principal_dop) <= 0) {
       toast.error("Ingrese un monto válido");
+      return;
+    }
+
+    // Verificar que hay fees disponibles
+    await checkFeesAvailability();
+    if (!feesAvailable) {
+      toast.error("No hay tarifas configuradas para este canal. Contacte al administrador.");
       return;
     }
 
