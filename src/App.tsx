@@ -7,6 +7,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AgentDashboard from "./pages/AgentDashboard";
+import CreateRemittance from "./pages/CreateRemittance";
 import Transactions from "./pages/Transactions";
 import Stores from "./pages/Stores";
 import NotFound from "./pages/NotFound";
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/agent-dashboard" element={<AgentDashboard />} />
+            <Route path="/remittances/create" element={<CreateRemittance />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/stores" element={<Stores />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

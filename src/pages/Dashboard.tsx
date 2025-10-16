@@ -72,14 +72,19 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="h-5 w-5 text-primary" />
-                  {t('newRemittance')}
+                  Panel de Agente
                 </CardTitle>
                 <CardDescription>
-                  Procesa un nuevo envío de dinero
+                  Gestiona tu tienda y procesa remesas
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">{t('create')}</Button>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/agent-dashboard")}
+                >
+                  Ir al Panel
+                </Button>
               </CardContent>
             </Card>
           )}
