@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, MapPin, Printer, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import QRCode from "qrcode";
 
 interface RemittanceEvent {
   id: string;
@@ -125,8 +127,175 @@ const RemittanceDetail = () => {
     return stateMap[state] || 'bg-muted';
   };
 
-  const handlePrintReceipt = () => {
-    toast.success("Función de impresión próximamente");
+  const handlePrintReceipt = async () => {
+    if (!remittance) return;
+
+    try {
+      // Crear PDF en formato térmico (80mm)
+      const doc = new jsPDF({
+        format: [80, 200],
+        unit: 'mm'
+      });
+
+      // Generar código QR con el código de referencia
+      const qrDataUrl = await QRCode.toDataURL(remittance.codigo_referencia, {
+        width: 120,
+        margin: 1,
+      });
+
+      // Configurar fuente
+      doc.setFont("helvetica");
+      
+      let yPos = 10;
+      
+      // Título
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("RECIBO DE REMESA", 40, yPos, { align: 'center' });
+      yPos += 7;
+
+      // Agregar QR Code
+      doc.addImage(qrDataUrl, 'PNG', 25, yPos, 30, 30);
+      yPos += 32;
+
+      // Código de referencia
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Ref: ${remittance.codigo_referencia}`, 40, yPos, { align: 'center' });
+      yPos += 5;
+      
+      doc.text(`Fecha: ${format(new Date(remittance.created_at), 'dd/MM/yyyy HH:mm')}`, 40, yPos, { align: 'center' });
+      yPos += 8;
+
+      // Línea separadora
+      doc.setLineWidth(0.3);
+      doc.line(10, yPos, 70, yPos);
+      yPos += 5;
+
+      // EMISOR
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("EMISOR", 10, yPos);
+      yPos += 5;
+      
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Nombre: ${remittance.emisor_nombre}`, 10, yPos);
+      yPos += 4;
+      
+      if (remittance.emisor_telefono) {
+        doc.text(`Telefono: ${remittance.emisor_telefono}`, 10, yPos);
+        yPos += 4;
+      }
+      
+      if (remittance.emisor_documento) {
+        doc.text(`Documento: ${remittance.emisor_documento}`, 10, yPos);
+        yPos += 4;
+      }
+      yPos += 3;
+
+      // BENEFICIARIO
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("BENEFICIARIO", 10, yPos);
+      yPos += 5;
+      
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Nombre: ${remittance.beneficiario_nombre}`, 10, yPos);
+      yPos += 4;
+      
+      if (remittance.beneficiario_telefono) {
+        doc.text(`Telefono: ${remittance.beneficiario_telefono}`, 10, yPos);
+        yPos += 4;
+      }
+      yPos += 3;
+
+      // Línea separadora
+      doc.line(10, yPos, 70, yPos);
+      yPos += 5;
+
+      // TRANSACCIÓN
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("TRANSACCION", 10, yPos);
+      yPos += 5;
+      
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Monto enviado:`, 10, yPos);
+      doc.text(`${remittance.principal_dop.toFixed(2)} DOP`, 70, yPos, { align: 'right' });
+      yPos += 4;
+      
+      if (remittance.total_client_fees_dop) {
+        doc.text(`Comision:`, 10, yPos);
+        doc.text(`${remittance.total_client_fees_dop.toFixed(2)} DOP`, 70, yPos, { align: 'right' });
+        yPos += 4;
+      }
+      
+      if (remittance.gov_fee_dop) {
+        doc.text(`Fee BRH:`, 10, yPos);
+        doc.text(`${remittance.gov_fee_dop.toFixed(2)} DOP`, 70, yPos, { align: 'right' });
+        yPos += 4;
+      }
+      
+      // Línea subtotal
+      doc.setLineWidth(0.1);
+      doc.line(10, yPos, 70, yPos);
+      yPos += 4;
+      
+      if (remittance.total_client_pays_dop) {
+        doc.setFont("helvetica", "bold");
+        doc.text(`Total pagado:`, 10, yPos);
+        doc.text(`${remittance.total_client_pays_dop.toFixed(2)} DOP`, 70, yPos, { align: 'right' });
+        yPos += 6;
+      }
+      
+      // Línea separadora
+      doc.setLineWidth(0.3);
+      doc.line(10, yPos, 70, yPos);
+      yPos += 5;
+      
+      doc.setFont("helvetica", "normal");
+      if (remittance.htg_to_beneficiary) {
+        doc.text(`Beneficiario recibe:`, 10, yPos);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${remittance.htg_to_beneficiary.toFixed(2)} HTG`, 70, yPos, { align: 'right' });
+        yPos += 4;
+      }
+      
+      doc.setFont("helvetica", "normal");
+      if (remittance.fx_client_sell) {
+        doc.text(`Tasa cambio: 1 DOP = ${remittance.fx_client_sell.toFixed(4)} HTG`, 10, yPos);
+        yPos += 6;
+      }
+      
+      // Línea separadora
+      doc.line(10, yPos, 70, yPos);
+      yPos += 5;
+      
+      // Información adicional
+      if (remittance.channel) {
+        doc.text(`Canal: ${remittance.channel}`, 10, yPos);
+        yPos += 4;
+      }
+      
+      doc.text(`Estado: ${remittance.state}`, 10, yPos);
+      yPos += 6;
+
+      // Pie de página
+      doc.setFontSize(7);
+      doc.text("Gracias por su preferencia", 40, yPos, { align: 'center' });
+      yPos += 3;
+      doc.text("================================", 40, yPos, { align: 'center' });
+
+      // Guardar PDF
+      doc.save(`recibo_${remittance.codigo_referencia}.pdf`);
+      toast.success("Recibo generado exitosamente");
+    } catch (error: any) {
+      console.error("Error generando PDF:", error);
+      toast.error("Error al generar el recibo");
+    }
   };
 
   if (authLoading || loading) {
