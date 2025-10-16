@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import {
   Table,
@@ -34,6 +35,7 @@ interface TransactionsTableProps {
 }
 
 export function TransactionsTable({ transactions, showPlatformMargin = false }: TransactionsTableProps) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const { language } = useLanguage();
   const { t } = useTranslation(language);
@@ -145,7 +147,11 @@ export function TransactionsTable({ transactions, showPlatformMargin = false }: 
               </TableRow>
             ) : (
               filteredTransactions.map((tx) => (
-                <TableRow key={tx.id}>
+                <TableRow 
+                  key={tx.id} 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => navigate(`/transactions/${tx.id}`)}
+                >
                   <TableCell className="font-medium">{tx.codigo_referencia}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {format(new Date(tx.created_at), 'dd/MM/yyyy HH:mm')}

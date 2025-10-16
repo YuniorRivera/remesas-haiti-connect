@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AgentDashboard from "./pages/AgentDashboard";
 import CreateRemittance from "./pages/CreateRemittance";
 import Transactions from "./pages/Transactions";
+import RemittanceDetail from "./pages/RemittanceDetail";
 import Stores from "./pages/Stores";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
             <Route path="/remittances/create" element={<CreateRemittance />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/transactions/:id" element={<RemittanceDetail />} />
             <Route path="/stores" element={<Stores />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
