@@ -152,7 +152,10 @@ export default function CreateRemittance() {
   };
 
   const handleConfirmRemittance = async () => {
-    if (!quote?.remittance?.id) return;
+    if (!quote?.remittance?.id) {
+      toast.error("No hay cotización para confirmar");
+      return;
+    }
     
     setLoading(true);
     try {

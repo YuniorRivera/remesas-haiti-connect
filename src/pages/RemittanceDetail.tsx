@@ -85,7 +85,7 @@ const RemittanceDetail = () => {
         .from("remittances")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (remittanceError) throw remittanceError;
       setRemittance(remittanceData);

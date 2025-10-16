@@ -22,6 +22,7 @@ const AgentDashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const { isAgent, loading: roleLoading } = useUserRole(user?.id);
   const [agent, setAgent] = useState<any>(null);
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     today: 0,
     week: 0,
@@ -41,17 +42,24 @@ const AgentDashboard = () => {
   useEffect(() => {
     if (user && isAgent) {
       fetchAgentData();
-      fetchEarnings();
     }
   }, [user, isAgent]);
 
+  useEffect(() => {
+    if (agentId) {
+      fetchEarnings();
+    }
+  }, [agentId]);
+
   const fetchAgentData = async () => {
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("agent_id")
         .eq("id", user?.id)
-        .single();
+        .maybeSingle();
+
+      if (profileError) throw profileError;
 
       if (!profile?.agent_id) {
         toast.error("No tienes una tienda asignada");
@@ -62,10 +70,11 @@ const AgentDashboard = () => {
         .from("agents")
         .select("*")
         .eq("id", profile.agent_id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setAgent(agentData);
+      setAgentId(profile.agent_id);
     } catch (error: any) {
       toast.error("Error al cargar datos del agente");
       console.error(error);
@@ -91,21 +100,21 @@ const AgentDashboard = () => {
       const { data: todayData } = await supabase
         .from("remittances")
         .select("comision_agente")
-        .eq("agente_id", user?.id)
+        .eq("agent_id", agentId)
         .gte("created_at", today.toISOString());
 
       // Ganancias de la semana
       const { data: weekData } = await supabase
         .from("remittances")
         .select("comision_agente")
-        .eq("agente_id", user?.id)
+        .eq("agent_id", agentId)
         .gte("created_at", weekAgo.toISOString());
 
       // Ganancias del mes
       const { data: monthData } = await supabase
         .from("remittances")
         .select("comision_agente")
-        .eq("agente_id", user?.id)
+        .eq("agent_id", agentId)
         .gte("created_at", monthAgo.toISOString());
 
       setStats({
