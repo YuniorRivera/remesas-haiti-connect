@@ -17,26 +17,47 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          direccion: string | null
           documento_identidad: string | null
           full_name: string
           id: string
+          kyc_level: Database["public"]["Enums"]["kyc_level"] | null
+          kyc_status: Database["public"]["Enums"]["verification_status"] | null
+          kyc_verified_at: string | null
+          kyc_verified_by: string | null
           phone: string | null
+          selfie_url: string | null
+          tipo_documento: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          direccion?: string | null
           documento_identidad?: string | null
           full_name: string
           id: string
+          kyc_level?: Database["public"]["Enums"]["kyc_level"] | null
+          kyc_status?: Database["public"]["Enums"]["verification_status"] | null
+          kyc_verified_at?: string | null
+          kyc_verified_by?: string | null
           phone?: string | null
+          selfie_url?: string | null
+          tipo_documento?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          direccion?: string | null
           documento_identidad?: string | null
           full_name?: string
           id?: string
+          kyc_level?: Database["public"]["Enums"]["kyc_level"] | null
+          kyc_status?: Database["public"]["Enums"]["verification_status"] | null
+          kyc_verified_at?: string | null
+          kyc_verified_by?: string | null
           phone?: string | null
+          selfie_url?: string | null
+          tipo_documento?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -45,34 +66,67 @@ export type Database = {
         Row: {
           activa: boolean
           agente_id: string | null
+          contrato_url: string | null
           created_at: string
+          cuenta_bancaria_encriptada: string | null
           direccion: string
+          dueno_id: string | null
           float_disponible: number
           id: string
+          kyb_status: Database["public"]["Enums"]["verification_status"] | null
+          kyb_verified_at: string | null
+          kyb_verified_by: string | null
           nombre: string
+          nombre_comercial: string | null
+          razon_social: string | null
+          rnc: string | null
           telefono: string | null
+          tipo_negocio: string | null
+          ubicacion_gps: string | null
           updated_at: string
         }
         Insert: {
           activa?: boolean
           agente_id?: string | null
+          contrato_url?: string | null
           created_at?: string
+          cuenta_bancaria_encriptada?: string | null
           direccion: string
+          dueno_id?: string | null
           float_disponible?: number
           id?: string
+          kyb_status?: Database["public"]["Enums"]["verification_status"] | null
+          kyb_verified_at?: string | null
+          kyb_verified_by?: string | null
           nombre: string
+          nombre_comercial?: string | null
+          razon_social?: string | null
+          rnc?: string | null
           telefono?: string | null
+          tipo_negocio?: string | null
+          ubicacion_gps?: string | null
           updated_at?: string
         }
         Update: {
           activa?: boolean
           agente_id?: string | null
+          contrato_url?: string | null
           created_at?: string
+          cuenta_bancaria_encriptada?: string | null
           direccion?: string
+          dueno_id?: string | null
           float_disponible?: number
           id?: string
+          kyb_status?: Database["public"]["Enums"]["verification_status"] | null
+          kyb_verified_at?: string | null
+          kyb_verified_by?: string | null
           nombre?: string
+          nombre_comercial?: string | null
+          razon_social?: string | null
+          rnc?: string | null
           telefono?: string | null
+          tipo_negocio?: string | null
+          ubicacion_gps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -84,7 +138,7 @@ export type Database = {
           beneficiario_nombre: string
           beneficiario_telefono: string | null
           codigo_referencia: string
-          comision: number
+          comision_agente: number
           completada_at: string | null
           created_at: string
           emisor_documento: string | null
@@ -93,6 +147,7 @@ export type Database = {
           emisor_telefono: string | null
           estado: Database["public"]["Enums"]["transaction_status"]
           id: string
+          margen_plataforma: number
           monto_enviado_dop: number
           monto_recibido_htg: number
           notas: string | null
@@ -105,7 +160,7 @@ export type Database = {
           beneficiario_nombre: string
           beneficiario_telefono?: string | null
           codigo_referencia: string
-          comision?: number
+          comision_agente?: number
           completada_at?: string | null
           created_at?: string
           emisor_documento?: string | null
@@ -114,6 +169,7 @@ export type Database = {
           emisor_telefono?: string | null
           estado?: Database["public"]["Enums"]["transaction_status"]
           id?: string
+          margen_plataforma?: number
           monto_enviado_dop: number
           monto_recibido_htg: number
           notas?: string | null
@@ -126,7 +182,7 @@ export type Database = {
           beneficiario_nombre?: string
           beneficiario_telefono?: string | null
           codigo_referencia?: string
-          comision?: number
+          comision_agente?: number
           completada_at?: string | null
           created_at?: string
           emisor_documento?: string | null
@@ -135,6 +191,7 @@ export type Database = {
           emisor_telefono?: string | null
           estado?: Database["public"]["Enums"]["transaction_status"]
           id?: string
+          margen_plataforma?: number
           monto_enviado_dop?: number
           monto_recibido_htg?: number
           notas?: string | null
@@ -147,6 +204,13 @@ export type Database = {
             columns: ["tienda_id"]
             isOneToOne: false
             referencedRelation: "tiendas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transacciones_tienda_id_fkey"
+            columns: ["tienda_id"]
+            isOneToOne: false
+            referencedRelation: "tiendas_agent_view"
             referencedColumns: ["id"]
           },
         ]
@@ -174,9 +238,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tiendas_agent_view: {
+        Row: {
+          activa: boolean | null
+          agente_id: string | null
+          created_at: string | null
+          direccion: string | null
+          float_disponible: number | null
+          id: string | null
+          nombre: string | null
+          telefono: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activa?: boolean | null
+          agente_id?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          float_disponible?: number | null
+          id?: string | null
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activa?: boolean | null
+          agente_id?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          float_disponible?: number | null
+          id?: string | null
+          nombre?: string | null
+          telefono?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_transaction_for_agent: {
+        Args: { transaction_id: string }
+        Returns: {
+          beneficiario_nombre: string
+          codigo_referencia: string
+          comision_agente: number
+          completada_at: string
+          created_at: string
+          emisor_nombre: string
+          estado: Database["public"]["Enums"]["transaction_status"]
+          id: string
+          monto_enviado_dop: number
+          monto_recibido_htg: number
+          tasa_cambio: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -186,12 +301,19 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "agente" | "emisor"
+      app_role:
+        | "admin"
+        | "agent_owner"
+        | "agent_clerk"
+        | "compliance_officer"
+        | "sender_user"
+      kyc_level: "L1" | "L2" | "L3"
       transaction_status:
         | "pendiente"
         | "completada"
         | "cancelada"
         | "en_proceso"
+      verification_status: "pending" | "approved" | "rejected" | "review"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -319,13 +441,21 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "agente", "emisor"],
+      app_role: [
+        "admin",
+        "agent_owner",
+        "agent_clerk",
+        "compliance_officer",
+        "sender_user",
+      ],
+      kyc_level: ["L1", "L2", "L3"],
       transaction_status: [
         "pendiente",
         "completada",
         "cancelada",
         "en_proceso",
       ],
+      verification_status: ["pending", "approved", "rejected", "review"],
     },
   },
 } as const
