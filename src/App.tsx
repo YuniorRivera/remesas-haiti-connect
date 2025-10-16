@@ -13,6 +13,13 @@ import CreateRemittance from "./pages/CreateRemittance";
 import Transactions from "./pages/Transactions";
 import RemittanceDetail from "./pages/RemittanceDetail";
 import Stores from "./pages/Stores";
+import AgentEarnings from "./pages/AgentEarnings";
+import AdminOperations from "./pages/AdminOperations";
+import AdminReconciliation from "./pages/AdminReconciliation";
+import AdminCompliance from "./pages/AdminCompliance";
+import AdminMargins from "./pages/AdminMargins";
+import AdminFees from "./pages/AdminFees";
+import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import { CookieBanner } from "./components/CookieBanner";
 
@@ -31,11 +38,18 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
+            <Route path="/agent-earnings" element={<AgentEarnings />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin-operations" element={<AdminOperations />} />
+            <Route path="/admin-reconciliation" element={<AdminReconciliation />} />
+            <Route path="/admin-compliance" element={<AdminCompliance />} />
+            <Route path="/admin-margins" element={<AdminMargins />} />
+            <Route path="/admin-fees" element={<AdminFees />} />
             <Route path="/remittances/create" element={<CreateRemittance />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/transactions/:id" element={<RemittanceDetail />} />
             <Route path="/stores" element={<Stores />} />
+            <Route path="/legal" element={<Legal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

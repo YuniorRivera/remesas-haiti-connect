@@ -65,6 +65,17 @@ export const translations = {
     error: 'Error',
     success: 'Éxito',
     confirmDelete: '¿Está seguro de eliminar?',
+    
+    // Navigation
+    earnings: 'Ganancias',
+    operations: 'Operaciones',
+    reconciliation: 'Conciliación',
+    complianceKYC: 'Compliance/KYC',
+    margins: 'Márgenes',
+    feesConfig: 'Tarifas',
+    legal: 'Legal',
+    privacy: 'Privacidad',
+    termsConditions: 'Términos',
   },
   ht: {
     // Auth
@@ -130,6 +141,17 @@ export const translations = {
     error: 'Erè',
     success: 'Siksè',
     confirmDelete: 'Èske w sèten pou efase?',
+    
+    // Navigation
+    earnings: 'Pwofi',
+    operations: 'Operasyon',
+    reconciliation: 'Rekonsiliasyon',
+    complianceKYC: 'Konfòmite/KYC',
+    margins: 'Maj',
+    feesConfig: 'Tarif',
+    legal: 'Legal',
+    privacy: 'Vi Prive',
+    termsConditions: 'Kondisyon',
   },
   fr: {
     // Auth
@@ -195,6 +217,17 @@ export const translations = {
     error: 'Erreur',
     success: 'Succès',
     confirmDelete: 'Êtes-vous sûr de vouloir supprimer?',
+    
+    // Navigation
+    earnings: 'Gains',
+    operations: 'Opérations',
+    reconciliation: 'Réconciliation',
+    complianceKYC: 'Conformité/KYC',
+    margins: 'Marges',
+    feesConfig: 'Tarifs',
+    legal: 'Légal',
+    privacy: 'Confidentialité',
+    termsConditions: 'Conditions',
   },
 };
 
