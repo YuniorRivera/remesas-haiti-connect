@@ -20,6 +20,10 @@ import AdminReconciliation from "./pages/AdminReconciliation";
 import AdminCompliance from "./pages/AdminCompliance";
 import AdminMargins from "./pages/AdminMargins";
 import AdminFees from "./pages/AdminFees";
+import AdminLimits from "./pages/AdminLimits";
+import AdminRiskFlags from "./pages/AdminRiskFlags";
+import AdminAuditLog from "./pages/AdminAuditLog";
+import AdminLedger from "./pages/AdminLedger";
 import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import { CookieBanner } from "./components/CookieBanner";
@@ -105,8 +109,28 @@ const App = () => (
                 <AdminFees />
               </ProtectedRoute>
             } />
+            <Route path="/admin-limits" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminLimits />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-audit-log" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminAuditLog />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-ledger" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <AdminLedger />
+              </ProtectedRoute>
+            } />
             
             {/* Admin + Compliance routes */}
+            <Route path="/admin-risk-flags" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin', 'compliance_officer']}>
+                <AdminRiskFlags />
+              </ProtectedRoute>
+            } />
             <Route path="/admin-compliance" element={
               <ProtectedRoute requireAuth allowedRoles={['admin', 'compliance_officer']}>
                 <AdminCompliance />
