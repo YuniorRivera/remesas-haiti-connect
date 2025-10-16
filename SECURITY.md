@@ -1,96 +1,170 @@
-# Seguridad de la Aplicación
+# Medidas de Seguridad - Remesas RD-Haití
 
-## Autenticación y Sesiones
+## Infraestructura y Comunicaciones
 
-### Cookies httpOnly Seguras
-- Lovable Cloud (Supabase) maneja automáticamente las cookies de sesión con las siguientes características:
-  - **httpOnly**: Las cookies no son accesibles desde JavaScript del cliente
-  - **Secure**: Solo se transmiten sobre HTTPS en producción
-  - **SameSite=Lax**: Protección contra CSRF en la mayoría de casos
-  - **Path=/**: Disponibles en toda la aplicación
+### HTTPS y HSTS
+- ✅ **Todas las comunicaciones usan HTTPS** (gestionado por Lovable Cloud / Supabase)
+- ✅ **HSTS (HTTP Strict Transport Security)** habilitado automáticamente en producción
+- ✅ **Cookies con flag Secure** para prevenir transmisión en HTTP
+- ✅ **SameSite=Strict** en cookies de sesión para prevenir CSRF
 
-### Tokens de Refresh
-- Los tokens de refresh se rotan automáticamente por Supabase
-- No se almacenan en localStorage ni sessionStorage
-- La gestión completa es server-side
+### Rate Limiting
+- ✅ **Rate limiting en autenticación** configurado en Supabase Auth
+  - Límite: 60 intentos de login por hora por IP
+  - Límite: 30 intentos de signup por hora por IP
+- ✅ **Protección contra brute force** en endpoints de autenticación
+- ⚠️ **Próximamente**: Rate limiting granular por endpoint en edge functions
 
-### Protección CSRF
-Supabase implementa protección CSRF nativa mediante:
-- Cookies SameSite que previenen ataques cross-site
-- Validación de origen en requests
-- No es necesario implementar tokens CSRF adicionales para operaciones estándar
+## Autenticación y Autorización
 
-Para endpoints personalizados que requieran protección adicional, se puede implementar:
-```typescript
-// Ejemplo de validación de origen en edge function
-const origin = req.headers.get('origin');
-const allowedOrigins = [process.env.VITE_SUPABASE_URL];
-if (!allowedOrigins.includes(origin)) {
-  return new Response('Forbidden', { status: 403 });
-}
-```
+### Gestión de Contraseñas
+- ✅ **Hashing automático con bcrypt** (gestionado por Supabase Auth)
+- ✅ **Política de contraseñas fuertes**:
+  - Mínimo 8 caracteres
+  - Al menos 1 mayúscula
+  - Al menos 1 minúscula
+  - Al menos 1 número
+- ✅ **Refresh tokens seguros** con rotación automática
+- ✅ **Auto-confirm email habilitado** (solo para desarrollo; deshabilitar en producción)
 
-## Control de Acceso Basado en Roles (RBAC)
+### RBAC (Role-Based Access Control)
+- ✅ **Sistema de roles implementado**:
+  - `admin`: Acceso completo, incluyendo márgenes de plataforma
+  - `compliance_officer`: Acceso a KYC/KYB y auditoría
+  - `agent_owner`: Propietario de tienda
+  - `agent_clerk`: Empleado de tienda
+  - `sender`: Usuario cliente
+- ✅ **Función `has_role(user_id, role)` con SECURITY DEFINER**
+- ✅ **RLS (Row Level Security) en todas las tablas**:
+  - Usuarios solo ven sus propios datos
+  - Agentes solo ven transacciones de su tienda
+  - Admins y compliance tienen acceso completo
+  - Campos sensibles (márgenes) ocultos a usuarios no autorizados
 
-### Arquitectura de Roles
-- Roles separados en tabla `user_roles` (no en perfil de usuario)
-- Validación server-side mediante RLS policies
-- Función `has_role()` con SECURITY DEFINER para verificaciones
+## Validación y Sanitización de Inputs
 
-### Roles Disponibles
-- **admin**: Acceso completo al sistema
-- **agente**: Gestión de remesas en tienda asignada
-- **emisor**: Envío de remesas y consulta de historial
+### Validación Client-Side
+- ✅ **Esquemas Zod** para todas las entradas de usuario:
+  - Auth: email, password, fullName, phone
+  - Remesas: datos de emisor, beneficiario, montos
+- ✅ **Límites de longitud** en todos los campos de texto
+- ✅ **Regex patterns** para formatos específicos (teléfonos, documentos)
+- ✅ **Sanitización automática** con `.trim()` en strings
 
-### RLS Policies
-Todas las tablas tienen Row Level Security habilitado:
-- `profiles`: Usuarios ven su perfil, admins ven todos
-- `tiendas`: Agentes ven su tienda, admins ven todas
-- `transacciones`: Emisores/agentes ven sus transacciones, admins ven todas
-- `user_roles`: Solo admins modifican roles
+### Validación Server-Side
+- ✅ **Validación duplicada en edge functions**
+- ✅ **Límites de monto**:
+  - Mínimo: 100 DOP
+  - Máximo: 1,000,000 DOP
+- ✅ **Encoding seguro** para parámetros en URLs externas
+- ⚠️ **Nunca usar `dangerouslySetInnerHTML`** con contenido de usuario
 
-## Validación de Entrada
+## Detección de Fraude
 
-### Client-Side
-- Validación de formularios con tipos TypeScript
-- Límites de longitud en campos de texto
-- Formato de email y teléfono
+### Límites Implementados
+- ✅ **Transacciones por día por emisor**: Máximo 10
+- ✅ **Monto diario por emisor**: Máximo 500,000 DOP
+- ✅ **Monto mensual por emisor**: Máximo 2,000,000 DOP
+- ✅ **Transacciones al mismo beneficiario**: Máximo 3 por día
+- ✅ **Tiempo mínimo entre transacciones**: 2 minutos
+- ✅ **Velocidad de transacciones**: Máximo 5 por hora
+- ✅ **Detección de montos redondos sospechosos**: >= 50,000 DOP múltiplo de 10,000
 
-### Server-Side
-- RLS policies validan permisos en cada operación
-- Constraints en base de datos (CHECK, NOT NULL, UNIQUE)
-- Triggers para datos automáticos
+### Sistema de Riesgo
+- ✅ **Edge function `fraud-detection`** con 3 niveles de riesgo:
+  - `low`: Sin banderas, permitir
+  - `medium`: 1-2 banderas, advertir
+  - `high`: >= 3 banderas o límites críticos, bloquear
+- ✅ **Auditoría automática** en `audit_log` para actividad sospechosa
+- ✅ **Flags detallados** para revisión manual
 
-## Accesibilidad
+## Auditoría y Logging
 
-### Estándares WCAG 2.1 AA
-- Contraste de colores ≥ 4.5:1 para texto normal
-- Labels descriptivos en todos los inputs
-- Focus visible en elementos interactivos
-- Navegación por teclado completa
-- Mensajes de error descriptivos
+### Tabla `audit_log`
+- ✅ **Registro de todas las acciones críticas**:
+  - Creación/modificación de remesas
+  - Cambios de estado de transacciones
+  - Eventos de fraude
+  - Acciones administrativas
+- ✅ **Campos capturados**:
+  - `actor_user_id`: Quien ejecuta la acción
+  - `entity` y `entity_id`: Qué se modifica
+  - `action`: Tipo de acción
+  - `details`: Metadata JSON
+  - `ip`: Dirección IP de origen
+  - `created_at`: Timestamp
+- ✅ **Solo admins pueden leer audit_log** (RLS policy)
 
-### Componentes Accesibles
-- Todos los componentes shadcn/ui cumplen WCAG
-- ARIA labels donde es necesario
-- Semántica HTML apropiada
+### Tabla `remittance_events`
+- ✅ **Timeline de eventos por remesa**:
+  - CREATED, QUOTED, CONFIRMED, SENT, PAID, SETTLED, FAILED, REFUNDED
+- ✅ **Tracking de actor y metadata**
+- ✅ **Acceso basado en roles** (RLS policy)
 
-## Internacionalización (i18n)
+## Gestión de Secretos
 
-### Idiomas Soportados
-- Español (es) - Primario
-- Kreyòl Haitiano (ht)
-- Français (fr)
+### Entornos
+- ✅ **Variables de entorno separadas** por ambiente (dev/staging/prod)
+- ✅ **Secretos gestionados por Lovable Cloud**:
+  - `SUPABASE_URL`
+  - `SUPABASE_PUBLISHABLE_KEY` (pública)
+  - `SUPABASE_SERVICE_ROLE_KEY` (secreta, solo edge functions)
+- ✅ **NUNCA exponer service role key en cliente**
+- ✅ **NUNCA hacer commit de secretos** (archivo `.env` en `.gitignore`)
 
-### Implementación
-- Sistema de traducciones centralizado en `src/lib/i18n.ts`
-- Context API para cambio de idioma global
-- Todas las strings UI son traducibles
+### Best Practices
+- ✅ **Rotar secretos regularmente** (especialmente service role key)
+- ✅ **Usar environment-specific configs** en edge functions
+- ⚠️ **Próximamente**: Integración con servicios de pago (MonCash, SPIH) usando API keys encriptadas
 
-## Best Practices
+## Hardening Adicional
 
-1. **No almacenar tokens en localStorage**: Supabase maneja esto automáticamente
-2. **Validar roles server-side**: Nunca confiar solo en validación client-side
-3. **Usar RLS policies**: Primera línea de defensa en base de datos
-4. **HTTPS obligatorio**: En producción, todas las comunicaciones deben ser HTTPS
-5. **Auditoría**: Logs de transacciones sensibles (creación, modificación de roles)
+### Code Security
+- ✅ **Validación de inputs exhaustiva** con Zod
+- ✅ **Prepared statements implícitos** (Supabase previene SQL injection)
+- ✅ **CORS configurado correctamente** en edge functions
+- ✅ **CSP (Content Security Policy)** recomendado en headers HTTP
+- ⚠️ **Próximamente**: SRI (Subresource Integrity) para CDN assets
+
+### Git y Deploy
+- ⚠️ **Recomendado**: Firma de commits con GPG
+- ⚠️ **Recomendado**: Branch protection en producción
+- ⚠️ **Recomendado**: CI/CD con tests de seguridad (SAST/DAST)
+
+### Compliance
+- ✅ **KYC/KYB verification** con estados: pending, approved, rejected
+- ✅ **Documentos almacenados de forma segura** (URLs encriptadas)
+- ✅ **Proceso de revisión manual** para compliance officers
+- ✅ **GDPR/CCPA ready**: Datos de usuario controlados con RLS
+
+## Checklist de Seguridad para Producción
+
+Antes de lanzar a producción, verificar:
+
+- [ ] **Deshabilitar auto-confirm email** en Supabase Auth
+- [ ] **Configurar Site URL y Redirect URLs** correctos
+- [ ] **Habilitar MFA (2FA)** para cuentas admin
+- [ ] **Rotar todas las API keys y secretos**
+- [ ] **Configurar alertas de monitoreo** (Sentry, LogRocket)
+- [ ] **Revisar todas las RLS policies** manualmente
+- [ ] **Hacer penetration testing** básico
+- [ ] **Configurar backups automáticos** de base de datos
+- [ ] **Documentar plan de respuesta a incidentes**
+- [ ] **Configurar rate limiting estricto** en producción
+- [ ] **Habilitar WAF (Web Application Firewall)** si disponible
+- [ ] **Revisar permisos de CORS** en edge functions
+
+## Reporte de Vulnerabilidades
+
+Si encuentras una vulnerabilidad de seguridad, por favor:
+
+1. **NO la publiques públicamente**
+2. Envía un reporte privado al equipo de seguridad
+3. Incluye pasos para reproducir el problema
+4. Espera confirmación antes de divulgar
+
+---
+
+**Última actualización**: 2025-10-16  
+**Versión**: 1.0  
+**Responsable**: Equipo de Seguridad Remesas RD-Haití

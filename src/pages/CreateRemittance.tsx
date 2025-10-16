@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { remittanceSchema } from "@/lib/validations";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,6 +40,7 @@ export default function CreateRemittance() {
 
   // Datos de la cotización
   const [quote, setQuote] = useState<any>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -71,19 +74,66 @@ export default function CreateRemittance() {
   };
 
   const handleCreateRemittance = async () => {
+    // Validate form data
+    setErrors({});
+    try {
+      remittanceSchema.parse({
+        emisor_nombre: formData.emisor_nombre,
+        emisor_telefono: formData.emisor_telefono || '',
+        emisor_documento: formData.emisor_documento || '',
+        beneficiario_nombre: formData.beneficiario_nombre,
+        beneficiario_telefono: formData.beneficiario_telefono,
+        beneficiario_documento: formData.beneficiario_documento || '',
+        principal_dop: parseFloat(formData.principal_dop),
+        channel: formData.channel,
+        payout_city: formData.payout_city || '',
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: { [key: string]: string } = {};
+        error.issues.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+        toast.error("Corrige los errores en el formulario");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
+      // Check for fraud before creating
+      const { data: fraudCheck, error: fraudError } = await supabase.functions.invoke("fraud-detection", {
+        body: {
+          emisor_documento: formData.emisor_documento || '',
+          beneficiario_telefono: formData.beneficiario_telefono,
+          principal_dop: parseFloat(formData.principal_dop),
+          origin_ip: window.location.hostname,
+        },
+      });
+
+      if (fraudError) {
+        console.warn("Fraud check failed:", fraudError);
+      } else if (fraudCheck?.should_block) {
+        toast.error(`Transacción bloqueada: ${fraudCheck.flags.join(', ')}`);
+        return;
+      } else if (fraudCheck?.risk_level === 'medium') {
+        toast.warning(`Advertencia: ${fraudCheck.flags.join(', ')}`);
+      }
+
       const { data, error } = await supabase.functions.invoke("remittances-create", {
         body: {
-          emisor_nombre: formData.emisor_nombre,
-          emisor_telefono: formData.emisor_telefono,
-          emisor_documento: formData.emisor_documento,
-          beneficiario_nombre: formData.beneficiario_nombre,
-          beneficiario_telefono: formData.beneficiario_telefono,
-          beneficiario_documento: formData.beneficiario_documento,
+          emisor_nombre: formData.emisor_nombre.trim(),
+          emisor_telefono: formData.emisor_telefono.trim() || null,
+          emisor_documento: formData.emisor_documento.trim() || null,
+          beneficiario_nombre: formData.beneficiario_nombre.trim(),
+          beneficiario_telefono: formData.beneficiario_telefono.trim(),
+          beneficiario_documento: formData.beneficiario_documento.trim() || null,
           principal_dop: parseFloat(formData.principal_dop),
           channel: formData.channel,
-          payout_city: formData.payout_city,
+          payout_city: formData.payout_city.trim() || null,
           origin_ip: window.location.hostname,
         },
       });
