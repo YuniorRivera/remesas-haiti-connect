@@ -1,1 +1,4 @@
 project_id = "ogcdrnvmbphytcwbcbbb"
+
+[functions.webhooks-payout]
+verify_jwt = false

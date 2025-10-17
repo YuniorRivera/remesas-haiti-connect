@@ -1,25 +1,31 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-signature',
 };
 
-interface PayoutWebhookPayload {
-  reference_code: string; // código_referencia de la remesa
-  status: 'PAID' | 'FAILED' | 'CASHOUT' | 'SETTLED';
-  transaction_id?: string; // ID del payout partner
-  paid_at?: string;
-  settled_at?: string;
-  failure_reason?: string;
-  payout_operator_id?: string;
-  payout_receipt_num?: string;
-  payout_lat?: number;
-  payout_lon?: number;
-  payout_address?: string;
-  payout_city?: string;
-  metadata?: Record<string, any>;
-}
+// Esquema de validación para el webhook payload
+const PayoutWebhookSchema = z.object({
+  reference_code: z.string().min(1, 'reference_code es requerido').max(50, 'reference_code muy largo'),
+  status: z.enum(['PAID', 'FAILED', 'CASHOUT', 'SETTLED'], {
+    errorMap: () => ({ message: 'status debe ser PAID, FAILED, CASHOUT o SETTLED' })
+  }),
+  transaction_id: z.string().max(100).optional(),
+  paid_at: z.string().datetime().optional(),
+  settled_at: z.string().datetime().optional(),
+  failure_reason: z.string().max(500).optional(),
+  payout_operator_id: z.string().max(50).optional(),
+  payout_receipt_num: z.string().max(50).optional(),
+  payout_lat: z.number().min(-90).max(90).optional(),
+  payout_lon: z.number().min(-180).max(180).optional(),
+  payout_address: z.string().max(500).optional(),
+  payout_city: z.string().max(100).optional(),
+  metadata: z.record(z.any()).optional(),
+});
+
+type PayoutWebhookPayload = z.infer<typeof PayoutWebhookSchema>;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -39,16 +45,26 @@ Deno.serve(async (req) => {
       }
     );
 
-    const payload: PayoutWebhookPayload = await req.json();
+    // Parsear y validar payload
+    const rawPayload = await req.json();
+    
+    console.log('Payout webhook received:', rawPayload);
 
-    console.log('Payout webhook received:', payload);
-
-    // Validar payload
-    if (!payload.reference_code || !payload.status) {
-      return new Response(
-        JSON.stringify({ error: 'reference_code y status son requeridos' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    let payload: PayoutWebhookPayload;
+    try {
+      payload = PayoutWebhookSchema.parse(rawPayload);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('Validation error:', error.errors);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Datos de entrada inválidos',
+            details: error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw error;
     }
 
     // Buscar la remesa por código de referencia

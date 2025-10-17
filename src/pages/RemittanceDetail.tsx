@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, MapPin, Printer, Clock } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
+import RemittanceTimeline from "@/components/RemittanceTimeline";
 
 interface RemittanceEvent {
   id: string;
@@ -314,15 +315,6 @@ const RemittanceDetail = () => {
     );
   }
 
-  const timelineSteps = [
-    { key: 'CREATED', label: 'Creada', time: remittance.created_at },
-    { key: 'QUOTED', label: 'Cotizada', time: remittance.quoted_at },
-    { key: 'CONFIRMED', label: 'Confirmada', time: remittance.confirmed_at },
-    { key: 'SENT', label: 'Enviada', time: remittance.sent_at },
-    { key: 'PAID', label: 'Pagada', time: remittance.paid_at },
-    { key: 'SETTLED', label: 'Liquidada', time: remittance.settled_at },
-  ].filter(step => step.time && isValidDate(step.time));
-
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-card shadow-sm">
@@ -349,41 +341,14 @@ const RemittanceDetail = () => {
       </header>
 
       <main className="container mx-auto p-6 space-y-6">
-        {/* Timeline */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Timeline de Estados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative">
-              {timelineSteps.map((step, index) => (
-                <div key={step.key} className="flex gap-4 pb-8 last:pb-0">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-3 h-3 rounded-full ${
-                      index === timelineSteps.length - 1 
-                        ? 'bg-primary' 
-                        : 'bg-muted-foreground'
-                    }`} />
-                    {index !== timelineSteps.length - 1 && (
-                      <div className="w-0.5 h-full bg-muted-foreground/30 my-1" />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-4">
-                    <div className="font-semibold">{step.label}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {step.time && isValidDate(step.time) 
-                        ? format(new Date(step.time), 'dd/MM/yyyy HH:mm:ss')
-                        : 'Fecha no disponible'}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Timeline con Mapa */}
+        <RemittanceTimeline 
+          events={events}
+          currentState={remittance.state}
+          payout_lat={remittance.payout_lat}
+          payout_lon={remittance.payout_lon}
+          payout_address={remittance.payout_address}
+        />
 
         {/* Transaction Details */}
         <div className="grid gap-6 md:grid-cols-2">
