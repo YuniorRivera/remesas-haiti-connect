@@ -1,31 +1,75 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-signature',
 };
 
-// Esquema de validación para el webhook payload
-const PayoutWebhookSchema = z.object({
-  reference_code: z.string().min(1, 'reference_code es requerido').max(50, 'reference_code muy largo'),
-  status: z.enum(['PAID', 'FAILED', 'CASHOUT', 'SETTLED'], {
-    errorMap: () => ({ message: 'status debe ser PAID, FAILED, CASHOUT o SETTLED' })
-  }),
-  transaction_id: z.string().max(100).optional(),
-  paid_at: z.string().datetime().optional(),
-  settled_at: z.string().datetime().optional(),
-  failure_reason: z.string().max(500).optional(),
-  payout_operator_id: z.string().max(50).optional(),
-  payout_receipt_num: z.string().max(50).optional(),
-  payout_lat: z.number().min(-90).max(90).optional(),
-  payout_lon: z.number().min(-180).max(180).optional(),
-  payout_address: z.string().max(500).optional(),
-  payout_city: z.string().max(100).optional(),
-  metadata: z.record(z.any()).optional(),
-});
+// Interfaz TypeScript para el webhook payload
+interface PayoutWebhookPayload {
+  reference_code: string;
+  status: 'PAID' | 'FAILED' | 'CASHOUT' | 'SETTLED';
+  transaction_id?: string;
+  paid_at?: string;
+  settled_at?: string;
+  failure_reason?: string;
+  payout_operator_id?: string;
+  payout_receipt_num?: string;
+  payout_lat?: number;
+  payout_lon?: number;
+  payout_address?: string;
+  payout_city?: string;
+  metadata?: Record<string, any>;
+}
 
-type PayoutWebhookPayload = z.infer<typeof PayoutWebhookSchema>;
+// Función de validación manual
+function validatePayload(data: any): { valid: boolean; errors: string[]; payload?: PayoutWebhookPayload } {
+  const errors: string[] = [];
+
+  // Validar reference_code
+  if (!data.reference_code || typeof data.reference_code !== 'string') {
+    errors.push('reference_code es requerido y debe ser string');
+  } else if (data.reference_code.length > 50) {
+    errors.push('reference_code muy largo (máximo 50 caracteres)');
+  }
+
+  // Validar status
+  const validStatuses = ['PAID', 'FAILED', 'CASHOUT', 'SETTLED'];
+  if (!data.status || !validStatuses.includes(data.status)) {
+    errors.push('status debe ser PAID, FAILED, CASHOUT o SETTLED');
+  }
+
+  // Validar campos opcionales
+  if (data.transaction_id && (typeof data.transaction_id !== 'string' || data.transaction_id.length > 100)) {
+    errors.push('transaction_id debe ser string (máximo 100 caracteres)');
+  }
+  
+  if (data.payout_lat !== undefined && (typeof data.payout_lat !== 'number' || data.payout_lat < -90 || data.payout_lat > 90)) {
+    errors.push('payout_lat debe ser un número entre -90 y 90');
+  }
+  
+  if (data.payout_lon !== undefined && (typeof data.payout_lon !== 'number' || data.payout_lon < -180 || data.payout_lon > 180)) {
+    errors.push('payout_lon debe ser un número entre -180 y 180');
+  }
+
+  if (data.payout_address && (typeof data.payout_address !== 'string' || data.payout_address.length > 500)) {
+    errors.push('payout_address debe ser string (máximo 500 caracteres)');
+  }
+
+  if (data.payout_city && (typeof data.payout_city !== 'string' || data.payout_city.length > 100)) {
+    errors.push('payout_city debe ser string (máximo 100 caracteres)');
+  }
+
+  if (errors.length > 0) {
+    return { valid: false, errors };
+  }
+
+  return { 
+    valid: true, 
+    errors: [],
+    payload: data as PayoutWebhookPayload 
+  };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -50,22 +94,20 @@ Deno.serve(async (req) => {
     
     console.log('Payout webhook received:', rawPayload);
 
-    let payload: PayoutWebhookPayload;
-    try {
-      payload = PayoutWebhookSchema.parse(rawPayload);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('Validation error:', error.errors);
-        return new Response(
-          JSON.stringify({ 
-            error: 'Datos de entrada inválidos',
-            details: error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
-          }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      throw error;
+    const validation = validatePayload(rawPayload);
+    
+    if (!validation.valid) {
+      console.error('Validation errors:', validation.errors);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Datos de entrada inválidos',
+          details: validation.errors
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const payload = validation.payload!;
 
     // Buscar la remesa por código de referencia
     const { data: remittance, error: fetchError } = await supabaseClient
