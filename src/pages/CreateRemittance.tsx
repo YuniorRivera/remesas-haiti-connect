@@ -4,6 +4,7 @@ import { z } from "zod";
 import { remittanceSchema } from "@/lib/validations";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { secureSupabase } from "@/lib/secureSupabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +109,7 @@ export default function CreateRemittance() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("pricing-quote", {
+      const { data, error } = await secureSupabase.functions.invoke("pricing-quote", {
         body: {
           principal_dop: parseFloat(formData.principal_dop),
           channel: formData.channel,
@@ -159,7 +160,7 @@ export default function CreateRemittance() {
     setLoading(true);
     try {
       // Check for fraud before creating
-      const { data: fraudCheck, error: fraudError } = await supabase.functions.invoke("fraud-detection", {
+      const { data: fraudCheck, error: fraudError } = await secureSupabase.functions.invoke("fraud-detection", {
         body: {
           emisor_documento: formData.emisor_documento || '',
           beneficiario_telefono: formData.beneficiario_telefono,
@@ -177,7 +178,7 @@ export default function CreateRemittance() {
         toast.warning(`Advertencia: ${fraudCheck.flags.join(', ')}`);
       }
 
-      const { data, error } = await supabase.functions.invoke("remittances-create", {
+      const { data, error } = await secureSupabase.functions.invoke("remittances-create", {
         body: {
           emisor_nombre: formData.emisor_nombre.trim(),
           emisor_telefono: formData.emisor_telefono.trim() || null,
@@ -213,7 +214,7 @@ export default function CreateRemittance() {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("remittances-confirm", {
+      const { data, error } = await secureSupabase.functions.invoke("remittances-confirm", {
         body: {
           remittance_id: quote.remittance.id,
         },
