@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sanitizeText, sanitizeName, sanitizePhone, sanitizeDocumentNumber } from './sanitize';
 
 // Auth validations
 export const authSchema = z.object({
@@ -30,36 +31,54 @@ export const signupSchema = authSchema;
 export const remittanceSchema = z.object({
   emisor_nombre: z.string()
     .trim()
-    .min(3, { message: "Nombre del emisor requerido" })
-    .max(100, { message: "Nombre demasiado largo" })
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: "Solo letras permitidas" }),
+    .transform(sanitizeName)
+    .pipe(z.string()
+      .min(3, { message: "Nombre del emisor requerido" })
+      .max(100, { message: "Nombre demasiado largo" })
+      .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: "Solo letras permitidas" })
+    ),
   
   emisor_telefono: z.string()
     .trim()
-    .regex(/^(\+?1?\d{9,15}|[0-9\s\-()]{7,20})$/, { message: "Teléfono inválido" })
+    .transform(sanitizePhone)
+    .pipe(z.string()
+      .regex(/^(\+?1?\d{9,15}|[0-9\s\-()]{7,20})$/, { message: "Teléfono inválido" })
+    )
     .optional()
     .or(z.literal('')),
   
   emisor_documento: z.string()
     .trim()
-    .max(50, { message: "Documento demasiado largo" })
-    .regex(/^[0-9\-]+$/, { message: "Solo números y guiones" })
+    .transform(sanitizeDocumentNumber)
+    .pipe(z.string()
+      .max(50, { message: "Documento demasiado largo" })
+      .regex(/^[0-9\-]+$/, { message: "Solo números y guiones" })
+    )
     .optional()
     .or(z.literal('')),
   
   beneficiario_nombre: z.string()
     .trim()
-    .min(3, { message: "Nombre del beneficiario requerido" })
-    .max(100, { message: "Nombre demasiado largo" })
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: "Solo letras permitidas" }),
+    .transform(sanitizeName)
+    .pipe(z.string()
+      .min(3, { message: "Nombre del beneficiario requerido" })
+      .max(100, { message: "Nombre demasiado largo" })
+      .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: "Solo letras permitidas" })
+    ),
   
   beneficiario_telefono: z.string()
     .trim()
-    .regex(/^(\+509\s?)?[0-9\s\-()]{8,15}$/, { message: "Teléfono haitiano inválido" }),
+    .transform(sanitizePhone)
+    .pipe(z.string()
+      .regex(/^(\+509\s?)?[0-9\s\-()]{8,15}$/, { message: "Teléfono haitiano inválido" })
+    ),
   
   beneficiario_documento: z.string()
     .trim()
-    .max(50, { message: "Documento demasiado largo" })
+    .transform(sanitizeDocumentNumber)
+    .pipe(z.string()
+      .max(50, { message: "Documento demasiado largo" })
+    )
     .optional()
     .or(z.literal('')),
   
@@ -70,7 +89,10 @@ export const remittanceSchema = z.object({
   
   payout_city: z.string()
     .trim()
-    .max(100, { message: "Ciudad demasiado larga" })
+    .transform(sanitizeText)
+    .pipe(z.string()
+      .max(100, { message: "Ciudad demasiado larga" })
+    )
     .optional()
     .or(z.literal('')),
   
