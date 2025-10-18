@@ -184,9 +184,15 @@ export default function AdminRiskFlags() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Banderas de Riesgo</h1>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-3xl font-bold">Banderas de Riesgo</h1>
+              <Badge variant="destructive" className="text-xs">Solo Admin</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">Acceso restringido a administradores</p>
+          </div>
           <Button onClick={() => handleOpenDialog()}>
             <Plus className="mr-2 h-4 w-4" /> Nueva Bandera
           </Button>

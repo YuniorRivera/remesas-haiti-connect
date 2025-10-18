@@ -51,6 +51,9 @@ export function AuthForm() {
 
     try {
       if (isLogin) {
+        // NOTA: Este formulario sigue usando supabase.auth.signInWithPassword()
+        // directamente. Para aprovechar el rate limiting de la Edge Function
+        // auth-login, se debería migrar a usar la función signIn del hook useAuth.
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,

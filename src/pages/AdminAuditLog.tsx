@@ -85,8 +85,14 @@ export default function AdminAuditLog() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Registro de Auditoría</h1>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-3xl font-bold">Registro de Auditoría</h1>
+            <Badge variant="destructive" className="text-xs">Solo Admin</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">Acceso restringido a administradores</p>
+        </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <Card>

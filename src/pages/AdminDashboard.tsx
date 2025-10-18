@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -194,11 +195,14 @@ const AdminDashboard = () => {
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-primary">
-                Panel de Administración
-              </h1>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-primary">
+                  Panel de Administración
+                </h1>
+                <Badge variant="destructive" className="text-xs">Solo Admin</Badge>
+              </div>
               <p className="text-sm text-muted-foreground">
-                Márgenes y Analítica de Plataforma
+                Acceso restringido a administradores - Márgenes y Analítica de Plataforma
               </p>
             </div>
           </div>

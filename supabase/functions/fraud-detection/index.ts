@@ -1,10 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
+
+const fraudCheckSchema = z.object({
+  emisor_documento: z.string().min(1, "Documento del emisor requerido"),
+  beneficiario_telefono: z.string().min(1, "Teléfono del beneficiario requerido"),
+  principal_dop: z.number().positive("El monto debe ser positivo"),
+  origin_ip: z.string().optional(),
+});
 
 interface FraudCheckRequest {
   emisor_documento: string;
@@ -61,13 +69,16 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body: FraudCheckRequest = await req.json();
+    const rawBody = await req.json();
     
-    // Validar campos requeridos
-    if (!body || typeof body.principal_dop !== 'number') {
+    // Validar con Zod schema
+    const validationResult = fraudCheckSchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
       return new Response(
         JSON.stringify({ 
-          error: 'Datos de solicitud inválidos',
+          error: `Validación de datos fallida: ${errors}`,
           is_suspicious: false,
           risk_level: 'low',
           flags: [],
@@ -76,6 +87,8 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    const body: FraudCheckRequest = validationResult.data as FraudCheckRequest;
 
     const { emisor_documento, beneficiario_telefono, principal_dop, origin_ip } = body;
 

@@ -179,10 +179,14 @@ export default function AdminCompliance() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Shield className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Compliance y KYC/KYB</h1>
+      <div className="container mx-auto p-6 space-y-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Shield className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">Compliance y KYC/KYB</h1>
+            <Badge variant="destructive" className="text-xs">Solo Admin</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">Acceso restringido a administradores y oficiales de compliance</p>
         </div>
         
         <div className="grid gap-6 md:grid-cols-3 mb-6">

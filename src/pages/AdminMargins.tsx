@@ -5,6 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -131,11 +132,15 @@ export default function AdminMargins() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Percent className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Márgenes de Plataforma</h1>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Percent className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Márgenes de Plataforma</h1>
+              <Badge variant="destructive" className="text-xs">Solo Admin</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">Acceso restringido a administradores</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={exportToCSV} variant="outline">
