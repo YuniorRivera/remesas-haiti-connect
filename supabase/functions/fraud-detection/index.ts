@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
 
 interface FraudCheckRequest {
@@ -36,12 +36,47 @@ serve(async (req) => {
   }
 
   try {
+    // Validar CSRF token
+    const csrfToken = req.headers.get('X-CSRF-Token');
+    const csrfCookie = req.headers.get('Cookie')?.split(';')
+      .find(c => c.trim().startsWith('csrf-token='))
+      ?.split('=')[1];
+
+    if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
+      console.error('CSRF validation failed');
+      return new Response(
+        JSON.stringify({ 
+          error: 'CSRF token inválido',
+          is_suspicious: false,
+          risk_level: 'low',
+          flags: [],
+          should_block: false,
+        }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const body: FraudCheckRequest = await req.json();
+    
+    // Validar campos requeridos
+    if (!body || typeof body.principal_dop !== 'number') {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Datos de solicitud inválidos',
+          is_suspicious: false,
+          risk_level: 'low',
+          flags: [],
+          should_block: false,
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { emisor_documento, beneficiario_telefono, principal_dop, origin_ip } = body;
 
     const flags: string[] = [];

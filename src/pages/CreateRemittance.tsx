@@ -51,22 +51,41 @@ export default function CreateRemittance() {
     const fetchAgentInfo = async () => {
       if (!user) return;
       
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('agent_id')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('agent_id')
+          .eq('id', user.id)
+          .maybeSingle();
 
-      if (profile?.agent_id) {
-        const { data: agent } = await supabase
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          toast.error('Error al cargar información del agente');
+          return;
+        }
+
+        if (!profile?.agent_id) {
+          toast.warning('No tienes una tienda asignada');
+          return;
+        }
+
+        const { data: agent, error: agentError } = await supabase
           .from('agents')
           .select('trade_name')
           .eq('id', profile.agent_id)
-          .single();
+          .maybeSingle();
         
+        if (agentError) {
+          console.error('Error fetching agent:', agentError);
+          return;
+        }
+
         if (agent?.trade_name) {
           setAgentName(agent.trade_name);
         }
+      } catch (error) {
+        console.error('Unexpected error fetching agent info:', error);
+        toast.error('Error inesperado al cargar información');
       }
     };
 

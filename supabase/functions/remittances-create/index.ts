@@ -1,8 +1,8 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
 
 interface CreateRemittanceRequest {
@@ -27,6 +27,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Validar CSRF token
+    const csrfToken = req.headers.get('X-CSRF-Token');
+    const csrfCookie = req.headers.get('Cookie')?.split(';')
+      .find(c => c.trim().startsWith('csrf-token='))
+      ?.split('=')[1];
+
+    if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
+      console.error('CSRF validation failed');
+      return new Response(
+        JSON.stringify({ error: 'CSRF token inválido' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -86,7 +100,8 @@ Deno.serve(async (req) => {
     console.log('Creating remittance:', { 
       user_id: user.id, 
       agent_id: profile.agent_id,
-      ...requestData 
+      principal_dop: requestData.principal_dop,
+      channel: requestData.channel
     });
 
     // Validar input
@@ -123,7 +138,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Quote received:', quoteData);
+    console.log('Quote received for remittance');
 
     // Generar código de referencia único
     const timestamp = Date.now().toString(36).toUpperCase();

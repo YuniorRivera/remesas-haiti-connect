@@ -1,8 +1,8 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
 
 interface QuoteRequest {
@@ -32,6 +32,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Validar CSRF token
+    const csrfToken = req.headers.get('X-CSRF-Token');
+    const csrfCookie = req.headers.get('Cookie')?.split(';')
+      .find(c => c.trim().startsWith('csrf-token='))
+      ?.split('=')[1];
+
+    if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
+      console.error('CSRF validation failed');
+      return new Response(
+        JSON.stringify({ error: 'CSRF token inválido' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',

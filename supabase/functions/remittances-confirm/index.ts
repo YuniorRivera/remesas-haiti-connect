@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,6 +15,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Validar CSRF token
+    const csrfToken = req.headers.get('X-CSRF-Token');
+    const csrfCookie = req.headers.get('Cookie')?.split(';')
+      .find(c => c.trim().startsWith('csrf-token='))
+      ?.split('=')[1];
+
+    if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
+      console.error('CSRF validation failed');
+      return new Response(
+        JSON.stringify({ error: 'CSRF token inválido' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -240,35 +254,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Crear asientos de ledger
+    // Crear asientos de ledger con estructura correcta de doble partida
     const now = new Date().toISOString();
     const ledgerEntries = [
-      // 1. Débito de efectivo de tienda (salida de DOP)
+      // 1. Principal: Crédito en efectivo del agente (salida) -> Débito en pasivo pendiente
       {
         txn_id: remittance.id,
-        debit_account: agentCashAccount.id,
-        credit_account: agentCashAccount.id, // placeholder, se reemplaza abajo
+        debit_account: pendingPayoutsAccount.id,
+        credit_account: agentCashAccount.id,
         amount: remittance.principal_dop,
         currency: 'DOP',
         memo: `Principal remesa ${remittance.codigo_referencia}`,
         entry_at: now,
         created_by: user.id,
       },
-      // 2. Crédito a pasivo de pagos pendientes (HTG que debe pagarse)
+      // 2. Comisión del agente: Crédito en efectivo -> Débito en ingresos
       {
         txn_id: remittance.id,
-        debit_account: pendingPayoutsAccount.id, // placeholder
-        credit_account: pendingPayoutsAccount.id,
-        amount: remittance.htg_to_beneficiary || 0,
-        currency: 'HTG',
-        memo: `Pago pendiente HTG ${remittance.codigo_referencia}`,
-        entry_at: now,
-        created_by: user.id,
-      },
-      // 3. Registro de comisión del agente
-      {
-        txn_id: remittance.id,
-        debit_account: agentCashAccount.id,
+        debit_account: commissionRevenueAccount.id,
         credit_account: agentCashAccount.id,
         amount: remittance.comision_agente || 0,
         currency: 'DOP',
@@ -329,11 +332,11 @@ Deno.serve(async (req) => {
         meta: {
           receipt_hash,
           float_debited: floatNeeded,
-          ledger_entries: ledgerEntries.length,
+          ledger_entries_created: ledgerEntries.length,
         },
       });
 
-    console.log('Remittance confirmed successfully:', remittance.id);
+    console.log('Remittance confirmed successfully');
 
     return new Response(
       JSON.stringify({
