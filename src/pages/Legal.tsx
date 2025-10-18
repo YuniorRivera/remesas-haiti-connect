@@ -9,9 +9,10 @@ export default function Legal() {
         <h1 className="text-3xl font-bold mb-6">Legal y Privacidad</h1>
         
         <Tabs defaultValue="privacy" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="privacy">Política de Privacidad</TabsTrigger>
             <TabsTrigger value="terms">Términos y Condiciones</TabsTrigger>
+            <TabsTrigger value="cookies">Política de Cookies</TabsTrigger>
           </TabsList>
           
           <TabsContent value="privacy">
@@ -91,6 +92,75 @@ export default function Legal() {
                 <p>
                   No somos responsables por demoras causadas por terceros, información incorrecta
                   proporcionada por el usuario, o circunstancias fuera de nuestro control.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="cookies">
+            <Card>
+              <CardHeader>
+                <CardTitle>Política de Cookies</CardTitle>
+              </CardHeader>
+              <CardContent className="prose dark:prose-invert max-w-none">
+                <h2>¿Qué son las cookies?</h2>
+                <p>
+                  Las cookies son pequeños archivos de texto que se almacenan en su dispositivo
+                  cuando visita nuestro sitio web. Nos ayudan a mejorar su experiencia y el
+                  funcionamiento del sitio.
+                </p>
+
+                <h2>Tipos de cookies que usamos</h2>
+                
+                <h3>Cookies Necesarias (Siempre activas)</h3>
+                <p>
+                  Estas cookies son esenciales para el funcionamiento del sitio y no pueden
+                  desactivarse:
+                </p>
+                <ul>
+                  <li><strong>Autenticación:</strong> Para mantener su sesión activa</li>
+                  <li><strong>Seguridad:</strong> Protección CSRF y validación de sesiones</li>
+                  <li><strong>Preferencias:</strong> Idioma seleccionado</li>
+                  <li><strong>Consentimiento:</strong> Su elección sobre cookies</li>
+                </ul>
+
+                <h3>Cookies de Analytics (Opcionales)</h3>
+                <p>
+                  Estas cookies nos ayudan a entender cómo usa el sitio para mejorarlo:
+                </p>
+                <ul>
+                  <li><strong>Uso del sitio:</strong> Páginas visitadas, tiempo de permanencia</li>
+                  <li><strong>Rendimiento:</strong> Velocidad de carga, errores técnicos</li>
+                  <li><strong>Comportamiento:</strong> Funciones más usadas, flujos de navegación</li>
+                </ul>
+                <p>
+                  Solo recopilamos datos de analytics si usted da su consentimiento explícito.
+                </p>
+
+                <h2>Cómo controlamos las cookies de analytics</h2>
+                <p>
+                  Las cookies de analytics solo se activan si usted hace clic en "Aceptar Todas"
+                  en nuestro banner de cookies. Si elige "Solo Necesarias", ningún script de
+                  analytics se ejecutará y no recopilaremos datos de uso.
+                </p>
+
+                <h2>Gestionar sus preferencias</h2>
+                <p>
+                  Puede cambiar sus preferencias de cookies en cualquier momento eliminando
+                  las cookies de su navegador. Esto hará que el banner de consentimiento
+                  aparezca nuevamente en su próxima visita.
+                </p>
+
+                <h2>Duración de las cookies</h2>
+                <ul>
+                  <li><strong>Sesión:</strong> Autenticación (hasta cerrar sesión)</li>
+                  <li><strong>Permanentes:</strong> Preferencias y consentimiento (1 año)</li>
+                </ul>
+
+                <h2>Más información</h2>
+                <p>
+                  Para cualquier pregunta sobre nuestro uso de cookies, contáctenos en
+                  privacidad@remesasrd.com
                 </p>
               </CardContent>
             </Card>

@@ -83,7 +83,32 @@ const Index = () => {
 
       <footer className="border-t bg-card/50 py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Remesas RD-Haití. Sistema seguro de transferencias.</p>
+          <p className="mb-2">&copy; 2025 Remesas RD-Haití. Sistema seguro de transferencias.</p>
+          <div className="flex justify-center gap-4">
+            <Button 
+              variant="link" 
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+              onClick={() => navigate("/legal")}
+            >
+              Política de Privacidad
+            </Button>
+            <span>•</span>
+            <Button 
+              variant="link" 
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+              onClick={() => navigate("/legal")}
+            >
+              Términos y Condiciones
+            </Button>
+            <span>•</span>
+            <Button 
+              variant="link" 
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+              onClick={() => navigate("/legal")}
+            >
+              Cookies
+            </Button>
+          </div>
         </div>
       </footer>
     </div>;

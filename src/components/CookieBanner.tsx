@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Cookie } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false);
@@ -47,7 +48,10 @@ export const CookieBanner = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Usamos cookies <strong>necesarias</strong> para el funcionamiento básico del sitio 
                 (autenticación, seguridad, preferencias de idioma). Las cookies de <strong>analytics</strong> 
-                son opcionales y nos ayudan a mejorar tu experiencia.
+                son opcionales y nos ayudan a mejorar tu experiencia.{" "}
+                <Link to="/legal" className="text-primary hover:underline">
+                  Ver política de cookies
+                </Link>
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button 
