@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { loginSchema, signupSchema } from "@/lib/validations";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 
 export function AuthForm() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,6 +76,29 @@ export function AuthForm() {
         });
         if (error) throw error;
         toast.success("Cuenta creada. Redirigiendo...");
+        
+        // Wait for profile creation and check roles
+        setTimeout(async () => {
+          try {
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            
+            if (currentUser) {
+              const { data: roles } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', currentUser.id);
+              
+              if (!roles || roles.length === 0) {
+                navigate('/onboarding');
+              } else {
+                navigate('/dashboard');
+              }
+            }
+          } catch (err) {
+            console.error("Error checking roles:", err);
+            navigate('/onboarding');
+          }
+        }, 1500);
       }
     } catch (error: any) {
       toast.error(error.message || "Error en la autenticación");

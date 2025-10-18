@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Shield, AlertTriangle, CheckCircle, Clock, User, Building } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle, Clock, User, Building, Store } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -21,10 +21,12 @@ export default function AdminCompliance() {
     pending: 0,
     alerts: 0,
     completed: 0,
+    pendingAgents: 0,
   });
   const [kycDocs, setKycDocs] = useState<any[]>([]);
   const [kybDocs, setKybDocs] = useState<any[]>([]);
   const [riskFlags, setRiskFlags] = useState<any[]>([]);
+  const [pendingAgents, setPendingAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -101,6 +103,20 @@ export default function AdminCompliance() {
         .eq('status', 'approved')
         .gte('reviewed_at', monthAgo.toISOString());
 
+      // Fetch pending agent requests
+      const { data: agentsData, error: agentsError } = await supabase
+        .from('agents')
+        .select(`
+          *,
+          profiles!owner_user_id(full_name, phone)
+        `)
+        .eq('kyb_status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (agentsError) {
+        console.error('Error fetching agents:', agentsError);
+      }
+
       const totalPending = (kycData?.length || 0) + (kybData?.length || 0);
       const totalCompleted = (completedKyc?.length || 0) + (completedKyb?.length || 0);
 
@@ -108,7 +124,9 @@ export default function AdminCompliance() {
         pending: totalPending,
         alerts: flagsData?.length || 0,
         completed: totalCompleted,
+        pendingAgents: agentsData?.length || 0,
       });
+      setPendingAgents(agentsData || []);
 
       setKycDocs(kycData || []);
       setKybDocs(kybData || []);
@@ -173,6 +191,60 @@ export default function AdminCompliance() {
     }
   };
 
+  const approveAgentRequest = async (agentId: string, ownerUserId: string) => {
+    try {
+      // Update agent status
+      const { error: agentError } = await supabase
+        .from('agents')
+        .update({
+          kyb_status: 'approved',
+          kyb_verified_by: user?.id,
+          kyb_verified_at: new Date().toISOString(),
+          is_active_old: true,
+        })
+        .eq('id', agentId);
+
+      if (agentError) throw agentError;
+
+      // Assign agent_owner role to the user
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: ownerUserId,
+          role: 'agent_owner',
+        });
+
+      if (roleError) throw roleError;
+
+      toast.success('Solicitud de agente aprobada exitosamente');
+      fetchComplianceData();
+    } catch (error: any) {
+      console.error('Error approving agent:', error);
+      toast.error('Error al aprobar agente: ' + error.message);
+    }
+  };
+
+  const rejectAgentRequest = async (agentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('agents')
+        .update({
+          kyb_status: 'rejected',
+          kyb_verified_by: user?.id,
+          kyb_verified_at: new Date().toISOString(),
+        })
+        .eq('id', agentId);
+
+      if (error) throw error;
+
+      toast.error('Solicitud de agente rechazada');
+      fetchComplianceData();
+    } catch (error: any) {
+      console.error('Error rejecting agent:', error);
+      toast.error('Error al rechazar agente');
+    }
+  };
+
   if (authLoading || roleLoading || loading) {
     return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
   }
@@ -223,6 +295,60 @@ export default function AdminCompliance() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pending Agent Requests */}
+        {stats.pendingAgents > 0 && (
+          <Card className="border-purple-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Store className="h-5 w-5 text-purple-600" />
+                Solicitudes de Agentes Pendientes ({stats.pendingAgents})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingAgents.map((agent) => (
+                  <div key={agent.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-semibold">{agent.trade_name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {agent.legal_name} • RNC: {agent.rnc}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Contacto: {agent.profiles?.full_name} - {agent.telefono}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {formatDistanceToNow(new Date(agent.created_at), { addSuffix: true, locale: es })}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="bg-purple-500/10 text-purple-700 border-purple-200">
+                        Pendiente
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="default"
+                        onClick={() => approveAgentRequest(agent.id, agent.owner_user_id)}
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Aprobar Agente
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={() => rejectAgentRequest(agent.id)}
+                      >
+                        Rechazar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="kyc" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-md">

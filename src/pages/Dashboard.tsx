@@ -20,7 +20,12 @@ const Dashboard = () => {
     if (!authLoading && !user) {
       navigate("/auth");
     }
-  }, [user, authLoading, navigate]);
+    
+    // If user is authenticated but has no role, redirect to onboarding
+    if (!roleLoading && user && !isAdmin && !isAgent && !isComplianceOfficer && !isSenderUser) {
+      navigate("/onboarding");
+    }
+  }, [user, authLoading, roleLoading, isAdmin, isAgent, isComplianceOfficer, isSenderUser, navigate]);
 
   const handleSignOut = async () => {
     await signOut();

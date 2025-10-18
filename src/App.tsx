@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Onboarding from "./pages/Onboarding";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateRemittance from "./pages/CreateRemittance";
@@ -41,8 +42,13 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/legal" element={<Legal />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/onboarding" element={
+            <ProtectedRoute requireAuth>
+              <Onboarding />
+            </ProtectedRoute>
+          } />
             
             {/* Authenticated routes (any role) */}
             <Route path="/dashboard" element={
