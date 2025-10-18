@@ -49,7 +49,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/auth");
+    navigate("/");
   };
 
   // Menu items for Tienda (Agent)

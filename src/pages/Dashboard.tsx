@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/auth");
+    navigate("/");
   };
 
   if (authLoading || roleLoading) {
@@ -181,6 +181,15 @@ const Dashboard = () => {
                 Tu cuenta aún no tiene un rol asignado. Contacta al administrador para obtener acceso.
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/")}
+                className="w-full"
+              >
+                Volver al Inicio
+              </Button>
+            </CardContent>
           </Card>
         )}
       </main>
