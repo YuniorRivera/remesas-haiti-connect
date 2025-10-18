@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Send, Shield, Clock, TrendingUp } from "lucide-react";
+import ShinyText from "@/components/ShinyText";
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -26,9 +27,11 @@ const Index = () => {
         <section className="container mx-auto px-4 py-20 text-center">
           <h2 className="mb-6 text-5xl font-bold tracking-tight">
             Envía dinero a Haití de forma{" "}
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              rápida y segura
-            </span>
+            <ShinyText 
+              text="rápida y segura" 
+              speed={3}
+              className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-5xl font-bold"
+            />
           </h2>
           <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
             Red de tiendas y colmados en República Dominicana para facilitar el envío
