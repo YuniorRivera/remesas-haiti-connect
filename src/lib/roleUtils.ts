@@ -2,12 +2,12 @@
  * Utility functions for role-based access control and field visibility
  */
 
-export type UserRole = 'admin' | 'agent_owner' | 'agent_clerk' | 'compliance_officer' | 'sender';
+export type AppRole = 'admin' | 'agent_owner' | 'agent_clerk' | 'compliance_officer' | 'sender';
 
 /**
  * Check if a user has a specific role
  */
-export function hasRole(userRoles: string[], role: UserRole): boolean {
+export function hasRole(userRoles: string[], role: AppRole): boolean {
   return userRoles.includes(role);
 }
 

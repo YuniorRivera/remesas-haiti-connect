@@ -29,24 +29,22 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/auth-login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await supabase.functions.invoke('auth-login', {
+        body: { email, password },
       });
 
-      const data = await response.json();
+      if (error) {
+        return { data: null, error: { message: error.message } };
+      }
 
-      if (!response.ok) {
+      if (data.error) {
         return { data: null, error: { message: data.error } };
       }
 
       // Store CSRF token for subsequent requests
-      sessionStorage.setItem('csrf-token', data.csrfToken);
+      if (data.csrfToken) {
+        sessionStorage.setItem('csrf-token', data.csrfToken);
+      }
       
       // Update local state
       setUser(data.user);
@@ -74,24 +72,27 @@ export function useAuth() {
     try {
       const csrfToken = sessionStorage.getItem('csrf-token');
       
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/auth-logout`, {
-        method: 'POST',
-        credentials: 'include',
+      const { data, error } = await supabase.functions.invoke('auth-logout', {
         headers: {
-          'Content-Type': 'application/json',
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
           'X-CSRF-Token': csrfToken || '',
         },
       });
 
-      if (response.ok) {
-        setUser(null);
-        setSession(null);
-        sessionStorage.removeItem('csrf-token');
+      if (error) {
+        console.error('Logout error:', error);
       }
+
+      // Always clear local state
+      setUser(null);
+      setSession(null);
+      sessionStorage.removeItem('csrf-token');
 
       return { error: null };
     } catch (error: any) {
+      // Even if there's an error, clear local state
+      setUser(null);
+      setSession(null);
+      sessionStorage.removeItem('csrf-token');
       return { error: { message: error.message } };
     }
   };

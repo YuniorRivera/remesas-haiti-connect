@@ -1,7 +1,31 @@
 project_id = "ogcdrnvmbphytcwbcbbb"
 
+[functions.auth-login]
+verify_jwt = false
+
+[functions.auth-logout]
+verify_jwt = false
+
+[functions.auth-refresh]
+verify_jwt = false
+
+[functions.csrf]
+verify_jwt = false
+
+[functions.fraud-detection]
+verify_jwt = true
+
+[functions.pricing-quote]
+verify_jwt = true
+
+[functions.remittances-create]
+verify_jwt = true
+
+[functions.remittances-confirm]
+verify_jwt = true
+
 [functions.webhooks-payout]
 verify_jwt = false
 
 [functions.reconciliation-process]
-verify_jwt = false
+verify_jwt = true
