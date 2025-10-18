@@ -7,6 +7,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileJson } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+// Zod schema para validar datos de reconciliación
+const reconciliationItemSchema = z.object({
+  reference_code: z.string().optional(),
+  transaction_id: z.string().optional(),
+  amount: z.number().positive("El monto debe ser positivo"),
+  date: z.string().datetime("Fecha debe estar en formato ISO 8601"),
+}).refine(
+  (data) => data.reference_code || data.transaction_id,
+  { message: "Debe incluir reference_code o transaction_id" }
+);
+
+const reconciliationDataSchema = z.array(reconciliationItemSchema).min(1, "Los datos deben contener al menos un item");
 
 interface ReconciliationUploadProps {
   onComplete: () => void;
@@ -42,12 +56,16 @@ export function ReconciliationUpload({ onComplete }: ReconciliationUploadProps) 
 
     setLoading(true);
     try {
-      const data = JSON.parse(jsonData);
+      const parsedData = JSON.parse(jsonData);
       
-      // Validar formato básico
-      if (!Array.isArray(data)) {
-        throw new Error("Los datos deben ser un array de transacciones");
+      // Validar con Zod schema
+      const validationResult = reconciliationDataSchema.safeParse(parsedData);
+      if (!validationResult.success) {
+        const errors = validationResult.error.issues.map(e => e.message).join(", ");
+        throw new Error(`Datos inválidos: ${errors}`);
       }
+
+      const data = validationResult.data;
 
       const { data: result, error } = await supabase.functions.invoke('reconciliation-process', {
         body: {
@@ -64,7 +82,16 @@ export function ReconciliationUpload({ onComplete }: ReconciliationUploadProps) 
       onComplete();
     } catch (error) {
       console.error('Error processing reconciliation:', error);
-      toast.error(error instanceof Error ? error.message : "Error al procesar reconciliación");
+      
+      // Mensajes de error más descriptivos
+      let errorMessage = "Error al procesar reconciliación";
+      if (error instanceof SyntaxError) {
+        errorMessage = "Formato JSON inválido. Verifica la sintaxis.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

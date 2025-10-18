@@ -63,21 +63,33 @@ export default function AdminOperations() {
 
   const fetchOperations = async () => {
     try {
+      setLoading(true);
+      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       // Stats de hoy
-      const { data: todayData } = await supabase
+      const { data: todayData, error: todayError } = await supabase
         .from('remittances')
         .select('principal_dop, state')
         .gte('created_at', today.toISOString());
 
+      if (todayError) {
+        console.error('Error fetching today stats:', todayError);
+        toast.error('Error al cargar estadísticas de hoy');
+      }
+
       // Actividad reciente
-      const { data: recent } = await supabase
+      const { data: recent, error: recentError } = await supabase
         .from('remittances')
         .select('*, agents(trade_name)')
         .order('created_at', { ascending: false })
         .limit(10);
+
+      if (recentError) {
+        console.error('Error fetching recent remittances:', recentError);
+        toast.error('Error al cargar actividad reciente');
+      }
 
       const todayCount = todayData?.length || 0;
       const volume = todayData?.reduce((sum, r) => sum + (r.principal_dop || 0), 0) || 0;
@@ -94,7 +106,7 @@ export default function AdminOperations() {
       setRecentRemittances(recent || []);
     } catch (error) {
       console.error('Error fetching operations:', error);
-      toast.error('Error al cargar operaciones');
+      toast.error('Error inesperado al cargar operaciones. Por favor intenta de nuevo.');
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,21 @@
-// Simple in-memory rate limiter for Edge Functions
-// For production, use Redis or Upstash
+/**
+ * Simple in-memory rate limiter for Edge Functions
+ * 
+ * ⚠️ IMPORTANTE - SOLO PARA DESARROLLO:
+ * Este rate limiter almacena datos en memoria y NO es adecuado para producción
+ * en entornos con múltiples instancias de Edge Functions.
+ * 
+ * Para producción, se recomienda usar:
+ * - Redis (self-hosted o managed)
+ * - Upstash (Redis serverless)
+ * - Cloudflare Rate Limiting
+ * - Supabase Edge Functions con Deno KV (cuando esté disponible)
+ * 
+ * Limitaciones actuales:
+ * - Los límites se reinician cuando la función se redeploya
+ * - Cada instancia de la función tiene su propio contador
+ * - No hay persistencia entre reinicios
+ */
 
 interface RateLimitEntry {
   count: number;

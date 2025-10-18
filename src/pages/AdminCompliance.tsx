@@ -47,26 +47,43 @@ export default function AdminCompliance() {
 
   const fetchComplianceData = async () => {
     try {
+      setLoading(true);
+      
       // KYC documents pendientes
-      const { data: kycData } = await supabase
+      const { data: kycData, error: kycError } = await supabase
         .from('kyc_documents')
         .select('*, profiles(full_name)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
+      if (kycError) {
+        console.error('Error fetching KYC:', kycError);
+        toast.error('Error al cargar documentos KYC');
+      }
+
       // KYB documents pendientes
-      const { data: kybData } = await supabase
+      const { data: kybData, error: kybError } = await supabase
         .from('kyb_documents')
         .select('*, agents(trade_name, legal_name)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
+      if (kybError) {
+        console.error('Error fetching KYB:', kybError);
+        toast.error('Error al cargar documentos KYB');
+      }
+
       // Risk flags activos
-      const { data: flagsData } = await supabase
+      const { data: flagsData, error: flagsError } = await supabase
         .from('risk_flags')
         .select('*')
         .eq('resolved', false)
         .order('created_at', { ascending: false });
+
+      if (flagsError) {
+        console.error('Error fetching flags:', flagsError);
+        toast.error('Error al cargar risk flags');
+      }
 
       // KYC/KYB completados (últimos 30 días)
       const monthAgo = new Date();
@@ -98,7 +115,7 @@ export default function AdminCompliance() {
       setRiskFlags(flagsData || []);
     } catch (error) {
       console.error('Error fetching compliance data:', error);
-      toast.error('Error al cargar datos de compliance');
+      toast.error('Error inesperado al cargar datos de compliance. Por favor intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -116,12 +133,17 @@ export default function AdminCompliance() {
         })
         .eq('id', docId);
 
-      if (error) throw error;
-      toast.success('Documento aprobado');
+      if (error) {
+        console.error('Error approving document:', error);
+        toast.error(`Error al aprobar documento: ${error.message}`);
+        return;
+      }
+      
+      toast.success('Documento aprobado exitosamente');
       fetchComplianceData();
     } catch (error) {
       console.error('Error approving document:', error);
-      toast.error('Error al aprobar documento');
+      toast.error('Error inesperado al aprobar documento. Intenta de nuevo.');
     }
   };
 
@@ -137,12 +159,17 @@ export default function AdminCompliance() {
         })
         .eq('id', docId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error rejecting document:', error);
+        toast.error(`Error al rechazar documento: ${error.message}`);
+        return;
+      }
+      
       toast.success('Documento rechazado');
       fetchComplianceData();
     } catch (error) {
       console.error('Error rejecting document:', error);
-      toast.error('Error al rechazar documento');
+      toast.error('Error inesperado al rechazar documento. Intenta de nuevo.');
     }
   };
 
