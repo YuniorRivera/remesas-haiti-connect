@@ -70,31 +70,26 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      const csrfToken = sessionStorage.getItem('csrf-token');
+      // Client-side logout first for immediate response
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.warn('Client signOut warning:', error);
+    } finally {
+      // Always clear local state regardless of backend status
+      setUser(null);
+      setSession(null);
+      sessionStorage.removeItem('csrf-token');
       
-      const { data, error } = await supabase.functions.invoke('auth-logout', {
-        headers: {
-          'X-CSRF-Token': csrfToken || '',
-        },
-      });
-
-      if (error) {
-        console.error('Logout error:', error);
+      // Optional: Try to clear backend cookies (fire-and-forget, non-blocking)
+      const csrfToken = sessionStorage.getItem('csrf-token');
+      if (csrfToken) {
+        supabase.functions.invoke('auth-logout', {
+          headers: { 'X-CSRF-Token': csrfToken },
+        }).catch(() => {}); // Silently ignore backend errors
       }
-
-      // Always clear local state
-      setUser(null);
-      setSession(null);
-      sessionStorage.removeItem('csrf-token');
-
-      return { error: null };
-    } catch (error: any) {
-      // Even if there's an error, clear local state
-      setUser(null);
-      setSession(null);
-      sessionStorage.removeItem('csrf-token');
-      return { error: { message: error.message } };
     }
+    
+    return { error: null };
   };
 
   return { user, session, loading, signIn, signUp, signOut };
