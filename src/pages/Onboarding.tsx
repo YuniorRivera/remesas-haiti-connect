@@ -11,21 +11,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { User, Store } from "lucide-react";
 import { z } from "zod";
-
 const agentFormSchema = z.object({
   trade_name: z.string().min(3, "El nombre comercial debe tener al menos 3 caracteres"),
   legal_name: z.string().min(3, "La razón social debe tener al menos 3 caracteres"),
   rnc: z.string().min(9, "El RNC debe tener al menos 9 caracteres"),
   telefono: z.string().min(10, "El teléfono debe tener al menos 10 dígitos"),
   address: z.string().min(10, "La dirección debe tener al menos 10 caracteres"),
-  business_type: z.string().min(3, "El tipo de negocio es requerido"),
+  business_type: z.string().min(3, "El tipo de negocio es requerido")
 });
-
 type AgentFormData = z.infer<typeof agentFormSchema>;
-
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [formData, setFormData] = useState<AgentFormData>({
@@ -34,20 +33,19 @@ const Onboarding = () => {
     rnc: "",
     telefono: "",
     address: "",
-    business_type: "",
+    business_type: ""
   });
-
   const handleSenderUser = async () => {
     if (!user) return;
-    
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: user.id, role: "sender_user" });
-
+      const {
+        error
+      } = await supabase.from("user_roles").insert({
+        user_id: user.id,
+        role: "sender_user"
+      });
       if (error) throw error;
-
       toast.success("¡Perfil configurado exitosamente!");
       navigate("/dashboard");
     } catch (error: any) {
@@ -57,32 +55,27 @@ const Onboarding = () => {
       setLoading(false);
     }
   };
-
   const handleAgentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
     try {
       const validatedData = agentFormSchema.parse(formData);
       setLoading(true);
-
-      const { error } = await supabase
-        .from("agents")
-        .insert([{
-          owner_user_id: user.id,
-          trade_name: validatedData.trade_name,
-          trade_name_old: validatedData.trade_name,
-          legal_name: validatedData.legal_name,
-          rnc: validatedData.rnc,
-          telefono: validatedData.telefono,
-          address_old: validatedData.address,
-          business_type: validatedData.business_type,
-          kyb_status: "pending",
-          is_active_old: false,
-        }]);
-
+      const {
+        error
+      } = await supabase.from("agents").insert([{
+        owner_user_id: user.id,
+        trade_name: validatedData.trade_name,
+        trade_name_old: validatedData.trade_name,
+        legal_name: validatedData.legal_name,
+        rnc: validatedData.rnc,
+        telefono: validatedData.telefono,
+        address_old: validatedData.address,
+        business_type: validatedData.business_type,
+        kyb_status: "pending",
+        is_active_old: false
+      }]);
       if (error) throw error;
-
       toast.success("Solicitud enviada. Un administrador la revisará pronto.");
       setShowAgentForm(false);
       navigate("/dashboard");
@@ -98,14 +91,10 @@ const Onboarding = () => {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
         <div className="mb-12 text-center">
-          <h1 className="mb-3 text-4xl font-bold text-primary">
-            Bienvenido a Remesas RD-Haití
-          </h1>
+          <h1 className="mb-3 text-4xl font-bold text-primary">Bienvenidos a KòbCash Remesas RD-Haití</h1>
           <p className="text-lg text-muted-foreground">
             Selecciona el tipo de cuenta que deseas crear
           </p>
@@ -129,12 +118,7 @@ const Onboarding = () => {
                 <li>✓ Seguimiento en tiempo real</li>
                 <li>✓ Comienza a usar de inmediato</li>
               </ul>
-              <Button 
-                onClick={handleSenderUser} 
-                disabled={loading}
-                className="w-full"
-                size="lg"
-              >
+              <Button onClick={handleSenderUser} disabled={loading} className="w-full" size="lg">
                 Continuar como Usuario
               </Button>
             </CardContent>
@@ -157,13 +141,7 @@ const Onboarding = () => {
                 <li>✓ Comisiones por cada envío</li>
                 <li>✓ Requiere aprobación administrativa</li>
               </ul>
-              <Button 
-                onClick={() => setShowAgentForm(true)} 
-                disabled={loading}
-                className="w-full"
-                size="lg"
-                variant="secondary"
-              >
+              <Button onClick={() => setShowAgentForm(true)} disabled={loading} className="w-full" size="lg" variant="secondary">
                 Registrar mi Tienda
               </Button>
             </CardContent>
@@ -183,79 +161,55 @@ const Onboarding = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="trade_name">Nombre Comercial *</Label>
-                <Input
-                  id="trade_name"
-                  value={formData.trade_name}
-                  onChange={(e) => setFormData({ ...formData, trade_name: e.target.value })}
-                  placeholder="Ej: Remesas Express"
-                  required
-                />
+                <Input id="trade_name" value={formData.trade_name} onChange={e => setFormData({
+                ...formData,
+                trade_name: e.target.value
+              })} placeholder="Ej: Remesas Express" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="legal_name">Razón Social *</Label>
-                <Input
-                  id="legal_name"
-                  value={formData.legal_name}
-                  onChange={(e) => setFormData({ ...formData, legal_name: e.target.value })}
-                  placeholder="Nombre legal del negocio"
-                  required
-                />
+                <Input id="legal_name" value={formData.legal_name} onChange={e => setFormData({
+                ...formData,
+                legal_name: e.target.value
+              })} placeholder="Nombre legal del negocio" required />
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="rnc">RNC *</Label>
-                <Input
-                  id="rnc"
-                  value={formData.rnc}
-                  onChange={(e) => setFormData({ ...formData, rnc: e.target.value })}
-                  placeholder="123-45678-9"
-                  required
-                />
+                <Input id="rnc" value={formData.rnc} onChange={e => setFormData({
+                ...formData,
+                rnc: e.target.value
+              })} placeholder="123-45678-9" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="telefono">Teléfono *</Label>
-                <Input
-                  id="telefono"
-                  value={formData.telefono}
-                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                  placeholder="809-XXX-XXXX"
-                  required
-                />
+                <Input id="telefono" value={formData.telefono} onChange={e => setFormData({
+                ...formData,
+                telefono: e.target.value
+              })} placeholder="809-XXX-XXXX" required />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="business_type">Tipo de Negocio *</Label>
-              <Input
-                id="business_type"
-                value={formData.business_type}
-                onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
-                placeholder="Ej: Casa de cambio, Tienda de conveniencia"
-                required
-              />
+              <Input id="business_type" value={formData.business_type} onChange={e => setFormData({
+              ...formData,
+              business_type: e.target.value
+            })} placeholder="Ej: Casa de cambio, Tienda de conveniencia" required />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="address">Dirección *</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Dirección completa del establecimiento"
-                required
-                rows={3}
-              />
+              <Textarea id="address" value={formData.address} onChange={e => setFormData({
+              ...formData,
+              address: e.target.value
+            })} placeholder="Dirección completa del establecimiento" required rows={3} />
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowAgentForm(false)}
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={() => setShowAgentForm(false)} disabled={loading}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={loading}>
@@ -265,8 +219,6 @@ const Onboarding = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Onboarding;
