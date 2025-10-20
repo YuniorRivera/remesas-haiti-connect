@@ -18,7 +18,7 @@ const Index = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(0_80%_15%_/_0.4),_hsl(0_0%_5%))] pointer-events-none" />
       <header className="container mx-auto px-4 py-6 relative z-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary drop-shadow-[0_0_10px_hsl(0_85%_50%_/_0.5)]">Remesas RD-Haití</h1>
+          <h1 className="text-2xl font-bold text-primary drop-shadow-[0_0_10px_hsl(0_85%_50%_/_0.5)]">kobcash</h1>
           <Button onClick={() => navigate("/auth")} variant="outline" className="border-primary/50 hover:bg-primary/10 hover:border-primary">
             Iniciar Sesión
           </Button>
@@ -88,7 +88,7 @@ const Index = () => {
 
       <footer className="border-t border-primary/20 bg-card/30 backdrop-blur-sm py-8 relative z-10">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="mb-2">&copy; 2025 Remesas RD-Haití. Sistema seguro de transferencias.</p>
+          <p className="mb-2">&copy; 2025 kobcash. Sistema seguro de transferencias.</p>
           <div className="flex justify-center gap-4">
             <Button 
               variant="link" 

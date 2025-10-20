@@ -27,7 +27,7 @@ const Auth = () => {
         </Button>
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold tracking-tight text-primary">
-            Remesas RD-Haití
+            kobcash
           </h1>
           <p className="text-muted-foreground">
             Sistema de envío de remesas seguro y confiable
