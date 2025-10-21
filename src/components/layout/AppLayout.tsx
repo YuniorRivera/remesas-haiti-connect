@@ -78,7 +78,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Menu items for Emisor (Sender)
   const senderMenuItems = [
     { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Enviar Dinero", url: "/remittances/create", icon: Send },
+    { title: "Enviar Dinero", url: "/send", icon: Send },
     { title: "Mis Envíos", url: "/transactions", icon: History },
   ];
 

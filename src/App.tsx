@@ -16,6 +16,7 @@ import Transactions from "./pages/Transactions";
 import RemittanceDetail from "./pages/RemittanceDetail";
 import Stores from "./pages/Stores";
 import AgentEarnings from "./pages/AgentEarnings";
+import SenderSend from "./pages/SenderSend";
 import AdminOperations from "./pages/AdminOperations";
 import AdminReconciliation from "./pages/AdminReconciliation";
 import AdminCompliance from "./pages/AdminCompliance";
@@ -64,6 +65,11 @@ const App = () => (
             <Route path="/transactions/:id" element={
               <ProtectedRoute requireAuth>
                 <RemittanceDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/send" element={
+              <ProtectedRoute requireAuth>
+                <SenderSend />
               </ProtectedRoute>
             } />
             

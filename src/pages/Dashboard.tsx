@@ -156,6 +156,28 @@ const Dashboard = () => {
             </>
           )}
 
+          {isSenderUser && !isAdmin && !isAgent && (
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5 text-primary" />
+                  Enviar Dinero
+                </CardTitle>
+                <CardDescription>
+                  Cotiza y envía dinero a Haití
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate("/send")}
+                >
+                  Iniciar Envío
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="transition-shadow hover:shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
