@@ -35,6 +35,7 @@ const Onboarding = () => {
     address: "",
     business_type: ""
   });
+  type AssignResult = { ok: boolean; created?: boolean; reason?: string };
   const handleSenderUser = async () => {
     if (!user) return;
     setLoading(true);
@@ -58,11 +59,12 @@ const Onboarding = () => {
         throw error;
       }
 
-      if (data?.ok) {
-        toast.success(data.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
+      const result = data as unknown as AssignResult;
+      if (result?.ok) {
+        toast.success(result.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
         navigate("/dashboard");
       } else {
-        toast.error("No se pudo configurar el perfil. Intenta nuevamente.");
+        toast.error(result?.reason ? `No se pudo configurar el perfil: ${result.reason}` : "No se pudo configurar el perfil. Intenta nuevamente.");
       }
     } catch (error: any) {
       console.error("Error asignando rol:", error);
