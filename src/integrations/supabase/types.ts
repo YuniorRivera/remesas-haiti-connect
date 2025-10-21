@@ -889,6 +889,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_sender_user: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_transaction_for_agent: {
         Args: { transaction_id: string }
         Returns: {
@@ -910,6 +914,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      user_has_no_roles: {
+        Args: { _user_id: string }
         Returns: boolean
       }
     }
