@@ -136,7 +136,7 @@ const Onboarding = () => {
                 <li>✓ Seguimiento en tiempo real</li>
                 <li>✓ Comienza a usar de inmediato</li>
               </ul>
-              <Button onClick={handleSenderUser} disabled={loading} className="w-full" size="lg">
+              <Button onClick={() => navigate('/onboarding/sender')} disabled={loading} className="w-full" size="lg">
                 Continuar como Usuario
               </Button>
             </CardContent>

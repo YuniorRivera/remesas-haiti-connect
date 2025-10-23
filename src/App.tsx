@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
+import OnboardingSender from "./pages/OnboardingSender";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateRemittance from "./pages/CreateRemittance";
@@ -48,6 +49,11 @@ const App = () => (
           <Route path="/onboarding" element={
             <ProtectedRoute requireAuth>
               <Onboarding />
+            </ProtectedRoute>
+          } />
+          <Route path="/onboarding/sender" element={
+            <ProtectedRoute requireAuth>
+              <OnboardingSender />
             </ProtectedRoute>
           } />
             
