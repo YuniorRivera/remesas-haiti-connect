@@ -26,7 +26,7 @@ const OnboardingSender = () => {
   console.log("🔷 OnboardingSender component mounted");
   
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [formData, setFormData] = useState<SenderFormData>({
@@ -38,11 +38,17 @@ const OnboardingSender = () => {
   });
 
   useEffect(() => {
-    console.log("🔷 useEffect triggered, user:", user ? `${user.id}` : "no user");
+    console.log("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user");
     
     const initializeForm = async () => {
       try {
         setIsChecking(true);
+
+        // 0. Esperar a que termine de cargar la autenticación
+        if (authLoading) {
+          console.log("⏳ Auth still loading, waiting...");
+          return;
+        }
 
         // 1. Verificar autenticación
         if (!user) {
@@ -105,7 +111,7 @@ const OnboardingSender = () => {
     };
 
     initializeForm();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
