@@ -23,9 +23,12 @@ const senderFormSchema = z.object({
 type SenderFormData = z.infer<typeof senderFormSchema>;
 
 const OnboardingSender = () => {
+  console.log("🔷 OnboardingSender component mounted");
+  
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const [formData, setFormData] = useState<SenderFormData>({
     full_name: "",
     phone: "",
@@ -35,45 +38,73 @@ const OnboardingSender = () => {
   });
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
+    console.log("🔷 useEffect triggered, user:", user ? `${user.id}` : "no user");
+    
+    const initializeForm = async () => {
+      try {
+        setIsChecking(true);
 
-    // Verificar si ya tiene el rol sender_user
-    const checkRole = async () => {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-      
-      if (roles && roles.some(r => r.role === "sender_user")) {
-        navigate("/dashboard");
-        return;
+        // 1. Verificar autenticación
+        if (!user) {
+          console.log("❌ No user found, redirecting to /auth");
+          navigate("/auth");
+          return;
+        }
+
+        console.log("✅ User authenticated:", user.id);
+
+        // 2. Verificar si ya tiene el rol sender_user
+        console.log("🔍 Checking if user has sender_user role...");
+        const { data: roles, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+
+        if (rolesError) {
+          console.error("❌ Error checking roles:", rolesError);
+        } else {
+          console.log("📋 User roles:", roles);
+          
+          if (roles && roles.some(r => r.role === "sender_user")) {
+            console.log("✅ User already has sender_user role, redirecting to dashboard");
+            navigate("/dashboard");
+            return;
+          }
+        }
+
+        // 3. Cargar perfil existente si ya existe
+        console.log("🔍 Loading existing profile...");
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("full_name, phone, direccion, documento_identidad, tipo_documento")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("❌ Error loading profile:", profileError);
+        } else if (profile) {
+          console.log("✅ Profile loaded:", profile);
+          setFormData({
+            full_name: profile.full_name || "",
+            phone: profile.phone || "",
+            direccion: profile.direccion || "",
+            documento_identidad: profile.documento_identidad || "",
+            tipo_documento: profile.tipo_documento || ""
+          });
+        } else {
+          console.log("ℹ️ No existing profile found");
+        }
+
+        console.log("✅ Initialization complete, showing form");
+        setIsChecking(false);
+
+      } catch (error) {
+        console.error("❌ Error in initialization:", error);
+        setIsChecking(false);
       }
     };
 
-    // Cargar perfil existente si ya existe
-    const loadProfile = async () => {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, phone, direccion, documento_identidad, tipo_documento")
-        .eq("id", user.id)
-        .single();
-      
-      if (profile) {
-        setFormData({
-          full_name: profile.full_name || "",
-          phone: profile.phone || "",
-          direccion: profile.direccion || "",
-          documento_identidad: profile.documento_identidad || "",
-          tipo_documento: profile.tipo_documento || ""
-        });
-      }
-    };
-
-    checkRole();
-    loadProfile();
+    initializeForm();
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -119,6 +150,17 @@ const OnboardingSender = () => {
       setLoading(false);
     }
   };
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
