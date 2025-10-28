@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -36,9 +36,12 @@ const OnboardingSender = () => {
   console.log("🔷 OnboardingSender component mounted");
   
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const force = searchParams.get("force") === "1";
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const ranRef = useRef(false);
   const [formData, setFormData] = useState<SenderFormData>({
     full_name: "",
     phone: "",
@@ -48,7 +51,7 @@ const OnboardingSender = () => {
   });
 
   useEffect(() => {
-    console.log("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user");
+    console.log("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user", "force:", force);
     
     const initializeForm = async () => {
       try {
@@ -66,6 +69,13 @@ const OnboardingSender = () => {
           navigate("/auth");
           return;
         }
+
+        // 2. Prevenir doble ejecución en Strict Mode
+        if (ranRef.current) {
+          console.log("⏭️ Already ran initialization, skipping");
+          return;
+        }
+        ranRef.current = true;
 
         console.log("✅ User authenticated:", user.id);
 
@@ -97,13 +107,14 @@ const OnboardingSender = () => {
 
         console.log("📊 Status:", { 
           hasSenderRole, 
-          profileComplete, 
+          profileComplete,
+          force,
           profile: profile ? { full_name: profile.full_name, phone: profile.phone } : null 
         });
 
-        // 4. Si tiene rol Y perfil completo -> dashboard
-        if (hasSenderRole && profileComplete) {
-          console.log("✅ User has role and complete profile, redirecting to dashboard");
+        // 4. Si tiene rol Y perfil completo Y no forzamos -> dashboard
+        if (hasSenderRole && profileComplete && !force) {
+          console.log("✅ User has role and complete profile, redirecting to dashboard (not forced)");
           toast.success("¡Ya estás listo!");
           navigate("/dashboard");
           return;
@@ -134,7 +145,7 @@ const OnboardingSender = () => {
     };
 
     initializeForm();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, force]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +212,7 @@ const OnboardingSender = () => {
             </div>
             <CardTitle className="text-3xl">Registro de Usuario Final</CardTitle>
             <CardDescription className="text-base">
-              Completa tu información para comenzar a enviar remesas
+              {force && formData.full_name ? "Estás editando tu perfil" : "Completa tu información para comenzar a enviar remesas"}
             </CardDescription>
           </CardHeader>
           <CardContent>
