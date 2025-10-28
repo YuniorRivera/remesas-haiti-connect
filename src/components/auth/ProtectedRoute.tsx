@@ -23,13 +23,27 @@ export default function ProtectedRoute({
   const { user, loading: authLoading } = useAuth();
   const { roles, loading: roleLoading } = useUserRole(user?.id);
 
+  const needsRoleCheck = !!(allowedRoles && allowedRoles.length > 0);
+
   useEffect(() => {
     if (!authLoading && requireAuth && !user) {
       navigate("/auth");
     }
   }, [authLoading, requireAuth, user, navigate]);
 
-  if (authLoading || (user && roleLoading)) {
+  // Logs para diagnóstico
+  useEffect(() => {
+    console.log("🔒 ProtectedRoute state", {
+      authLoading,
+      hasUser: !!user,
+      needsRoleCheck,
+      roleLoading,
+      roles
+    });
+  }, [authLoading, user, needsRoleCheck, roleLoading, roles]);
+
+  // Mostrar loader SOLO si auth carga o si necesitamos roles y estos cargan
+  if (authLoading || (requireAuth && user && needsRoleCheck && roleLoading)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -44,8 +58,8 @@ export default function ProtectedRoute({
     return null;
   }
 
-  if (allowedRoles && allowedRoles.length > 0) {
-    const hasAllowedRole = roles.some(role => allowedRoles.includes(role));
+  if (needsRoleCheck) {
+    const hasAllowedRole = roles.some(role => allowedRoles!.includes(role));
     
     if (!hasAllowedRole) {
       return (
