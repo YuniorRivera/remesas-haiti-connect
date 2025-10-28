@@ -8,6 +8,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogOut, Send, Users, BarChart3, History } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,12 +20,39 @@ const Dashboard = () => {
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/auth");
+      return;
     }
     
     // If user is authenticated but has no role, redirect to onboarding
     if (!roleLoading && user && !isAdmin && !isAgent && !isComplianceOfficer && !isSenderUser) {
       navigate("/onboarding");
+      return;
     }
+
+    // Salvaguarda: Si es sender_user, verificar que el perfil esté completo
+    const checkProfileCompletion = async () => {
+      if (!roleLoading && isSenderUser && user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, phone")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        const isComplete = Boolean(
+          profile?.full_name && 
+          profile?.phone && 
+          profile.full_name.trim() && 
+          profile.phone.trim()
+        );
+
+        if (!isComplete) {
+          console.log("⚠️ Sender user with incomplete profile, redirecting to onboarding");
+          navigate("/onboarding/sender");
+        }
+      }
+    };
+
+    checkProfileCompletion();
   }, [user, authLoading, roleLoading, isAdmin, isAgent, isComplianceOfficer, isSenderUser, navigate]);
 
   const handleSignOut = async () => {

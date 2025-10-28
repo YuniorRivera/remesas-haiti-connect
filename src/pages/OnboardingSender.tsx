@@ -14,11 +14,21 @@ import { User } from "lucide-react";
 
 const senderFormSchema = z.object({
   full_name: z.string().trim().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
-  phone: z.string().trim().min(10, "El teléfono debe tener al menos 10 dígitos").max(20, "El teléfono es muy largo").optional().or(z.literal("")),
+  phone: z.string().trim().min(10, "El teléfono debe tener al menos 10 dígitos").max(20, "El teléfono es muy largo"),
   direccion: z.string().trim().max(200, "La dirección es muy larga").optional().or(z.literal("")),
   documento_identidad: z.string().trim().max(50, "El documento es muy largo").optional().or(z.literal("")),
   tipo_documento: z.string().optional().or(z.literal(""))
 });
+
+// Helper para verificar si el perfil está completo
+const isProfileComplete = (profile: any): boolean => {
+  return Boolean(
+    profile?.full_name && 
+    profile?.phone && 
+    profile.full_name.trim() && 
+    profile.phone.trim()
+  );
+};
 
 type SenderFormData = z.infer<typeof senderFormSchema>;
 
@@ -59,27 +69,8 @@ const OnboardingSender = () => {
 
         console.log("✅ User authenticated:", user.id);
 
-        // 2. Verificar si ya tiene el rol sender_user
-        console.log("🔍 Checking if user has sender_user role...");
-        const { data: roles, error: rolesError } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id);
-
-        if (rolesError) {
-          console.error("❌ Error checking roles:", rolesError);
-        } else {
-          console.log("📋 User roles:", roles);
-          
-          if (roles && roles.some(r => r.role === "sender_user")) {
-            console.log("✅ User already has sender_user role, redirecting to dashboard");
-            navigate("/dashboard");
-            return;
-          }
-        }
-
-        // 3. Cargar perfil existente si ya existe
-        console.log("🔍 Loading existing profile...");
+        // 2. Cargar perfil y verificar si está completo
+        console.log("🔍 Loading profile...");
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("full_name, phone, direccion, documento_identidad, tipo_documento")
@@ -88,8 +79,39 @@ const OnboardingSender = () => {
 
         if (profileError) {
           console.error("❌ Error loading profile:", profileError);
-        } else if (profile) {
-          console.log("✅ Profile loaded:", profile);
+        }
+
+        // 3. Verificar si ya tiene el rol sender_user
+        console.log("🔍 Checking if user has sender_user role...");
+        const { data: roles, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+
+        if (rolesError) {
+          console.error("❌ Error checking roles:", rolesError);
+        }
+
+        const hasSenderRole = roles && roles.some(r => r.role === "sender_user");
+        const profileComplete = isProfileComplete(profile);
+
+        console.log("📊 Status:", { 
+          hasSenderRole, 
+          profileComplete, 
+          profile: profile ? { full_name: profile.full_name, phone: profile.phone } : null 
+        });
+
+        // 4. Si tiene rol Y perfil completo -> dashboard
+        if (hasSenderRole && profileComplete) {
+          console.log("✅ User has role and complete profile, redirecting to dashboard");
+          toast.success("¡Ya estás listo!");
+          navigate("/dashboard");
+          return;
+        }
+
+        // 5. Cargar datos del perfil en el formulario (si existen)
+        if (profile) {
+          console.log("✅ Loading profile data into form");
           setFormData({
             full_name: profile.full_name || "",
             phone: profile.phone || "",
@@ -101,7 +123,8 @@ const OnboardingSender = () => {
           console.log("ℹ️ No existing profile found");
         }
 
-        console.log("✅ Initialization complete, showing form");
+        // 6. Mostrar formulario (perfil incompleto o sin rol)
+        console.log("✅ Showing form");
         setIsChecking(false);
 
       } catch (error) {
