@@ -50,15 +50,41 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## Development
+
+### Linting & Type Checking
+
+```sh
+npm run lint          # Check ESLint issues
+npm run lint:fix      # Auto-fix ESLint issues  
+npm run type-check    # TypeScript strict type checking
+```
+
+### Testing
+
+```sh
+npm run test          # Run tests in watch mode
+npm run test:smoke    # Run smoke tests once (CI-friendly)
+npm run test:ui       # Open Vitest UI for debugging
+```
+
+Smoke tests verify critical paths without requiring a full test suite:
+- App rendering
+- i18n translations (HT/ES/FR)
+- Utility functions (logger)
+
+**Note:** TypeScript strict mode is enabled. Expect type errors during incremental adoption.
+
 ## What technologies are used for this project?
 
 This project is built with:
 
 - Vite
-- TypeScript
+- TypeScript (strict mode)
 - React
 - shadcn-ui
 - Tailwind CSS
+- Vitest (testing)
 
 ## Security
 
