@@ -97,10 +97,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <Sidebar className="border-r">
+        <Sidebar className="border-r" id="main-navigation" role="navigation" aria-label="Navegación principal">
           <SidebarHeader className="border-b p-4">
             <div className="flex items-center gap-2">
-              <Store className="h-6 w-6" />
+              <Store className="h-6 w-6" aria-hidden="true" />
               <span className="font-semibold">RemitApp</span>
             </div>
           </SidebarHeader>
@@ -122,8 +122,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                             navigate(item.url);
                           }}
                           className="flex items-center gap-2"
+                          aria-label={item.title}
                         >
-                          <item.icon className="h-4 w-4" />
+                          <item.icon className="h-4 w-4" aria-hidden="true" />
                           <span>{item.title}</span>
                         </a>
                       </SidebarMenuButton>
@@ -146,8 +147,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                           navigate("/legal");
                         }}
                         className="flex items-center gap-2"
+                        aria-label={`${t("privacy")} y ${t("termsConditions")}`}
                       >
-                        <FileText className="h-4 w-4" />
+                        <FileText className="h-4 w-4" aria-hidden="true" />
                         <span>{t("privacy")} & {t("termsConditions")}</span>
                       </a>
                     </SidebarMenuButton>
@@ -169,8 +171,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                   size="sm"
                   onClick={handleSignOut}
                   className="flex-1"
+                  aria-label={`${t("logout")} de la sesión`}
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
                   {t("logout")}
                 </Button>
               </div>
@@ -179,13 +182,13 @@ export function AppLayout({ children }: AppLayoutProps) {
         </Sidebar>
 
         <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center justify-between px-4">
-            <SidebarTrigger />
+          <header className="h-14 border-b flex items-center justify-between px-4" role="banner">
+            <SidebarTrigger aria-label="Abrir o cerrar menú de navegación" />
             <div className="flex items-center gap-2">
               <LanguageSelector />
             </div>
           </header>
-          <main className="flex-1 overflow-auto">{children}</main>
+          <main id="main-content" className="flex-1 overflow-auto" role="main" tabIndex={-1}>{children}</main>
         </div>
       </div>
     </SidebarProvider>

@@ -22,20 +22,30 @@ export function LanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Languages className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2"
+          aria-label={`Seleccionar idioma. Idioma actual: ${currentLang?.label}`}
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <Languages className="h-4 w-4" aria-hidden="true" />
           <span className="hidden sm:inline">{currentLang?.flag} {currentLang?.label}</span>
           <span className="sm:hidden">{currentLang?.flag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" role="menu" aria-label="Seleccionar idioma">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
             className={language === lang.code ? "bg-accent" : ""}
+            role="menuitem"
+            aria-label={`Cambiar idioma a ${lang.label}`}
+            aria-selected={language === lang.code}
           >
-            <span className="mr-2">{lang.flag}</span>
+            <span className="mr-2" aria-hidden="true">{lang.flag}</span>
             {lang.label}
           </DropdownMenuItem>
         ))}

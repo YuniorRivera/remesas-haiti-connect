@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { LiteModeProvider } from "@/contexts/LiteModeContext";
 import { CookieBanner } from "./components/CookieBanner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SkipLinks } from "@/components/SkipLink";
 // Critical above-the-fold pages (no lazy loading for LCP)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -55,6 +56,7 @@ const App = () => (
         <LiteModeProvider>
           <TooltipProvider>
             <BrowserRouter>
+              <SkipLinks />
               <Toaster />
               <Sonner />
               <CookieBanner />
