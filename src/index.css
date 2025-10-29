@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lite mode: disable animations, transitions, shadows, and heavy effects */
+body.lite *, body.lite *::before, body.lite *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Disable shadcn/sonner/toast animations in lite mode */
+body.lite .sonner, body.lite [data-sonner-toaster], body.lite [role="tooltip"], body.lite [data-state] {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

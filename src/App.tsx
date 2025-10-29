@@ -30,12 +30,14 @@ import AdminLedger from "./pages/AdminLedger";
 import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import { CookieBanner } from "./components/CookieBanner";
+import { LiteModeProvider } from "@/contexts/LiteModeContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
+      <LiteModeProvider>
       <TooltipProvider>
         <BrowserRouter>
           <Toaster />
@@ -160,6 +162,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </LiteModeProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
