@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { validateKycFile, KYC_ALLOWED_TYPES, KYC_MAX_SIZE_MB } from "@/lib/sanitize";
 import { toast } from "sonner";
 

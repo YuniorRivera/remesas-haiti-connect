@@ -41,7 +41,7 @@ export function ReconciliationUpload({ onComplete }: ReconciliationUploadProps) 
         const content = event.target?.result as string;
         const parsed = JSON.parse(content);
         setJsonData(JSON.stringify(parsed, null, 2));
-      } catch (error) {
+      } catch {
         toast.error("Error al leer archivo JSON");
       }
     };

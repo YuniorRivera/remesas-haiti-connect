@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+*.local
+coverage
+.vscode
+.idea
+build
+pnpm-lock.yaml
+package-lock.json
+

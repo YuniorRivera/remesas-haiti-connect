@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 
 interface AdminOnlyFieldProps {

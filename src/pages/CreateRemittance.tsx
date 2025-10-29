@@ -184,7 +184,7 @@ export default function CreateRemittance() {
           emisor_documento: formData.emisor_documento || '',
           beneficiario_telefono: formData.beneficiario_telefono,
           principal_dop: parseFloat(formData.principal_dop),
-          origin_ip: window.location.hostname,
+          origin_ip: typeof window !== 'undefined' ? window.location.hostname : 'unknown',
         },
       });
 
@@ -208,7 +208,7 @@ export default function CreateRemittance() {
           principal_dop: parseFloat(formData.principal_dop),
           channel: formData.channel,
           payout_city: formData.payout_city.trim() || null,
-          origin_ip: window.location.hostname,
+          origin_ip: typeof window !== 'undefined' ? window.location.hostname : 'unknown',
         },
       });
 

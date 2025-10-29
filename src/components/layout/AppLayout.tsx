@@ -23,7 +23,6 @@ import {
   Send,
   History,
   TrendingUp,
-  Settings,
   FileText,
   ShieldCheck,
   BarChart3,

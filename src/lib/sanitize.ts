@@ -46,7 +46,7 @@ export function sanitizeFilename(filename: string): string {
   let sanitized = filename.replace(/\.\.\//g, '');
   
   // Remove path separators
-  sanitized = sanitized.replace(/[\/\\]/g, '');
+  sanitized = sanitized.replace(/[/\\]/g, '');
   
   // Keep only safe characters: letters, numbers, dash, underscore, dot
   sanitized = sanitized.replace(/[^a-zA-Z0-9\-_.]/g, '_');
@@ -76,7 +76,7 @@ export function sanitizeDocumentNumber(doc: string): string {
   if (!doc) return '';
   
   // Allow only alphanumeric and dash
-  return doc.replace(/[^a-zA-Z0-9\-]/g, '').trim();
+  return doc.replace(/[^a-zA-Z0-9-]/g, '').trim();
 }
 
 /**
@@ -86,7 +86,7 @@ export function sanitizeName(name: string): string {
   if (!name) return '';
   
   // Allow letters (including accented), spaces, apostrophes, hyphens
-  return name.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s'\-]/g, '').trim();
+  return name.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]/g, '').trim();
 }
 
 /**

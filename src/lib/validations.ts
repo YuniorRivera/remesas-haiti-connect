@@ -52,7 +52,7 @@ export const remittanceSchema = z.object({
     .transform(sanitizeDocumentNumber)
     .pipe(z.string()
       .max(50, { message: "Documento demasiado largo" })
-      .regex(/^[0-9\-]+$/, { message: "Solo números y guiones" })
+      .regex(/^[0-9-]+$/, { message: "Solo números y guiones" })
     )
     .optional()
     .or(z.literal('')),

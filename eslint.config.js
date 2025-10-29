@@ -24,22 +24,22 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-non-null-assertion": "warn",
+      // Disallow console in UI code except warn/error (default)
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
-    overrides: [
-      {
-        files: ["src/**/*.{ts,tsx}"],
-        rules: {
-          // Disallow console in UI code except warn/error
-          "no-console": ["warn", { allow: ["warn", "error"] }],
-        },
-      },
-      {
-        files: ["supabase/functions/**/*.{ts,tsx}"],
-        rules: {
-          // Allow console in serverless functions for observability
-          "no-console": "off",
-        },
-      },
-    ],
+  },
+  // UI code specific rules
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+    },
+  },
+  // Supabase functions allow console
+  {
+    files: ["supabase/functions/**/*.{ts,tsx}"],
+    rules: {
+      "no-console": "off",
+    },
   },
 );

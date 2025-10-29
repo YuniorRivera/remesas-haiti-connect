@@ -8,10 +8,7 @@ const DEFAULT_SECURITY_HEADERS: HeadersRecord = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
 };
 
-function parseAllowedOrigins(): string[] | '*':
-  | string[]
-  | '*'
-{
+function parseAllowedOrigins(): string[] | '*' {
   const raw = Deno.env.get('ALLOWED_ORIGINS');
   if (!raw) return '*';
   const list = raw
