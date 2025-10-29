@@ -1,21 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0'
 import { checkRateLimit } from '../_shared/rateLimiter.ts'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Access-Control-Allow-Credentials': 'true',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-}
+import { buildCorsHeaders, preflight, json } from '../_shared/security.ts'
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     const { email, password } = await req.json()
@@ -31,38 +20,25 @@ Deno.serve(async (req) => {
     
     if (!rateLimit.allowed) {
       console.warn(`Rate limit exceeded for IP: ${clientIp}`);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Demasiados intentos de inicio de sesión. Intenta de nuevo en 15 minutos.' 
-        }),
-        { 
-          status: 429, 
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json',
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-            'X-RateLimit-Reset': new Date(rateLimit.resetAt).toISOString(),
-          } 
-        }
-      );
+      return json({ 
+        error: 'Demasiados intentos de inicio de sesión. Intenta de nuevo en 15 minutos.' 
+      }, { status: 429, headers: {
+        'X-RateLimit-Limit': '5',
+        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rateLimit.resetAt).toISOString(),
+        ...buildCorsHeaders(req)
+      }})
     }
     
     // Input validation
     if (!email || !password) {
-      return new Response(
-        JSON.stringify({ error: 'Email y contraseña requeridos' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Email y contraseña requeridos' }, 400, req)
     }
     
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return new Response(
-        JSON.stringify({ error: 'Formato de email inválido' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Formato de email inválido' }, 400, req)
     }
 
     const supabaseClient = createClient(
@@ -77,10 +53,7 @@ Deno.serve(async (req) => {
 
     if (error) {
       console.error('Login error:', error)
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: error.message }, 401, req)
     }
 
     // Generate CSRF token
@@ -93,25 +66,9 @@ Deno.serve(async (req) => {
       `csrf-token=${csrfToken}; Secure; SameSite=Lax; Path=/; Max-Age=3600`,
     ]
 
-    return new Response(
-      JSON.stringify({ 
-        user: data.user,
-        csrfToken,
-      }),
-      {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-          'Set-Cookie': cookies.join(', '),
-        },
-      }
-    )
+    return json({ user: data.user, csrfToken }, { status: 200, headers: { 'Set-Cookie': cookies.join(', '), ...buildCorsHeaders(req) } })
   } catch (err) {
     console.error('Unexpected error:', err)
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    return json({ error: 'Internal server error' }, 500, req)
   }
 })

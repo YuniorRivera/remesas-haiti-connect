@@ -1,9 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-};
+import { buildCorsHeaders, preflight, json } from '../_shared/security.ts'
 
 interface QuoteRequest {
   principal_dop: number;
@@ -26,10 +22,8 @@ interface FeesMatrix {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Validar CSRF token
@@ -40,10 +34,7 @@ Deno.serve(async (req) => {
 
     if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
       console.error('CSRF validation failed');
-      return new Response(
-        JSON.stringify({ error: 'CSRF token inválido' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'CSRF token inválido' }, 403, req);
     }
 
     const supabaseClient = createClient(
@@ -64,10 +55,7 @@ Deno.serve(async (req) => {
 
     if (authError || !user) {
       console.error('Authentication error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'No autorizado' }, 401, req)
     }
 
     // Verificar rol del usuario
@@ -85,17 +73,11 @@ Deno.serve(async (req) => {
 
     // Validar input
     if (!principal_dop || principal_dop <= 0) {
-      return new Response(
-        JSON.stringify({ error: 'Monto principal inválido' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Monto principal inválido' }, 400, req)
     }
 
     if (!channel || !['MONCASH', 'SPIH'].includes(channel)) {
-      return new Response(
-        JSON.stringify({ error: 'Canal inválido. Use MONCASH o SPIH' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Canal inválido. Use MONCASH o SPIH' }, 400, req)
     }
 
     // Leer fees_matrix activa para RD→HT y el canal especificado
@@ -109,10 +91,7 @@ Deno.serve(async (req) => {
 
     if (feesError || !feesData) {
       console.error('Error fetching fees matrix:', feesError);
-      return new Response(
-        JSON.stringify({ error: 'No se encontró configuración de tarifas activa para este canal' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'No se encontró configuración de tarifas activa para este canal' }, 404, req)
     }
 
     const fees: FeesMatrix = feesData;
@@ -186,19 +165,16 @@ Deno.serve(async (req) => {
         deficit: total_costs - total_platform_revenue,
       });
 
-      return new Response(
-        JSON.stringify({
-          error: 'Cotización rechazada: La transacción no es rentable con las tarifas actuales',
-          details: isAdmin
-            ? {
-                total_costs,
-                total_platform_revenue,
-                deficit: total_costs - total_platform_revenue,
-              }
-            : undefined,
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({
+        error: 'Cotización rechazada: La transacción no es rentable con las tarifas actuales',
+        details: isAdmin
+          ? {
+              total_costs,
+              total_platform_revenue,
+              deficit: total_costs - total_platform_revenue,
+            }
+          : undefined,
+      }, 400, req)
     }
 
     // === RESPUESTA DIFERENCIADA POR ROL ===
@@ -254,16 +230,10 @@ Deno.serve(async (req) => {
 
     console.log('Quote generated successfully for user:', user.id);
 
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json(response, 200, req)
   } catch (error) {
     console.error('Error in pricing-quote function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    return new Response(
-      JSON.stringify({ error: 'Error interno del servidor', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return json({ error: 'Error interno del servidor', details: errorMessage }, 500, req)
   }
 });
