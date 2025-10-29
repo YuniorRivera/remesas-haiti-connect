@@ -1,7 +1,4 @@
-import React, { Component, type ErrorInfo, type ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Component, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -11,47 +8,25 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
-  errorInfo: ErrorInfo | null;
 }
 
+/**
+ * Error Boundary component to catch React errors
+ * and provide graceful degradation
+ */
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({
-      error,
-      errorInfo,
-    });
-
-    // Log error to console in development
-    if (import.meta.env.DEV) {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
-    }
-
-    // TODO: Send to error tracking service (e.g., Sentry) in production
-    // if (import.meta.env.PROD) {
-    //   errorTrackingService.captureException(error, { extra: errorInfo });
-    // }
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
-
-  handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
-  };
 
   render() {
     if (this.state.hasError) {
@@ -60,55 +35,34 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-          <Card className="max-w-2xl w-full">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-                <CardTitle>Algo salió mal</CardTitle>
-              </div>
-              <CardDescription>
-                Ha ocurrido un error inesperado. Por favor, intenta recargar la página.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {import.meta.env.DEV && this.state.error && (
-                <div className="rounded-md bg-destructive/10 p-4 text-sm">
-                  <p className="font-semibold mb-2">Error (solo en desarrollo):</p>
-                  <pre className="whitespace-pre-wrap text-xs overflow-auto">
-                    {this.state.error.toString()}
-                    {this.state.errorInfo?.componentStack && (
-                      <>
-                        {"\n\nComponent Stack:"}
-                        {this.state.errorInfo.componentStack}
-                      </>
-                    )}
-                  </pre>
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <Button onClick={this.handleReset} variant="outline">
-                  Intentar de nuevo
-                </Button>
-                <Button
-                  onClick={() => {
-                    window.location.href = "/";
-                  }}
-                >
-                  Ir al inicio
-                </Button>
-                <Button
-                  onClick={() => {
-                    window.location.reload();
-                  }}
-                  variant="secondary"
-                >
-                  Recargar página
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+          <div className="text-center max-w-md">
+            <h1 className="text-2xl font-bold text-destructive mb-4">
+              Algo salió mal
+            </h1>
+            <p className="text-muted-foreground mb-4">
+              Lo sentimos, ocurrió un error. Por favor, recarga la página.
+            </p>
+            <button
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Recargar página
+            </button>
+            {process.env.NODE_ENV === 'development' && this.state.error && (
+              <details className="mt-4 text-left">
+                <summary className="cursor-pointer text-sm text-muted-foreground">
+                  Detalles del error
+                </summary>
+                <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
+                  {this.state.error.toString()}
+                </pre>
+              </details>
+            )}
+          </div>
         </div>
       );
     }
@@ -116,4 +70,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-

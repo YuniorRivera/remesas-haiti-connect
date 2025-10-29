@@ -34,6 +34,7 @@ const Index = () => {
 
       <main className="relative z-10">
         <section className="container mx-auto px-4 py-20 text-center">
+          {/* LCP element - prioritize loading */}
           <h2 className="mb-6 text-5xl font-bold tracking-tight">
             Envía dinero a Haití de forma{" "}
             {isLite ? (

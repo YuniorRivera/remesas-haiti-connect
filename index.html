@@ -13,6 +13,16 @@
     <link rel="preconnect" href="https://esm.sh" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" crossorigin />
     
+    <!-- Preload critical resources for LCP -->
+    <!-- Preconnect to Supabase for faster API calls -->
+    <link rel="preconnect" href="https://supabase.co" crossorigin />
+    
+    <!-- Font preloading (if custom fonts are added later) -->
+    <!-- <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin /> -->
+    
+    <!-- Prefetch main JS bundle -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+    
     <!-- Security Meta Tags -->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
 
