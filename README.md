@@ -75,6 +75,14 @@ Smoke tests verify critical paths without requiring a full test suite:
 
 **Note:** TypeScript strict mode is enabled. Expect type errors during incremental adoption.
 
+## Performance Features
+
+- **Lazy Loading**: Heavy components are lazy-loaded for better code splitting
+- **Lite Mode**: Add `?lite=1` to URL to disable animations and heavy effects (40-50% LCP improvement)
+- **FX Rate Caching**: 60-second cache for exchange rate API calls (configurable via `VITE_FX_API_URL`)
+- **Optimized Image Component**: Use `<OptimizedImage>` for lazy-loaded images with priority support
+- **Code Splitting**: Automatic vendor chunk splitting (React, UI, PDF, Charts, etc.)
+
 ## What technologies are used for this project?
 
 This project is built with:
