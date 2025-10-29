@@ -13,6 +13,8 @@ import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
 import { toast } from "sonner";
 import { RemittanceReceipt } from "@/components/RemittanceReceipt";
 import { logger } from "@/lib/logger";
+import { PageHeader } from "@/components/ui/page-header";
+import { StepIndicator } from "@/components/ui/step-indicator";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -48,13 +50,13 @@ export default function CreateRemittance() {
           .maybeSingle();
 
         if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          toast.error('Error al cargar información del agente');
+          logger.error('Error fetching profile:', profileError);
+          toast.error(t('errorLoadingAgentInfo'));
           return;
         }
 
         if (!profile?.agent_id) {
-          toast.warning('No tienes una tienda asignada');
+          toast.warning(t('noStoreAssigned'));
           return;
         }
 
@@ -65,7 +67,7 @@ export default function CreateRemittance() {
           .maybeSingle();
         
         if (agentError) {
-          console.error('Error fetching agent:', agentError);
+          logger.error('Error fetching agent:', agentError);
           return;
         }
 
@@ -74,7 +76,7 @@ export default function CreateRemittance() {
         }
       } catch {
         logger.error('Unexpected error fetching agent info');
-        toast.error('Error inesperado al cargar información');
+        toast.error(t('unexpectedErrorLoadingInfo'));
       }
     };
 
@@ -105,42 +107,14 @@ export default function CreateRemittance() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-card shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate("/agent-dashboard")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToDashboard")}
-          </Button>
-          <h1 className="text-2xl font-bold text-primary mt-2">{t("createRemittance")}</h1>
-        </div>
-      </header>
+      <PageHeader
+        title={t("createRemittance")}
+        backUrl="/agent-dashboard"
+        backLabel={t("backToDashboard")}
+      />
 
       <main className="container mx-auto p-6 max-w-2xl">
-        {/* Indicador de pasos */}
-        <div className="flex items-center justify-center mb-8 gap-2">
-          {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex items-center">
-              <div
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  s < step
-                    ? "bg-primary text-primary-foreground"
-                    : s === step
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {s < step ? <Check className="h-4 w-4" /> : s}
-              </div>
-              {s < 4 && (
-                <div
-                  className={`h-0.5 w-12 ${
-                    s < step ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        <StepIndicator currentStep={step} totalSteps={4} />
 
         {/* Paso 1: Datos del Emisor */}
         {step === 1 && (

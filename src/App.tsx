@@ -10,6 +10,7 @@ import { LiteModeProvider } from "@/contexts/LiteModeContext";
 import { CookieBanner } from "./components/CookieBanner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipLinks } from "@/components/SkipLink";
+import { LoadingFallback } from "@/components/ui/loading";
 // Critical above-the-fold pages (no lazy loading for LCP)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -37,15 +38,6 @@ const AdminLedger = lazy(() => import("./pages/AdminLedger"));
 const Stores = lazy(() => import("./pages/Stores"));
 const AgentEarnings = lazy(() => import("./pages/AgentEarnings"));
 const SenderSend = lazy(() => import("./pages/SenderSend"));
-
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
-      <p className="text-muted-foreground">Cargando...</p>
-    </div>
-  </div>
-);
 
 const queryClient = new QueryClient();
 
