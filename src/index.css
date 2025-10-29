@@ -3,19 +3,64 @@
 @tailwind utilities;
 
 /* Lite mode: disable animations, transitions, shadows, and heavy effects */
-body.lite *, body.lite *::before, body.lite *::after {
+/* This improves LCP and reduces CPU usage on low-end devices */
+body.lite *,
+body.lite *::before,
+body.lite *::after {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
   transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
   scroll-behavior: auto !important;
   box-shadow: none !important;
   filter: none !important;
   backdrop-filter: none !important;
+  transform: none !important;
 }
 
 /* Disable shadcn/sonner/toast animations in lite mode */
-body.lite .sonner, body.lite [data-sonner-toaster], body.lite [role="tooltip"], body.lite [data-state] {
+body.lite .sonner,
+body.lite [data-sonner-toaster],
+body.lite [role="tooltip"],
+body.lite [data-state],
+body.lite [data-radix-popper-content-wrapper] {
   animation: none !important;
   transition: none !important;
+}
+
+/* Disable hover effects in lite mode */
+body.lite *:hover {
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Hide decorative gradients and heavy overlays in lite mode */
+body.lite .bg-gradient-to-r,
+body.lite .bg-gradient-to-br,
+body.lite .bg-gradient-to-bl,
+body.lite [class*="gradient"] {
+  background-image: none !important;
+  background: var(--card) !important;
+}
+
+/* Disable backdrop blur (expensive) */
+body.lite [class*="backdrop-blur"],
+body.lite [class*="backdrop-blur-sm"],
+body.lite [class*="backdrop-blur-md"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Disable drop-shadow effects */
+body.lite [class*="drop-shadow"],
+body.lite .drop-shadow-sm,
+body.lite .drop-shadow-md,
+body.lite .drop-shadow-lg {
+  filter: none !important;
+  text-shadow: none !important;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
