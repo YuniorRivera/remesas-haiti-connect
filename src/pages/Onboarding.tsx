@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { User, Store } from "lucide-react";
+import { logger } from "@/lib/logger";
 import { z } from "zod";
 const agentFormSchema = z.object({
   trade_name: z.string().min(3, "El nombre comercial debe tener al menos 3 caracteres"),
@@ -138,7 +139,7 @@ const Onboarding = () => {
               </ul>
               <Button 
                 onClick={() => {
-                  console.log("🔷 Navigating to /onboarding/sender?force=1");
+                  logger.debug("🔷 Navigating to /onboarding/sender?force=1");
                   navigate('/onboarding/sender?force=1');
                 }} 
                 disabled={loading} 

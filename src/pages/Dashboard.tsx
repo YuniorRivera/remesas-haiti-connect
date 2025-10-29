@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogOut, Send, Users, BarChart3, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Dashboard = () => {
         );
 
         if (!isComplete) {
-          console.log("⚠️ Sender user with incomplete profile, redirecting to onboarding");
+          logger.warn("⚠️ Sender user with incomplete profile, redirecting to onboarding");
           navigate("/onboarding/sender");
         }
       }

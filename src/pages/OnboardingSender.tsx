@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { z } from "zod";
 import { User } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 const senderFormSchema = z.object({
   full_name: z.string().trim().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
@@ -33,7 +34,7 @@ const isProfileComplete = (profile: any): boolean => {
 type SenderFormData = z.infer<typeof senderFormSchema>;
 
 const OnboardingSender = () => {
-  console.log("🔷 OnboardingSender component mounted");
+  logger.debug("🔷 OnboardingSender component mounted");
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -51,7 +52,7 @@ const OnboardingSender = () => {
   });
 
   useEffect(() => {
-    console.log("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user", "force:", force);
+    logger.debug("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user", "force:", force);
     
     const initializeForm = async () => {
       try {
@@ -59,28 +60,28 @@ const OnboardingSender = () => {
 
         // 0. Esperar a que termine de cargar la autenticación
         if (authLoading) {
-          console.log("⏳ Auth still loading, waiting...");
+          logger.debug("⏳ Auth still loading, waiting...");
           return;
         }
 
         // 1. Verificar autenticación
         if (!user) {
-          console.log("❌ No user found, redirecting to /auth");
+          logger.debug("❌ No user found, redirecting to /auth");
           navigate("/auth");
           return;
         }
 
         // 2. Prevenir doble ejecución en Strict Mode
         if (ranRef.current) {
-          console.log("⏭️ Already ran initialization, skipping");
+          logger.debug("⏭️ Already ran initialization, skipping");
           return;
         }
         ranRef.current = true;
 
-        console.log("✅ User authenticated:", user.id);
+        logger.debug("✅ User authenticated:", user.id);
 
         // 2. Cargar perfil y verificar si está completo
-        console.log("🔍 Loading profile...");
+        logger.debug("🔍 Loading profile...");
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("full_name, phone, direccion, documento_identidad, tipo_documento")
@@ -92,7 +93,7 @@ const OnboardingSender = () => {
         }
 
         // 3. Verificar si ya tiene el rol sender_user
-        console.log("🔍 Checking if user has sender_user role...");
+        logger.debug("🔍 Checking if user has sender_user role...");
         const { data: roles, error: rolesError } = await supabase
           .from("user_roles")
           .select("role")
@@ -105,7 +106,7 @@ const OnboardingSender = () => {
         const hasSenderRole = roles && roles.some(r => r.role === "sender_user");
         const profileComplete = isProfileComplete(profile);
 
-        console.log("📊 Status:", { 
+        logger.debug("📊 Status:", { 
           hasSenderRole, 
           profileComplete,
           force,
@@ -114,7 +115,7 @@ const OnboardingSender = () => {
 
         // 4. Si tiene rol Y perfil completo Y no forzamos -> dashboard
         if (hasSenderRole && profileComplete && !force) {
-          console.log("✅ User has role and complete profile, redirecting to dashboard (not forced)");
+          logger.debug("✅ User has role and complete profile, redirecting to dashboard (not forced)");
           toast.success("¡Ya estás listo!");
           navigate("/dashboard");
           return;
@@ -122,7 +123,7 @@ const OnboardingSender = () => {
 
         // 5. Cargar datos del perfil en el formulario (si existen)
         if (profile) {
-          console.log("✅ Loading profile data into form");
+          logger.debug("✅ Loading profile data into form");
           setFormData({
             full_name: profile.full_name || "",
             phone: profile.phone || "",
@@ -131,11 +132,11 @@ const OnboardingSender = () => {
             tipo_documento: profile.tipo_documento || ""
           });
         } else {
-          console.log("ℹ️ No existing profile found");
+          logger.debug("ℹ️ No existing profile found");
         }
 
         // 6. Mostrar formulario (perfil incompleto o sin rol)
-        console.log("✅ Showing form");
+        logger.debug("✅ Showing form");
         setIsChecking(false);
 
       } catch (error) {

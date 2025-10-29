@@ -22,5 +22,21 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
     },
+    overrides: [
+      {
+        files: ["src/**/*.{ts,tsx}"],
+        rules: {
+          // Disallow console in UI code except warn/error
+          "no-console": ["warn", { allow: ["warn", "error"] }],
+        },
+      },
+      {
+        files: ["supabase/functions/**/*.{ts,tsx}"],
+        rules: {
+          // Allow console in serverless functions for observability
+          "no-console": "off",
+        },
+      },
+    ],
   },
 );

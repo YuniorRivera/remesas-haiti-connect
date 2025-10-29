@@ -5,6 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 type AppRole = "admin" | "agent_owner" | "agent_clerk" | "compliance_officer" | "sender_user";
 
@@ -33,7 +34,7 @@ export default function ProtectedRoute({
 
   // Logs para diagnóstico
   useEffect(() => {
-    console.log("🔒 ProtectedRoute state", {
+    logger.debug("🔒 ProtectedRoute state", {
       authLoading,
       hasUser: !!user,
       needsRoleCheck,
