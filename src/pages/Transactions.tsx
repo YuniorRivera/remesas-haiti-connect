@@ -48,17 +48,9 @@ const Transactions = () => {
     }
   };
 
-  if (authLoading || loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">{t('loading')}</p>
-      </div>
-    );
-  }
-
   return (
     <AppLayout>
-      <LoadingOverlay isLoading={loading}>
+      <LoadingOverlay isLoading={authLoading || loading} message={t('loading')}>
         <div className="min-h-screen bg-muted/30">
           <PageHeader
             title={t('myTransactions')}
