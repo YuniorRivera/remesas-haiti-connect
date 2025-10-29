@@ -57,21 +57,21 @@ const Transactions = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-card shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-2">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t('dashboard')}
-          </Button>
-          <h1 className="text-2xl font-bold text-primary">{t('myTransactions')}</h1>
-        </div>
-      </header>
+    <AppLayout>
+      <LoadingOverlay isLoading={loading}>
+        <div className="min-h-screen bg-muted/30">
+          <PageHeader
+            title={t('myTransactions')}
+            backUrl="/dashboard"
+            backLabel={t('dashboard')}
+          />
 
-      <main className="container mx-auto p-6">
-        <TransactionsTable transactions={transactions} showPlatformMargin={showPlatformMargin} />
-      </main>
-    </div>
+          <main className="container mx-auto p-6">
+            <TransactionsTable transactions={transactions} showPlatformMargin={showPlatformMargin} />
+          </main>
+        </div>
+      </LoadingOverlay>
+    </AppLayout>
   );
 };
 

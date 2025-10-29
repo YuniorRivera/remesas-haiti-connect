@@ -127,5 +127,8 @@
   "platformGrossMargin": "Margen bruto plataforma",
   "totalRevenue": "Ingresos totales",
   "totalCosts": "Costos totales",
-  "fxSpreadRevenue": "Spread FX revenue"
+  "fxSpreadRevenue": "Spread FX revenue",
+  "errorLoadingAgentInfo": "Error al cargar información del agente",
+  "noStoreAssigned": "No tienes una tienda asignada",
+  "unexpectedErrorLoadingInfo": "Error inesperado al cargar información"
 }

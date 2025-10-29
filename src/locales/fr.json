@@ -125,7 +125,10 @@
   "profitThisTransaction": "Profit pour cette transaction",
   "administrativeDetails": "Détails Administratifs",
   "platformGrossMargin": "Marge brute plateforme",
-  "totalRevenue": "Revenus totaux",
-  "totalCosts": "Coûts totaux",
-  "fxSpreadRevenue": "Revenus spread FX"
-}
+    "totalRevenue": "Revenus totaux",
+    "totalCosts": "Coûts totaux",
+    "fxSpreadRevenue": "Revenus spread FX",
+    "errorLoadingAgentInfo": "Erreur lors du chargement des informations de l'agent",
+    "noStoreAssigned": "Vous n'avez pas de magasin assigné",
+    "unexpectedErrorLoadingInfo": "Erreur inattendue lors du chargement des informations"
+  }

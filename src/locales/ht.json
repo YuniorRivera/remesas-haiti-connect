@@ -128,7 +128,10 @@
   "profitThisTransaction": "Pwofi pou tranzaksyon sa a",
   "administrativeDetails": "Detay Administratif",
   "platformGrossMargin": "Maj platfòm",
-  "totalRevenue": "Revni Total",
-  "totalCosts": "Depans Total",
-  "fxSpreadRevenue": "Revni spread FX"
-}
+    "totalRevenue": "Revni Total",
+    "totalCosts": "Depans Total",
+    "fxSpreadRevenue": "Revni spread FX",
+    "errorLoadingAgentInfo": "Erè nan chajman enfòmasyon ajan an",
+    "noStoreAssigned": "Ou pa gen yon magazen ki asiyen",
+    "unexpectedErrorLoadingInfo": "Erè inatandi nan chajman enfòmasyon"
+  }

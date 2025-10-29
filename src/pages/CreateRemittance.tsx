@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
+import { ArrowRight, Check, Send } from "lucide-react";
 import { toast } from "sonner";
 import { RemittanceReceipt } from "@/components/RemittanceReceipt";
 import { logger } from "@/lib/logger";
