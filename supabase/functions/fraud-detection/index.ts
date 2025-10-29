@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-};
+import { buildCorsHeaders, preflight, json } from '../_shared/security.ts';
 
 const fraudCheckSchema = z.object({
   emisor_documento: z.string().min(1, "Documento del emisor requerido"),
@@ -39,9 +35,8 @@ const LIMITS = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Validar CSRF token
@@ -52,16 +47,13 @@ serve(async (req) => {
 
     if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
       console.error('CSRF validation failed');
-      return new Response(
-        JSON.stringify({ 
-          error: 'CSRF token inválido',
-          is_suspicious: false,
-          risk_level: 'low',
-          flags: [],
-          should_block: false,
-        }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ 
+        error: 'CSRF token inválido',
+        is_suspicious: false,
+        risk_level: 'low',
+        flags: [],
+        should_block: false,
+      }, 403, req);
     }
 
     const supabaseClient = createClient(
@@ -76,16 +68,13 @@ serve(async (req) => {
     
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
-      return new Response(
-        JSON.stringify({ 
-          error: `Validación de datos fallida: ${errors}`,
-          is_suspicious: false,
-          risk_level: 'low',
-          flags: [],
-          should_block: false,
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ 
+        error: `Validación de datos fallida: ${errors}`,
+        is_suspicious: false,
+        risk_level: 'low',
+        flags: [],
+        should_block: false,
+      }, 400, req);
     }
     
     const body: FraudCheckRequest = validationResult.data as FraudCheckRequest;
@@ -247,24 +236,16 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json(response, 200, req)
 
   } catch (error) {
     console.error('Fraud detection error:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Error en detección de fraude',
-        is_suspicious: false,
-        risk_level: 'low',
-        flags: [],
-        should_block: false,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return json({ 
+      error: error instanceof Error ? error.message : 'Error en detección de fraude',
+      is_suspicious: false,
+      risk_level: 'low',
+      flags: [],
+      should_block: false,
+    }, 500, req);
   }
 });

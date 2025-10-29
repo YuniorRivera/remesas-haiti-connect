@@ -1,15 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Access-Control-Allow-Credentials': 'true',
-}
+import { buildCorsHeaders, preflight, json } from '../_shared/security.ts'
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Verify CSRF token
@@ -21,10 +15,7 @@ Deno.serve(async (req) => {
       ?.split('=')[1]
 
     if (!csrfFromHeader || !csrfFromCookie || csrfFromHeader !== csrfFromCookie) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid CSRF token' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: 'Invalid CSRF token' }, 403, req)
     }
 
     // Extract session token
@@ -54,22 +45,9 @@ Deno.serve(async (req) => {
       `csrf-token=; Secure; SameSite=Lax; Path=/; Max-Age=0`,
     ]
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-          'Set-Cookie': cookies.join(', '),
-        },
-      }
-    )
+    return json({ success: true }, { status: 200, headers: { 'Set-Cookie': cookies.join(', '), ...buildCorsHeaders(req) } })
   } catch (err) {
     console.error('Unexpected error:', err)
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    return json({ error: 'Internal server error' }, 500, req)
   }
 })

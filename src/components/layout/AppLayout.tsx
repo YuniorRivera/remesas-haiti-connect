@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +44,6 @@ export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole(user?.id);
-  const { language } = useLanguage();
 
   const handleSignOut = async () => {
     await signOut();
