@@ -13,8 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Download, Search } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n";
 
 interface Transaction {
   id: string;
@@ -37,8 +36,7 @@ interface TransactionsTableProps {
 export function TransactionsTable({ transactions, showPlatformMargin = false }: TransactionsTableProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const { language } = useLanguage();
-  const { t } = useTranslation(language);
+  const { t } = useLocale();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -51,7 +49,7 @@ export function TransactionsTable({ transactions, showPlatformMargin = false }: 
   };
 
   const getStatusLabel = (status: string) => {
-    const statusMap: Record<string, keyof typeof import('@/lib/i18n').translations.es> = {
+    const statusMap: Record<string, string> = {
       'pendiente': 'pending',
       'completada': 'completed',
       'cancelada': 'cancelled',

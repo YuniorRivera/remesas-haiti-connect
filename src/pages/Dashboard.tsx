@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,8 +14,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const { isAdmin, isAgent, isComplianceOfficer, isSenderUser, loading: roleLoading } = useUserRole(user?.id);
-  const { language } = useLanguage();
-  const { t } = useTranslation(language);
+  const { t } = useLocale();
 
   useEffect(() => {
     if (!authLoading && !user) {

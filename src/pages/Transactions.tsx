@@ -4,8 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { TransactionsTable } from "@/components/transactions/TransactionsTable";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslation } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -14,8 +13,7 @@ const Transactions = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isComplianceOfficer } = useUserRole(user?.id);
-  const { language } = useLanguage();
-  const { t } = useTranslation(language);
+  const { t } = useLocale();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   
