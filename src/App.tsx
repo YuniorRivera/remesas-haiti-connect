@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { LiteModeProvider } from "@/contexts/LiteModeContext";
 import { CookieBanner } from "./components/CookieBanner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -47,15 +48,16 @@ const LoadingFallback = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <LiteModeProvider>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Toaster />
-          <Sonner />
-          <CookieBanner />
-          <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <LiteModeProvider>
+          <TooltipProvider>
+            <BrowserRouter>
+              <Toaster />
+              <Sonner />
+              <CookieBanner />
+              <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
@@ -175,12 +177,13 @@ const App = () => (
             
             {/* 404 - Must be last */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-      </LiteModeProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </LiteModeProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

@@ -14,13 +14,14 @@ import { format } from "date-fns";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 import RemittanceTimeline from "@/components/RemittanceTimeline";
+import { logger } from "@/lib/logger";
 
 interface RemittanceEvent {
   id: string;
   event: string;
   event_at: string;
   actor_type: string;
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 interface Remittance {
@@ -99,8 +100,9 @@ const RemittanceDetail = () => {
 
       if (eventsError) throw eventsError;
       setEvents(eventsData || []);
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      const err = error as { message?: string };
+      toast.error(err.message || "Error al cargar eventos");
     } finally {
       setLoading(false);
     }
@@ -291,8 +293,9 @@ const RemittanceDetail = () => {
       // Guardar PDF
       doc.save(`recibo_${remittance.codigo_referencia}.pdf`);
       toast.success("Recibo generado exitosamente");
-    } catch (error: any) {
-      console.error("Error generando PDF:", error);
+    } catch (error) {
+      const err = error as { message?: string };
+      logger.error("Error generando PDF:", err);
       toast.error("Error al generar el recibo");
     }
   };
