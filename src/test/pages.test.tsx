@@ -161,8 +161,8 @@ describe("Pages Smoke Tests", () => {
       // Should render without errors
       expect(container).toBeTruthy();
       // Should show 404 or not found message (check for "404" or "not found")
-      const has404 = screen.queryByText(/404/i) || screen.queryByText(/not found/i);
-      expect(has404 || container.textContent?.toLowerCase().includes('404') || container.textContent?.toLowerCase().includes('not found')).toBeTruthy();
+      const textContent = container.textContent?.toLowerCase() || '';
+      expect(textContent.includes('404') || textContent.includes('not found') || textContent.includes('page not found')).toBeTruthy();
     });
   });
 

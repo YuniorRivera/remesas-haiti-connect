@@ -85,42 +85,43 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+// Mock useUserRole hook (needs to be outside describe block)
+vi.mock("@/hooks/useUserRole", () => ({
+  useUserRole: () => ({
+    isAdmin: false,
+    isAgent: false,
+    isComplianceOfficer: false,
+    isSenderUser: true,
+    loading: false,
+  }),
+}));
+
 describe("Authenticated Pages Smoke Tests", () => {
   describe("Dashboard Page", () => {
     it("should render without crashing", async () => {
       const Dashboard = (await import("@/pages/Dashboard")).default;
-      render(
+      const { container } = render(
         <TestWrapper>
           <Dashboard />
         </TestWrapper>
       );
       
       // Dashboard should render (might show loading or content)
-      expect(document.body).toBeTruthy();
+      expect(container).toBeTruthy();
     });
   });
 
   describe("Transactions Page", () => {
     it("should render without crashing", async () => {
-      vi.mock("@/hooks/useUserRole", () => ({
-        useUserRole: () => ({
-          isAdmin: false,
-          isAgent: false,
-          isComplianceOfficer: false,
-          isSenderUser: true,
-          loading: false,
-        }),
-      }));
-
       const Transactions = (await import("@/pages/Transactions")).default;
-      render(
+      const { container } = render(
         <TestWrapper>
           <Transactions />
         </TestWrapper>
       );
       
       // Should render transactions page structure
-      expect(document.body).toBeTruthy();
+      expect(container).toBeTruthy();
     });
   });
 });
