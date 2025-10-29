@@ -60,6 +60,20 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Security
+
+- Strict headers via `public/_headers` (HSTS, XFO=DENY, nosniff, XSS, Referrer-Policy, Permissions-Policy, CSP)
+- CSRF: function `csrf` issues cookie `csrf-token` and clients send `X-CSRF-Token` header
+- Secure cookies: `__Host-sid`, `__Host-rt` are `HttpOnly; Secure; SameSite=Lax; Path=/`
+- CORS helper: functions use `buildCorsHeaders(req)` with allowlist from `ALLOWED_ORIGINS`
+- Rate limiting: dev-only in `supabase/functions/_shared/rateLimiter.ts` (migrate to Upstash/Deno KV for prod)
+
+### Recommended environment variables (Supabase Functions)
+
+```
+ALLOWED_ORIGINS=https://your-domain.com,https://staging.your-domain.com
+```
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/8f716265-0cb6-48c6-a07c-d524bdad17fa) and click on Share -> Publish.

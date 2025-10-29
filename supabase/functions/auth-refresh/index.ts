@@ -1,15 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-  'Access-Control-Allow-Credentials': 'true',
-}
+import { checkRateLimit } from '../_shared/rateLimiter.ts'
+import { buildCorsHeaders, preflight, json } from '../_shared/security.ts'
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Extract refresh token from cookie
@@ -20,10 +15,20 @@ Deno.serve(async (req) => {
       ?.split('=')[1]
 
     if (!refreshToken) {
-      return new Response(
-        JSON.stringify({ error: 'No refresh token found' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: 'No refresh token found' }, 401, req)
+    }
+
+    // Rate limiting: refresh 30/5m por IP
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateKey = `refresh:${clientIp}`;
+    const rl = checkRateLimit(rateKey, { windowMs: 5 * 60 * 1000, maxRequests: 30 });
+    if (!rl.allowed) {
+      return json({ error: 'Demasiadas solicitudes de refresh. Intenta más tarde.' }, { status: 429, headers: {
+        'X-RateLimit-Limit': '30',
+        'X-RateLimit-Remaining': rl.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rl.resetAt).toISOString(),
+        ...buildCorsHeaders(req)
+      }})
     }
 
     const supabaseClient = createClient(
@@ -37,10 +42,7 @@ Deno.serve(async (req) => {
 
     if (error || !data.session) {
       console.error('Refresh error:', error)
-      return new Response(
-        JSON.stringify({ error: error?.message || 'Session refresh failed' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: error?.message || 'Session refresh failed' }, 401, req)
     }
 
     // Generate new CSRF token
@@ -53,25 +55,9 @@ Deno.serve(async (req) => {
       `csrf-token=${csrfToken}; Secure; SameSite=Lax; Path=/; Max-Age=3600`,
     ]
 
-    return new Response(
-      JSON.stringify({ 
-        user: data.user,
-        csrfToken,
-      }),
-      {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-          'Set-Cookie': cookies.join(', '),
-        },
-      }
-    )
+    return json({ user: data.user, csrfToken }, { status: 200, headers: { 'Set-Cookie': cookies.join(', '), ...buildCorsHeaders(req) } })
   } catch (err) {
     console.error('Unexpected error:', err)
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    return json({ error: 'Internal server error' }, 500, req)
   }
 })

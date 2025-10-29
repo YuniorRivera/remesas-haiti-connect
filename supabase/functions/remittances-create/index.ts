@@ -1,9 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-};
+import { checkRateLimit } from '../_shared/rateLimiter.ts'
+import { buildCorsHeaders, preflight, json } from '..//_shared/security.ts'
 
 interface CreateRemittanceRequest {
   emisor_nombre: string;
@@ -22,9 +19,8 @@ interface CreateRemittanceRequest {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Validar CSRF token
@@ -35,10 +31,7 @@ Deno.serve(async (req) => {
 
     if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
       console.error('CSRF validation failed');
-      return new Response(
-        JSON.stringify({ error: 'CSRF token inválido' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'CSRF token inválido' }, 403, req)
     }
 
     const supabaseClient = createClient(
@@ -58,10 +51,7 @@ Deno.serve(async (req) => {
 
     if (authError || !user) {
       console.error('Authentication error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'No autorizado' }, 401, req)
     }
 
     // Verificar que el usuario sea agente
@@ -75,10 +65,7 @@ Deno.serve(async (req) => {
     ) ?? false;
 
     if (!isAgent) {
-      return new Response(
-        JSON.stringify({ error: 'Solo agentes pueden crear remesas' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Solo agentes pueden crear remesas' }, 403, req)
     }
 
     // Obtener datos del agente
@@ -89,10 +76,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!profile?.agent_id) {
-      return new Response(
-        JSON.stringify({ error: 'Usuario no tiene tienda asignada' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Usuario no tiene tienda asignada' }, 400, req)
     }
 
     const requestData: CreateRemittanceRequest = await req.json();
@@ -106,17 +90,24 @@ Deno.serve(async (req) => {
 
     // Validar input
     if (!requestData.emisor_nombre || !requestData.beneficiario_nombre) {
-      return new Response(
-        JSON.stringify({ error: 'Emisor y beneficiario son requeridos' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Emisor y beneficiario son requeridos' }, 400, req)
     }
 
     if (!requestData.principal_dop || requestData.principal_dop <= 0) {
-      return new Response(
-        JSON.stringify({ error: 'Monto principal inválido' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Monto principal inválido' }, 400, req)
+    }
+
+    // Rate limit create remittances: 20 por 10m por usuario/IP
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateKey = `create:${user.id}:${clientIp}`;
+    const rl = checkRateLimit(rateKey, { windowMs: 10 * 60 * 1000, maxRequests: 20 });
+    if (!rl.allowed) {
+      return json({ error: 'Demasiadas remesas creadas recientemente. Intenta más tarde.' }, { status: 429, headers: {
+        'X-RateLimit-Limit': '20',
+        'X-RateLimit-Remaining': rl.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rl.resetAt).toISOString(),
+        ...buildCorsHeaders(req)
+      }})
     }
 
     // Obtener cotización del motor de precios
@@ -132,10 +123,7 @@ Deno.serve(async (req) => {
 
     if (quoteError || !quoteData) {
       console.error('Error getting quote:', quoteError);
-      return new Response(
-        JSON.stringify({ error: 'Error al obtener cotización', details: quoteError }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error al obtener cotización', details: quoteError }, 400, req)
     }
 
     console.log('Quote received for remittance');
@@ -201,10 +189,7 @@ Deno.serve(async (req) => {
 
     if (createError) {
       console.error('Error creating remittance:', createError);
-      return new Response(
-        JSON.stringify({ error: 'Error al crear remesa', details: createError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error al crear remesa', details: createError.message }, 500, req)
     }
 
     // Crear evento de auditoría
@@ -223,33 +208,27 @@ Deno.serve(async (req) => {
 
     console.log('Remittance created successfully:', remittance.id);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        remittance: {
-          id: remittance.id,
-          codigo_referencia: remittance.codigo_referencia,
-          state: remittance.state,
-          principal_dop: remittance.principal_dop,
-          htg_to_beneficiary: remittance.htg_to_beneficiary,
-          total_client_pays_dop: remittance.total_client_pays_dop,
-          fx_client_sell: remittance.fx_client_sell,
-          client_fee_fixed_dop: remittance.client_fee_fixed_dop,
-          client_fee_pct_dop: remittance.client_fee_pct_dop,
-          total_client_fees_dop: remittance.total_client_fees_dop,
-          gov_fee_dop: remittance.gov_fee_dop,
-          store_commission_dop: remittance.comision_agente,
-          quoted_at: remittance.quoted_at,
-        },
-      }),
-      { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return json({
+      success: true,
+      remittance: {
+        id: remittance.id,
+        codigo_referencia: remittance.codigo_referencia,
+        state: remittance.state,
+        principal_dop: remittance.principal_dop,
+        htg_to_beneficiary: remittance.htg_to_beneficiary,
+        total_client_pays_dop: remittance.total_client_pays_dop,
+        fx_client_sell: remittance.fx_client_sell,
+        client_fee_fixed_dop: remittance.client_fee_fixed_dop,
+        client_fee_pct_dop: remittance.client_fee_pct_dop,
+        total_client_fees_dop: remittance.total_client_fees_dop,
+        gov_fee_dop: remittance.gov_fee_dop,
+        store_commission_dop: remittance.comision_agente,
+        quoted_at: remittance.quoted_at,
+      },
+    }, 201, req)
   } catch (error) {
     console.error('Error in remittances-create function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    return new Response(
-      JSON.stringify({ error: 'Error interno del servidor', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return json({ error: 'Error interno del servidor', details: errorMessage }, 500, req)
   }
 });

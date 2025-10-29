@@ -1,18 +1,14 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.75.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
-};
+import { checkRateLimit } from '../_shared/rateLimiter.ts'
+import { preflight, json } from '../_shared/security.ts'
 
 interface ConfirmRemittanceRequest {
   remittance_id: string;
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req)
+  if (pf) return pf
 
   try {
     // Validar CSRF token
@@ -23,10 +19,7 @@ Deno.serve(async (req) => {
 
     if (!csrfToken || !csrfCookie || csrfToken !== csrfCookie) {
       console.error('CSRF validation failed');
-      return new Response(
-        JSON.stringify({ error: 'CSRF token inválido' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'CSRF token inválido' }, 403, req)
     }
 
     const supabaseClient = createClient(
@@ -46,10 +39,7 @@ Deno.serve(async (req) => {
 
     if (authError || !user) {
       console.error('Authentication error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'No autorizado' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'No autorizado' }, 401, req)
     }
 
     const requestData: ConfirmRemittanceRequest = await req.json();
@@ -68,18 +58,12 @@ Deno.serve(async (req) => {
 
     if (fetchError || !remittance) {
       console.error('Error fetching remittance:', fetchError);
-      return new Response(
-        JSON.stringify({ error: 'Remesa no encontrada' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Remesa no encontrada' }, 404, req)
     }
 
     // Validar que la remesa esté en estado QUOTED
     if (remittance.state !== 'QUOTED') {
-      return new Response(
-        JSON.stringify({ error: `Remesa no está en estado QUOTED (actual: ${remittance.state})` }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: `Remesa no está en estado QUOTED (actual: ${remittance.state})` }, 400, req)
     }
 
     // Validar que el usuario sea el agente de la remesa o admin
@@ -92,10 +76,7 @@ Deno.serve(async (req) => {
       const isAdmin = userRoles?.some(r => r.role === 'admin') ?? false;
       
       if (!isAdmin) {
-        return new Response(
-          JSON.stringify({ error: 'No autorizado para confirmar esta remesa' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return json({ error: 'No autorizado para confirmar esta remesa' }, 403, req)
       }
     }
 
@@ -106,17 +87,26 @@ Deno.serve(async (req) => {
 
     if (currentFloat < floatNeeded) {
       console.error('Insufficient float:', { currentFloat, floatNeeded });
-      return new Response(
-        JSON.stringify({ 
-          error: 'Float insuficiente en la tienda',
-          details: {
-            current: currentFloat,
-            needed: floatNeeded,
-            shortage: floatNeeded - currentFloat
-          }
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ 
+        error: 'Float insuficiente en la tienda',
+        details: {
+          current: currentFloat,
+          needed: floatNeeded,
+          shortage: floatNeeded - currentFloat
+        }
+      }, 400, req)
+    }
+
+    // Rate limit confirmations: 15 por 10m por agente/IP
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateKey = `confirm:${user.id}:${clientIp}`;
+    const rl = checkRateLimit(rateKey, { windowMs: 10 * 60 * 1000, maxRequests: 15 });
+    if (!rl.allowed) {
+      return json({ error: 'Demasiadas confirmaciones recientes. Intenta más tarde.' }, { status: 429, headers: {
+        'X-RateLimit-Limit': '15',
+        'X-RateLimit-Remaining': rl.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rl.resetAt).toISOString(),
+      }})
     }
 
     // Generar receipt_hash para QR
@@ -192,10 +182,7 @@ Deno.serve(async (req) => {
 
       if (createError) {
         console.error('Error creating pending payouts account:', createError);
-        return new Response(
-          JSON.stringify({ error: 'Error creando cuenta de ledger' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return json({ error: 'Error creando cuenta de ledger' }, 500, req)
       }
       pendingPayoutsAccount = newAccount;
     }
@@ -222,10 +209,7 @@ Deno.serve(async (req) => {
 
       if (createError) {
         console.error('Error creating commission revenue account:', createError);
-        return new Response(
-          JSON.stringify({ error: 'Error creando cuenta de ledger' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return json({ error: 'Error creando cuenta de ledger' }, 500, req)
       }
       commissionRevenueAccount = newAccount;
     }
@@ -240,18 +224,12 @@ Deno.serve(async (req) => {
 
     if (floatError) {
       console.error('Error updating float:', floatError);
-      return new Response(
-        JSON.stringify({ error: 'Error actualizando float de la tienda' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error actualizando float de la tienda' }, 500, req)
     }
 
     // Verificar que las cuentas existan
     if (!agentCashAccount || !pendingPayoutsAccount || !commissionRevenueAccount) {
-      return new Response(
-        JSON.stringify({ error: 'Error: cuentas de ledger no encontradas' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error: cuentas de ledger no encontradas' }, 500, req)
     }
 
     // Crear asientos de ledger con estructura correcta de doble partida
@@ -294,10 +272,7 @@ Deno.serve(async (req) => {
         .update({ float_balance_dop: currentFloat })
         .eq('id', agent.id);
       
-      return new Response(
-        JSON.stringify({ error: 'Error creando asientos contables' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error creando asientos contables' }, 500, req)
     }
 
     // Actualizar remesa a CONFIRMED
@@ -315,10 +290,7 @@ Deno.serve(async (req) => {
 
     if (updateError) {
       console.error('Error updating remittance:', updateError);
-      return new Response(
-        JSON.stringify({ error: 'Error confirmando remesa' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'Error confirmando remesa' }, 500, req)
     }
 
     // Crear evento de auditoría
@@ -338,25 +310,19 @@ Deno.serve(async (req) => {
 
     console.log('Remittance confirmed successfully');
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        remittance: {
-          id: updatedRemittance.id,
-          codigo_referencia: updatedRemittance.codigo_referencia,
-          state: updatedRemittance.state,
-          receipt_hash: updatedRemittance.receipt_hash,
-          confirmed_at: updatedRemittance.confirmed_at,
-        },
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return json({
+      success: true,
+      remittance: {
+        id: updatedRemittance.id,
+        codigo_referencia: updatedRemittance.codigo_referencia,
+        state: updatedRemittance.state,
+        receipt_hash: updatedRemittance.receipt_hash,
+        confirmed_at: updatedRemittance.confirmed_at,
+      },
+    }, 200, req)
   } catch (error) {
     console.error('Error in remittances-confirm function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    return new Response(
-      JSON.stringify({ error: 'Error interno del servidor', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return json({ error: 'Error interno del servidor', details: errorMessage }, 500, req)
   }
 });
