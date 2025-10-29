@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useLocale } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin, isAgent, loading: roleLoading } = useUserRole(user?.id);
+  const { t } = useLocale();
 
   const handleSignOut = async () => {
     await signOut();
@@ -51,32 +53,32 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   // Menu items for Tienda (Agent)
   const agentMenuItems = [
-    { title: "Dashboard", url: "/agent-dashboard", icon: Home },
-    { title: "Crear Envío", url: "/remittances/create", icon: Send },
-    { title: "Historial", url: "/transactions", icon: History },
-    { title: "Ganancias", url: "/agent-earnings", icon: TrendingUp },
+    { title: t("dashboard"), url: "/agent-dashboard", icon: Home },
+    { title: t("createShipment"), url: "/remittances/create", icon: Send },
+    { title: t("history"), url: "/transactions", icon: History },
+    { title: t("earnings"), url: "/agent-earnings", icon: TrendingUp },
   ];
 
   // Menu items for Admin
   const adminMenuItems = [
-    { title: "Dashboard", url: "/admin-dashboard", icon: Home },
-    { title: "Operaciones", url: "/admin-operations", icon: Store },
-    { title: "Tiendas", url: "/stores", icon: Store },
-    { title: "Conciliación", url: "/admin-reconciliation", icon: FileText },
-    { title: "Compliance/KYC", url: "/admin-compliance", icon: ShieldCheck },
-    { title: "Márgenes", url: "/admin-margins", icon: BarChart3 },
-    { title: "Tarifas", url: "/admin-fees", icon: DollarSign },
-    { title: "Límites", url: "/admin-limits", icon: Scale },
-    { title: "Risk Flags", url: "/admin-risk-flags", icon: AlertTriangle },
-    { title: "Audit Log", url: "/admin-audit-log", icon: ScrollText },
-    { title: "Ledger", url: "/admin-ledger", icon: BookOpen },
+    { title: t("dashboard"), url: "/admin-dashboard", icon: Home },
+    { title: t("operations"), url: "/admin-operations", icon: Store },
+    { title: t("storeName"), url: "/stores", icon: Store },
+    { title: t("reconciliation"), url: "/admin-reconciliation", icon: FileText },
+    { title: t("complianceKYC"), url: "/admin-compliance", icon: ShieldCheck },
+    { title: t("margins"), url: "/admin-margins", icon: BarChart3 },
+    { title: t("feesConfig"), url: "/admin-fees", icon: DollarSign },
+    { title: "Límites", url: "/admin-limits", icon: Scale }, // TODO: Add to dicts
+    { title: "Risk Flags", url: "/admin-risk-flags", icon: AlertTriangle }, // TODO: Add to dicts
+    { title: "Audit Log", url: "/admin-audit-log", icon: ScrollText }, // TODO: Add to dicts
+    { title: "Ledger", url: "/admin-ledger", icon: BookOpen }, // TODO: Add to dicts
   ];
 
   // Menu items for Emisor (Sender)
   const senderMenuItems = [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Enviar Dinero", url: "/send", icon: Send },
-    { title: "Mis Envíos", url: "/transactions", icon: History },
+    { title: t("dashboard"), url: "/dashboard", icon: Home },
+    { title: "Enviar Dinero", url: "/send", icon: Send }, // TODO: Add to dicts
+    { title: t("myTransactions"), url: "/transactions", icon: History },
   ];
 
   // Determine which menu to show based on role
@@ -89,7 +91,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const menuItems = getMenuItems();
 
   if (roleLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
+    return <div className="flex items-center justify-center min-h-screen">{t("loading")}</div>;
   }
 
   return (
@@ -106,7 +108,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel>
-                {isAdmin ? "Admin" : isAgent ? "Tienda" : "Emisor"}
+                {isAdmin ? t("admin") : isAgent ? t("agent") : t("sender")}
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -132,7 +134,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </SidebarGroup>
 
             <SidebarGroup>
-              <SidebarGroupLabel>Legal</SidebarGroupLabel>
+              <SidebarGroupLabel>{t("legal")}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -146,7 +148,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         className="flex items-center gap-2"
                       >
                         <FileText className="h-4 w-4" />
-                        <span>Privacidad y Términos</span>
+                        <span>{t("privacy")} & {t("termsConditions")}</span>
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -169,7 +171,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   className="flex-1"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Salir
+                  {t("logout")}
                 </Button>
               </div>
             </div>
@@ -177,8 +179,11 @@ export function AppLayout({ children }: AppLayoutProps) {
         </Sidebar>
 
         <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center px-4">
+          <header className="h-14 border-b flex items-center justify-between px-4">
             <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+            </div>
           </header>
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
