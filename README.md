@@ -71,8 +71,10 @@ This project is built with:
 ### Recommended environment variables (Supabase Functions)
 
 ```
-ALLOWED_ORIGINS=https://your-domain.com,https://staging.your-domain.com
+ALLOWED_ORIGINS=https://kobcash.net,https://www.kobcash.net
 ```
+
+**Ver guía completa de deployment:** [DEPLOY.md](./DEPLOY.md)
 
 ## How can I deploy this project?
 
