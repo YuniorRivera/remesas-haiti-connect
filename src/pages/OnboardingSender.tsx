@@ -21,15 +21,8 @@ const senderFormSchema = z.object({
   tipo_documento: z.string().optional().or(z.literal(""))
 });
 
-// Helper para verificar si el perfil está completo
-const isProfileComplete = (profile: any): boolean => {
-  return Boolean(
-    profile?.full_name && 
-    profile?.phone && 
-    profile.full_name.trim() && 
-    profile.phone.trim()
-  );
-};
+import { isProfileComplete } from "@/types/profile";
+import type { UserProfile } from "@/types/profile";
 
 type SenderFormData = z.infer<typeof senderFormSchema>;
 
@@ -104,7 +97,7 @@ const OnboardingSender = () => {
         }
 
         const hasSenderRole = roles && roles.some(r => r.role === "sender_user");
-        const profileComplete = isProfileComplete(profile);
+        const profileComplete = isProfileComplete(profile as UserProfile | null);
 
         logger.debug("📊 Status:", { 
           hasSenderRole, 
@@ -179,13 +172,14 @@ const OnboardingSender = () => {
 
       toast.success("¡Perfil configurado exitosamente!");
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];
         toast.error(firstError.message);
       } else {
-        console.error("Error guardando perfil:", error);
-        toast.error("Error al guardar el perfil: " + (error.message || "desconocido"));
+        const err = error as { message?: string };
+        logger.error("Error guardando perfil:", error);
+        toast.error("Error al guardar el perfil: " + (err.message || "desconocido"));
       }
     } finally {
       setLoading(false);

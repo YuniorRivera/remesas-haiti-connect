@@ -13,6 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Check, Send } from "lucide-react";
 import { toast } from "sonner";
 import { RemittanceReceipt } from "@/components/RemittanceReceipt";
+import type { PricingQuote, CreateRemittanceResponse, FraudDetectionResponse, Remittance, ConfirmRemittanceResponse } from "@/types/api";
+import type { SupabaseFunctionError } from "@/types/api";
+import { logger } from "@/lib/logger";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -42,10 +45,13 @@ export default function CreateRemittance() {
   });
 
   // Datos de la cotización
-  const [quote, setQuote] = useState<any>(null);
+  const [quote, setQuote] = useState<PricingQuote | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [feesAvailable, setFeesAvailable] = useState(true);
-  const [confirmedRemittance, setConfirmedRemittance] = useState<any>(null);
+  const [confirmedRemittance, setConfirmedRemittance] = useState<Remittance | null>(null);
+  
+  // Expose errors for display (if needed in future)
+  const hasErrors = Object.keys(errors).length > 0;
 
   useEffect(() => {
     const fetchAgentInfo = async () => {
@@ -137,11 +143,12 @@ export default function CreateRemittance() {
 
       if (error) throw error;
       
-      setQuote(data);
+      setQuote(data as PricingQuote);
       setStep(3);
       toast.success("Cotización generada");
-    } catch (error: any) {
-      toast.error(error.message || "Error al generar cotización");
+    } catch (error) {
+      const err = error as SupabaseFunctionError;
+      toast.error(err.message || "Error al generar cotización");
     } finally {
       setLoading(false);
     }
@@ -189,12 +196,15 @@ export default function CreateRemittance() {
       });
 
       if (fraudError) {
-        console.warn("Fraud check failed:", fraudError);
-      } else if (fraudCheck?.should_block) {
-        toast.error(`Transacción bloqueada: ${fraudCheck.flags.join(', ')}`);
-        return;
-      } else if (fraudCheck?.risk_level === 'medium') {
-        toast.warning(`Advertencia: ${fraudCheck.flags.join(', ')}`);
+        logger.warn("Fraud check failed:", fraudError);
+      } else {
+        const fraud = fraudCheck as FraudDetectionResponse | null;
+        if (fraud?.should_block) {
+          toast.error(`Transacción bloqueada: ${fraud.flags.join(', ')}`);
+          return;
+        } else if (fraud?.risk_level === 'medium') {
+          toast.warning(`Advertencia: ${fraud.flags.join(', ')}`);
+        }
       }
 
       const { data, error } = await secureSupabase.functions.invoke("remittances-create", {
@@ -214,12 +224,14 @@ export default function CreateRemittance() {
 
       if (error) throw error;
       
-      if (data?.success) {
+      const result = data as CreateRemittanceResponse;
+      if (result?.success) {
         toast.success("Remesa creada exitosamente");
         setStep(4);
       }
-    } catch (error: any) {
-      toast.error(error.message || "Error al crear remesa");
+    } catch (error) {
+      const err = error as SupabaseFunctionError;
+      toast.error(err.message || "Error al crear remesa");
     } finally {
       setLoading(false);
     }
@@ -241,20 +253,24 @@ export default function CreateRemittance() {
 
       if (error) throw error;
       
-      // Guardar datos completos para el recibo
-      setConfirmedRemittance({
-        ...quote.remittance,
-        ...data.remittance,
-        emisor_nombre: formData.emisor_nombre,
-        beneficiario_nombre: formData.beneficiario_nombre,
-        beneficiario_telefono: formData.beneficiario_telefono,
-        channel: formData.channel,
-      });
-      
-      toast.success("Remesa confirmada exitosamente");
-      setStep(4);
-    } catch (error: any) {
-      toast.error(error.message || "Error al confirmar remesa");
+      const result = data as ConfirmRemittanceResponse;
+      if (result?.success && quote?.remittance) {
+        // Guardar datos completos para el recibo
+        setConfirmedRemittance({
+          ...quote.remittance,
+          ...result.remittance,
+          emisor_nombre: formData.emisor_nombre,
+          beneficiario_nombre: formData.beneficiario_nombre,
+          beneficiario_telefono: formData.beneficiario_telefono,
+          channel: formData.channel,
+        });
+        
+        toast.success("Remesa confirmada exitosamente");
+        setStep(4);
+      }
+    } catch (error) {
+      const err = error as SupabaseFunctionError;
+      toast.error(err.message || "Error al confirmar remesa");
     } finally {
       setLoading(false);
     }
