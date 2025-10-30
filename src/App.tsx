@@ -11,6 +11,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipLinks } from "@/components/SkipLink";
 import { LoadingFallback } from "@/components/ui/loading";
+import { ThemeProvider } from "next-themes";
 // Critical above-the-fold pages (no lazy loading for LCP)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -42,16 +43,17 @@ const SenderSend = lazy(() => import("./pages/SenderSend"));
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <LiteModeProvider>
-          <TooltipProvider>
-            <BrowserRouter>
-              <SkipLinks />
-              <Toaster />
-              <Sonner />
-              <CookieBanner />
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <LiteModeProvider>
+            <TooltipProvider>
+              <BrowserRouter>
+                <SkipLinks />
+                <Toaster />
+                <Sonner />
+                <CookieBanner />
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -209,6 +211,7 @@ const App = () => (
       </LanguageProvider>
     </QueryClientProvider>
   </ErrorBoundary>
+  </ThemeProvider>
 );
 
 export default App;

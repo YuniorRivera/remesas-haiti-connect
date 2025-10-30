@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useLocale } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -166,6 +167,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               </div>
               <div className="flex gap-2">
                 <LanguageSelector />
+                <ThemeToggle />
                 <Button
                   variant="outline"
                   size="sm"
@@ -186,6 +188,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <SidebarTrigger aria-label="Abrir o cerrar menú de navegación" />
             <div className="flex items-center gap-2">
               <LanguageSelector />
+              <ThemeToggle />
             </div>
           </header>
           <main id="main-content" className="flex-1 overflow-auto" role="main" tabIndex={-1}>{children}</main>

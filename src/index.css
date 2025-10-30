@@ -148,8 +148,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    /* Light mode variables */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
     --card: 222 47% 11% / 0.7;
     --card-foreground: 210 40% 98%;
