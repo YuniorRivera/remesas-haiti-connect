@@ -130,5 +130,20 @@
   "fxSpreadRevenue": "Spread FX revenue",
   "errorLoadingAgentInfo": "Error al cargar información del agente",
   "noStoreAssigned": "No tienes una tienda asignada",
-  "unexpectedErrorLoadingInfo": "Error inesperado al cargar información"
+  "unexpectedErrorLoadingInfo": "Error inesperado al cargar información",
+  "heroTitle": "Voye lajan nan Ayiti rapid e an sekirite",
+  "heroSubtitle": "Depósito directo en MonCash o retiro en efectivo (Unibank, Rapid Transfert, Fonkoze, Grace)",
+  "ctaPrimary": "Continuar",
+  "ctaSecondary": "Saber más",
+  "signIn": "Iniciar Sesión",
+  "features": "Características",
+  "featureFast": "Envío Rápido",
+  "featureFastDesc": "Procesa tus remesas en minutos desde cualquier punto autorizado",
+  "featureSecure": "100% Seguro",
+  "featureSecureDesc": "Cumplimiento KYC/KYB y tecnología de encriptación de última generación",
+  "feature24h": "Disponible 24/7",
+  "feature24hDesc": "Accede a tu cuenta y consulta transacciones en cualquier momento",
+  "featureBest": "Mejor Tasa",
+  "featureBestDesc": "Tasas de cambio competitivas y comisiones transparentes",
+  "copyright": "© 2025 kobcash. Sistema seguro de transferencias."
 }

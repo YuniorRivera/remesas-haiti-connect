@@ -133,5 +133,20 @@
   "fxSpreadRevenue": "Revni spread FX",
   "errorLoadingAgentInfo": "Erè nan chajman enfòmasyon ajan an",
   "noStoreAssigned": "Ou pa gen yon magazen ki asiyen",
-  "unexpectedErrorLoadingInfo": "Erè inatandi nan chajman enfòmasyon"
+  "unexpectedErrorLoadingInfo": "Erè inatandi nan chajman enfòmasyon",
+  "heroTitle": "Voye lajan nan Ayiti rapid e an sekirite",
+  "heroSubtitle": "Depósito directo en MonCash o retiro en efectivo (Unibank, Rapid Transfert, Fonkoze, Grace)",
+  "ctaPrimary": "Kontinye",
+  "ctaSecondary": "Aprann plis",
+  "signIn": "Konekte",
+  "features": "Karakteristik",
+  "featureFast": "Vwayaj Rapid",
+  "featureFastDesc": "Tretman remès nan minit depi nenpòt pwen otorize",
+  "featureSecure": "100% An Sekirite",
+  "featureSecureDesc": "Konfòmite KYC/KYB ak teknoloji chifreman avanse",
+  "feature24h": "Disponib 24/7",
+  "feature24hDesc": "Jwenn aksè nan kont ou ak konsilte tranzaksyon nenpòt lè",
+  "featureBest": "To Chanj Pi Bon",
+  "featureBestDesc": "To chanj konpetitif ak komisyon transparan",
+  "copyright": "© 2025 kobcash. Sistèm transfè sekirite."
 }

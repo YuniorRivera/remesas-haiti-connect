@@ -2,14 +2,16 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLite } from "@/contexts/LiteModeContext";
+import { useLocale } from "@/lib/i18n";
 import { SkipLinks } from "@/components/SkipLink";
 import { Button } from "@/components/ui/button";
 import { Send, Shield, Clock, TrendingUp } from "lucide-react";
-import ShinyText from "@/components/ShinyText";
+
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isLite = useLite();
+  const { t } = useLocale();
 
   useEffect(() => {
     if (user) {
@@ -37,9 +39,9 @@ const Index = () => {
             onClick={() => navigate("/auth")} 
             variant="outline" 
             className="border-primary/50 hover:bg-primary/10 hover:border-primary"
-            aria-label="Ir a la página de inicio de sesión"
+            aria-label={`Ir a la página de inicio de sesión / ${t("signIn")}`}
           >
-            Iniciar Sesión
+            {t("signIn")}
           </Button>
         </div>
       </header>
@@ -48,45 +50,35 @@ const Index = () => {
         <section className="container mx-auto px-4 py-20 text-center" aria-labelledby="hero-heading">
           {/* LCP element - prioritize loading */}
           <h2 id="hero-heading" className="mb-6 text-5xl font-bold tracking-tight">
-            Envía dinero a Haití de forma{" "}
-            {isLite ? (
-              <span className="text-primary">rápida y segura</span>
-            ) : (
-              <ShinyText 
-                text="rápida y segura" 
-                speed={3}
-                className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-5xl font-bold"
-              />
-            )}
+            {t("heroTitle")}
           </h2>
           <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
-            Red de tiendas y colmados en República Dominicana para facilitar el envío
-            de remesas a tus seres queridos en Haití.
+            {t("heroSubtitle")}
           </p>
           <div className="flex justify-center gap-4">
             <Button 
               onClick={() => navigate("/auth")} 
               size="lg" 
               className={isLite ? '' : 'shadow-lg'}
-              aria-label="Comenzar a usar kobcash - ir a registro o inicio de sesión"
+              aria-label={`${t("ctaPrimary")} - ir a registro o inicio de sesión`}
             >
-              Comenzar Ahora
+              {t("ctaPrimary")}
             </Button>
             <Button 
               variant="outline" 
               size="lg"
-              aria-label="Conocer más sobre kobcash"
+              aria-label={t("ctaSecondary")}
               onClick={() => {
                 document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Conocer Más
+              {t("ctaSecondary")}
             </Button>
           </div>
         </section>
 
         <section id="features" className="container mx-auto px-4 py-16" aria-labelledby="features-heading">
-          <h2 id="features-heading" className="sr-only">Características principales</h2>
+          <h2 id="features-heading" className="sr-only">{t("features")}</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" role="list">
             <article 
               className={`rounded-lg border border-primary/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_50%_/_0.3)] hover:border-primary/60 hover:bg-card/70'}`}
@@ -96,9 +88,9 @@ const Index = () => {
                 className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
                 aria-hidden="true"
               />
-              <h3 className="mb-2 text-xl font-semibold text-foreground">Envío Rápido</h3>
+              <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureFast")}</h3>
               <p className="text-muted-foreground">
-                Procesa tus remesas en minutos desde cualquier punto autorizado
+                {t("featureFastDesc")}
               </p>
             </article>
 
@@ -110,9 +102,9 @@ const Index = () => {
                 className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
                 aria-hidden="true"
               />
-              <h3 className="mb-2 text-xl font-semibold text-foreground">100% Seguro</h3>
+              <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureSecure")}</h3>
               <p className="text-muted-foreground">
-                Cumplimiento KYC/KYB y tecnología de encriptación de última generación
+                {t("featureSecureDesc")}
               </p>
             </article>
 
@@ -124,9 +116,9 @@ const Index = () => {
                 className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
                 aria-hidden="true"
               />
-              <h3 className="mb-2 text-xl font-semibold text-foreground">Disponible 24/7</h3>
+              <h3 className="mb-2 text-xl font-semibold text-foreground">{t("feature24h")}</h3>
               <p className="text-muted-foreground">
-                Accede a tu cuenta y consulta transacciones en cualquier momento
+                {t("feature24hDesc")}
               </p>
             </article>
 
@@ -138,9 +130,9 @@ const Index = () => {
                 className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
                 aria-hidden="true"
               />
-              <h3 className="mb-2 text-xl font-semibold text-foreground">Mejor Tasa</h3>
+              <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureBest")}</h3>
               <p className="text-muted-foreground">
-                Tasas de cambio competitivas y comisiones transparentes
+                {t("featureBestDesc")}
               </p>
             </article>
           </div>
@@ -154,7 +146,7 @@ const Index = () => {
         tabIndex={-1}
       >
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="mb-2">&copy; 2025 kobcash. Sistema seguro de transferencias.</p>
+          <p className="mb-2">{t("copyright")}</p>
           <nav aria-label="Enlaces legales">
             <div className="flex justify-center gap-4">
               <Button 
