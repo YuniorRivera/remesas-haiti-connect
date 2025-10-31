@@ -153,5 +153,9 @@
   "calculating": "Calculando...",
   "calculatorError": "Error al calcular. Intente nuevamente.",
   "governmentFee": "Tarifa BRH",
-  "totalToPay": "Total a pagar"
+  "totalToPay": "Total a pagar",
+  "youPay": "Pagas",
+  "haitiFee": "Tarifa Haití",
+  "rate": "Tasa",
+  "netReceive": "Recibe neto"
 }

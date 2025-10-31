@@ -104,44 +104,31 @@ export function PricingCalculator() {
                 ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800' 
                 : 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-300 dark:border-green-700'
             }`}>
-              <p className="text-sm font-medium text-muted-foreground mb-2">
-                {t("recipientWillReceive") || "El beneficiario recibirá"}
-              </p>
-              <p className={`text-5xl font-bold ${
+              <p className={`text-5xl font-bold mb-4 ${
                 isLite ? 'text-green-700 dark:text-green-400' : 'text-green-600 dark:text-green-500'
               }`}>
                 {quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} HTG
               </p>
             </div>
 
-            {/* Desglose */}
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-muted-foreground">
-                <span>1 DOP = {quote.fx_client_sell?.toFixed(4)} HTG</span>
-                <span className="text-xs">{quote.channel}</span>
-              </div>
-
-              <div className="border-t pt-2 mt-2 space-y-2">
-                <div className="flex justify-between">
-                  <span>{t("kobcashFee") || "Comisión Kobcash"}:</span>
-                  <span className="font-medium">
-                    ${quote.total_client_fees_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>{t("governmentFee") || "Tarifa BRH"} (${quote.gov_fee_usd} USD):</span>
-                  <span className="font-medium">
-                    ${quote.gov_fee_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
-
-                <div className="border-t pt-2 flex justify-between font-semibold text-base">
-                  <span>{t("totalToPay") || "Total a pagar"}:</span>
-                  <span className="text-primary">
-                    ${quote.total_client_pays_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
-                  </span>
-                </div>
+            {/* Formato compacto: Pagas • Tarifa • Tasa • Recibe */}
+            <div className="space-y-3 text-base">
+              <div className="flex flex-wrap items-center justify-center gap-2 text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {t("youPay") || "Pagas"}: <span className="text-primary font-semibold">RD${quote.total_client_pays_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span>
+                </span>
+                <span aria-hidden="true">•</span>
+                <span>
+                  {t("haitiFee") || "Tarifa Haití"}: <span className="font-medium">US${quote.gov_fee_usd?.toFixed(2)}</span>
+                </span>
+                <span aria-hidden="true">•</span>
+                <span>
+                  {t("rate") || "Tasa"}: <span className="font-medium">1 DOP = {quote.fx_client_sell?.toFixed(4)} HTG</span>
+                </span>
+                <span aria-hidden="true">•</span>
+                <span className="font-medium text-green-600 dark:text-green-400">
+                  {t("netReceive") || "Recibe neto"}: <span className="font-bold">{quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG</span>
+                </span>
               </div>
             </div>
           </div>

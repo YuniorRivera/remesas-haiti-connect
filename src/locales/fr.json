@@ -153,5 +153,9 @@
   "calculating": "Calcul en cours...",
   "calculatorError": "Erreur de calcul. Veuillez réessayer.",
   "governmentFee": "Frais BRH",
-  "totalToPay": "Total à payer"
+  "totalToPay": "Total à payer",
+  "youPay": "Vous payez",
+  "haitiFee": "Frais Haïti",
+  "rate": "Taux",
+  "netReceive": "Reçu net"
 }

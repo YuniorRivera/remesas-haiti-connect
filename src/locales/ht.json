@@ -156,5 +156,9 @@
   "calculating": "Ap kalkile...",
   "calculatorError": "Erè nan kalkil. Tanpri eseye ankò.",
   "governmentFee": "Fee Gouvènman BRH",
-  "totalToPay": "Total pou peye"
+  "totalToPay": "Total pou peye",
+  "youPay": "Ou peye",
+  "haitiFee": "Fee Ayiti",
+  "rate": "Tasa",
+  "netReceive": "Resevwa nèt"
 }
