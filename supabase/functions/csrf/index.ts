@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
     // Generate new CSRF token
     const csrfToken = crypto.randomUUID()
 
-    const cookie = `csrf-token=${csrfToken}; Secure; SameSite=Lax; Path=/; Max-Age=3600`
+    const cookie = `csrf-token=${csrfToken}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=3600`
     return json({ csrfToken }, { status: 200, headers: { 'Set-Cookie': cookie, ...buildCorsHeaders(req) } })
   } catch (err) {
     console.error('Unexpected error:', err)

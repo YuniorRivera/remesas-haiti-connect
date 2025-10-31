@@ -40,9 +40,9 @@ Deno.serve(async (req) => {
 
     // Clear cookies
     const cookies = [
-      `__Host-sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`,
-      `__Host-rt=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`,
-      `csrf-token=; Secure; SameSite=Lax; Path=/; Max-Age=0`,
+      `__Host-sid=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`,
+      `__Host-rt=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`,
+      `csrf-token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`,
     ]
 
     return json({ success: true }, { status: 200, headers: { 'Set-Cookie': cookies.join(', '), ...buildCorsHeaders(req) } })

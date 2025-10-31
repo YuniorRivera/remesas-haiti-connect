@@ -42,6 +42,7 @@ const SenderSend = lazy(() => import("./pages/SenderSend"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
 const Track = lazy(() => import("./pages/Track"));
+const Security = lazy(() => import("./pages/Security"));
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,11 @@ const App = () => (
           <Route path="/track" element={
             <Suspense fallback={<LoadingFallback />}>
               <Track />
+            </Suspense>
+          } />
+          <Route path="/security" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Security />
             </Suspense>
           } />
           <Route path="/onboarding" element={

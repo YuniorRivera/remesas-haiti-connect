@@ -61,9 +61,9 @@ Deno.serve(async (req) => {
 
     // Create secure cookies
     const cookies = [
-      `__Host-sid=${data.session.access_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600`,
-      `__Host-rt=${data.session.refresh_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`,
-      `csrf-token=${csrfToken}; Secure; SameSite=Lax; Path=/; Max-Age=3600`,
+      `__Host-sid=${data.session.access_token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600`,
+      `__Host-rt=${data.session.refresh_token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`,
+      `csrf-token=${csrfToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600`,
     ]
 
     return json({ user: data.user, csrfToken }, { status: 200, headers: { 'Set-Cookie': cookies.join(', '), ...buildCorsHeaders(req) } })
