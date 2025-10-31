@@ -13,6 +13,7 @@ import { SkipLinks } from "@/components/SkipLink";
 import { LoadingFallback } from "@/components/ui/loading";
 import { ThemeProvider } from "next-themes";
 import { SupportIntegration } from "@/components/support/SupportIntegration";
+import { WebVitalsMonitor } from "@/components/WebVitalsMonitor";
 // Critical above-the-fold pages (no lazy loading for LCP)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -48,6 +49,7 @@ const AgentLocator = lazy(() => import("./pages/AgentLocator"));
 const MonCashPlusWizard = lazy(() => import("./pages/MonCashPlusWizard"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 const AdminKPIs = lazy(() => import("./pages/AdminKPIs"));
+const Status = lazy(() => import("./pages/Status"));
 
 const queryClient = new QueryClient();
 
@@ -64,6 +66,7 @@ const App = () => (
                 <Sonner />
                 <CookieBanner />
                 <SupportIntegration />
+                <WebVitalsMonitor />
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -92,6 +95,11 @@ const App = () => (
           <Route path="/help" element={
             <Suspense fallback={<LoadingFallback />}>
               <HelpCenter />
+            </Suspense>
+          } />
+          <Route path="/status" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Status />
             </Suspense>
           } />
           <Route path="/onboarding" element={
