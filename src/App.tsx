@@ -57,10 +57,10 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <LiteModeProvider>
-            <TooltipProvider>
-              <BrowserRouter>
+        <BrowserRouter>
+          <LanguageProvider>
+            <LiteModeProvider>
+              <TooltipProvider>
                 <SkipLinks />
                 <Toaster />
                 <Sonner />
@@ -269,12 +269,12 @@ const App = () => (
             {/* 404 - Must be last */}
             <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </LiteModeProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+              </TooltipProvider>
+            </LiteModeProvider>
+          </LanguageProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </ThemeProvider>
 );
 
