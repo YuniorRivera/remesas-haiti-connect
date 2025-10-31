@@ -98,9 +98,13 @@ This project is built with:
 
 - Strict headers via `public/_headers` (HSTS, XFO=DENY, nosniff, XSS, Referrer-Policy, Permissions-Policy, CSP)
 - CSRF: function `csrf` issues cookie `csrf-token` and clients send `X-CSRF-Token` header
-- Secure cookies: `__Host-sid`, `__Host-rt` are `HttpOnly; Secure; SameSite=Lax; Path=/`
+- Secure cookies: `__Host-sid`, `__Host-rt` are `HttpOnly; Secure; SameSite=Strict; Path=/`
 - CORS helper: functions use `buildCorsHeaders(req)` with allowlist from `ALLOWED_ORIGINS`
 - Rate limiting: dev-only in `supabase/functions/_shared/rateLimiter.ts` (migrate to Upstash/Deno KV for prod)
+- OTP/2FA: SMS/Email OTP + Google Authenticator support (backend ready, UI pending)
+  - Feature flags: `ENABLE_OTP`, `ENABLE_TOTP`
+  - Edge functions: `otp-send`, `otp-verify`, `totp-enrol`, `totp-verify`
+  - See [MFA_INTEGRATION.md](./MFA_INTEGRATION.md) for frontend integration guide
 
 ### Recommended environment variables (Supabase Functions)
 
