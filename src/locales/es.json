@@ -227,5 +227,19 @@
   "prismOptInFailed": "Error en autorización. Intenta nuevamente.",
   "prismWarningTitle": "PRISM No Autorizado",
   "prismWarningDesc": "El beneficiario debe autorizar PRISM para recibir remesas en MonCash Plus.",
-  "startPrismWizard": "Iniciar Proceso"
+  "startPrismWizard": "Iniciar Proceso",
+  "helpCenter": "Centro de Ayuda",
+  "helpCenterDesc": "Encuentra respuestas rápidas a tus preguntas",
+  "searchHelpPlaceholder": "Buscar ayuda...",
+  "allCategories": "Todas",
+  "noArticlesFound": "No se encontraron artículos. Intenta con otros términos.",
+  "readMore": "Leer más",
+  "popularTopics": "Temas Populares",
+  "articles": "artículos",
+  "popularMoncash": "MonCash Plus",
+  "popularFees": "Tarifas",
+  "popularTracking": "Rastreo",
+  "relatedArticles": "Artículos Relacionados",
+  "backToHelp": "Volver al Centro de Ayuda",
+  "home": "Inicio"
 }

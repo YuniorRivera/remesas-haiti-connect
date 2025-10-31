@@ -45,6 +45,7 @@ const Track = lazy(() => import("./pages/Track"));
 const Security = lazy(() => import("./pages/Security"));
 const AgentLocator = lazy(() => import("./pages/AgentLocator"));
 const MonCashPlusWizard = lazy(() => import("./pages/MonCashPlusWizard"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,11 @@ const App = () => (
           <Route path="/moncash-plus" element={
             <Suspense fallback={<LoadingFallback />}>
               <MonCashPlusWizard />
+            </Suspense>
+          } />
+          <Route path="/help" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <HelpCenter />
             </Suspense>
           } />
           <Route path="/onboarding" element={

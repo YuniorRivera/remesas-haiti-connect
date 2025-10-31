@@ -230,5 +230,19 @@
   "prismOptInFailed": "Erè nan otorizasyon. Eseye ankò.",
   "prismWarningTitle": "PRISM Pa Otorize",
   "prismWarningDesc": "Benefisyè a dwe otorize PRISM pou resevwa remès nan MonCash Plus.",
-  "startPrismWizard": "Kòmanse Pwosesis"
+  "startPrismWizard": "Kòmanse Pwosesis",
+  "helpCenter": "Sant Èd",
+  "helpCenterDesc": "Jwenn repons rapid pou kesyon ou",
+  "searchHelpPlaceholder": "Chèche èd...",
+  "allCategories": "Tout",
+  "noArticlesFound": "Pa gen atik. Eseye ak lòt tèm.",
+  "readMore": "Li plis",
+  "popularTopics": "Sijè Popilè",
+  "articles": "atik",
+  "popularMoncash": "MonCash Plus",
+  "popularFees": "Tarif",
+  "popularTracking": "Swiv",
+  "relatedArticles": "Atik Ki Gen Rapò",
+  "backToHelp": "Retounen nan Sant Èd",
+  "home": "Kay"
 }
