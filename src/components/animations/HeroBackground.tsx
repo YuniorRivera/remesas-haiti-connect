@@ -107,24 +107,30 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
         p.strokeWeight(0.5);
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
+            const particleI = particles[i];
+            const particleJ = particles[j];
+            if (!particleI || !particleJ) continue;
+            
             const d = p.dist(
-              particles[i].x,
-              particles[i].y,
-              particles[j].x,
-              particles[j].y
+              particleI.x,
+              particleI.y,
+              particleJ.x,
+              particleJ.y
             );
             if (d < connectionDistance) {
               const opacity = p.map(d, 0, connectionDistance, 30, 0);
               p.stroke(15, 23, 42, opacity);
-              p.line(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+              p.line(particleI.x, particleI.y, particleJ.x, particleJ.y);
             }
           }
         }
 
         // Update and draw particles
         for (const particle of particles) {
-          particle.update();
-          particle.draw();
+          if (particle) {
+            particle.update();
+            particle.draw();
+          }
         }
       };
 
