@@ -33,10 +33,19 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
         targetY: number;
 
         constructor() {
-          this.x = p.random(p.width);
-          this.y = p.random(p.height);
+          // Use default values, will be set in setup after canvas is created
+          this.x = 0;
+          this.y = 0;
           this.vx = p.random(-maxSpeed, maxSpeed);
           this.vy = p.random(-maxSpeed, maxSpeed);
+          this.targetX = 0;
+          this.targetY = 0;
+        }
+
+        initialize() {
+          // Initialize position after canvas is created
+          this.x = p.random(p.width);
+          this.y = p.random(p.height);
           this.targetX = this.x;
           this.targetY = this.y;
         }
@@ -70,11 +79,6 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
         }
       }
 
-      // Initialize particles
-      for (let i = 0; i < numParticles; i++) {
-        particles.push(new Particle());
-      }
-
       p.setup = () => {
         const canvas = p.createCanvas(
           containerRef.current?.clientWidth || 1200,
@@ -85,6 +89,14 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
         canvas.style.left = "0";
         canvas.style.zIndex = "0";
         p.noLoop(); // Start paused for LCP optimization
+        
+        // Initialize particles AFTER canvas is created
+        for (let i = 0; i < numParticles; i++) {
+          particles.push(new Particle());
+        }
+        
+        // Set initial positions now that p.width and p.height are available
+        particles.forEach(particle => particle.initialize());
       };
 
       p.draw = () => {
