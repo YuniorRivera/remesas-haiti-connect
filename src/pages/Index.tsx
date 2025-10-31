@@ -9,6 +9,7 @@ import { Send, Shield, Clock, TrendingUp } from "lucide-react";
 import { PricingCalculator } from "@/components/PricingCalculator";
 import { StatisticsDisplay } from "@/components/StatisticsDisplay";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+import { StablecoinsInfo } from "@/components/StablecoinsInfo";
 
 // Lazy load heavy p5.js animation only when needed
 const HeroBackground = lazy(() => import("@/components/animations/HeroBackground").then(module => ({ default: module.HeroBackground })));
@@ -92,8 +93,9 @@ const Index = () => {
 
         {/* Calculator Section */}
         <section className="container mx-auto px-4 py-12" aria-labelledby="calculator-heading">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto space-y-8">
             <PricingCalculator />
+            <StablecoinsInfo />
           </div>
         </section>
 
