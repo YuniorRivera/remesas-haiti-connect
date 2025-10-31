@@ -29,3 +29,15 @@ verify_jwt = false
 
 [functions.reconciliation-process]
 verify_jwt = true
+
+[functions.otp-send]
+verify_jwt = true
+
+[functions.otp-verify]
+verify_jwt = true
+
+[functions.totp-enrol]
+verify_jwt = true
+
+[functions.totp-verify]
+verify_jwt = true

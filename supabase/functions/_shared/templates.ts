@@ -5,7 +5,7 @@
  */
 
 export type Language = 'es' | 'ht' | 'fr';
-export type EventType = 'ORDER_CREATED' | 'PAYMENT_CONFIRMED' | 'PAYOUT_SENT' | 'PAYOUT_SETTLED';
+export type EventType = 'ORDER_CREATED' | 'PAYMENT_CONFIRMED' | 'PAYOUT_SENT' | 'PAYOUT_SETTLED' | 'OTP_SENT';
 
 export interface NotificationTemplate {
   subject: string;
@@ -246,6 +246,56 @@ Suivi: {tracking_url}
       `.trim(),
       sms: '✅ Virement liquidé: {code}. Transaction complète. Suivre: {tracking_url}',
       whatsapp: '✅ Virement Liquidé!\n\n📋 Code: {code}\n💵 Montant: {amount_htg} HTG\n📞 Bénéficiaire: {beneficiary}\n\n🎉 Transaction complète!\n\n🔗 Suivre: {tracking_url}'
+    }
+  },
+  OTP_SENT: {
+    es: {
+      subject: 'Código de Verificación - kobcash',
+      body: `
+Estimado/a {name},
+
+Tu código de verificación es: {code}
+
+Este código expira en {expiry}.
+
+Si no solicitaste este código, ignora este mensaje.
+
+kobcash - Transferencias seguras
+      `.trim(),
+      sms: 'kobcash: Tu código es {code}. Válido por {expiry}',
+      whatsapp: '🔐 kobcash\n\nTu código de verificación:\n📌 {code}\n\n⏰ Válido por {expiry}\n\nSi no solicitaste esto, ignora este mensaje.'
+    },
+    ht: {
+      subject: 'Kòd Verifikasyon - kobcash',
+      body: `
+Mesyè/Madam {name},
+
+Kòd verifikasyon ou se: {code}
+
+Kòd sa a expire nan {expiry}.
+
+Si ou pa mande kòd sa a, inyore mesaj sa a.
+
+kobcash - Transfè sekirite
+      `.trim(),
+      sms: 'kobcash: Kòd ou se {code}. Valab pou {expiry}',
+      whatsapp: '🔐 kobcash\n\nKòd verifikasyon ou:\n📌 {code}\n\n⏰ Valab pou {expiry}\n\nSi ou pa mande sa, inyore mesaj sa a.'
+    },
+    fr: {
+      subject: 'Code de Vérification - kobcash',
+      body: `
+Cher/Chère {name},
+
+Votre code de vérification est: {code}
+
+Ce code expire dans {expiry}.
+
+Si vous n'avez pas demandé ce code, ignorez ce message.
+
+kobcash - Transferts sécurisés
+      `.trim(),
+      sms: 'kobcash: Votre code est {code}. Valable pour {expiry}',
+      whatsapp: '🔐 kobcash\n\nVotre code de vérification:\n📌 {code}\n\n⏰ Valable pour {expiry}\n\nSi vous n\'avez pas demandé ceci, ignorez ce message.'
     }
   }
 };
