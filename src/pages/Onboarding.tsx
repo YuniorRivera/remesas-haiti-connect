@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Store } from "lucide-react";
+import { User, Store, ArrowLeft } from "lucide-react";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 const agentFormSchema = z.object({
@@ -112,6 +112,17 @@ const Onboarding = () => {
   };
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
+        <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al inicio
+          </Button>
+        </div>
+        
         <div className="mb-12 text-center">
           <h1 className="mb-3 text-4xl font-bold text-primary">Bienvenidos a KòbCash Remesas RD-Haití</h1>
           <p className="text-lg text-muted-foreground">
