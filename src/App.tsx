@@ -41,6 +41,7 @@ const AgentEarnings = lazy(() => import("./pages/AgentEarnings"));
 const SenderSend = lazy(() => import("./pages/SenderSend"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
+const Track = lazy(() => import("./pages/Track"));
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/legal" element={<Legal />} />
+          <Route path="/track" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Track />
+            </Suspense>
+          } />
           <Route path="/onboarding" element={
             <ProtectedRoute requireAuth>
               <Onboarding />
