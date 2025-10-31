@@ -157,5 +157,22 @@
   "youPay": "Pagas",
   "haitiFee": "Tarifa Haití",
   "rate": "Tasa",
-  "netReceive": "Recibe neto"
+  "netReceive": "Recibe neto",
+  "receiptTitle": "RECIBO DE REMESA",
+  "receiptTitleAlt": "RESEP REMES",
+  "remitter": "REMITENTE",
+  "beneficiaryHeader": "BENEFICIARIO",
+  "transactionDetails": "DETALLES DE LA TRANSACCIÓN",
+  "amountSent": "Monto enviado",
+  "totalPaid": "Total pagado",
+  "exchangeRateLabel": "Tasa de cambio",
+  "beneficiarioRecibe": "Beneficiario recibe",
+  "paymentChannelLabel": "Canal de pago",
+  "verificationCode": "Código de verificación",
+  "receiptValid": "Este recibo es válido como comprobante de transacción",
+  "issuedBy": "Emitido por",
+  "officialDisclaimer": "Pago en Gourdes Haitianos",
+  "officialFee": "Tarifa oficial de US$1.50",
+  "printReceipt": "Imprimir",
+  "downloadPDF": "Descargar PDF"
 }

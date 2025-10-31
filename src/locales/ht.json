@@ -160,5 +160,22 @@
   "youPay": "Ou peye",
   "haitiFee": "Fee Ayiti",
   "rate": "Tasa",
-  "netReceive": "Resevwa nèt"
+  "netReceive": "Resevwa nèt",
+  "receiptTitle": "RESEP REMES",
+  "receiptTitleAlt": "RECIBO DE REMESA",
+  "remitter": "METEUR",
+  "beneficiaryHeader": "BENEFISYE",
+  "transactionDetails": "DETAY TRANZAKSYON",
+  "amountSent": "Montan voye",
+  "totalPaid": "Total peye",
+  "exchangeRateLabel": "To chanj",
+  "beneficiarioRecibe": "Benefisye a resevwa",
+  "paymentChannelLabel": "Kanal peman",
+  "verificationCode": "Kòd Verifikasyon",
+  "receiptValid": "Resep sa a valab kòm pwòv tranzaksyon",
+  "issuedBy": "Emisyon pa",
+  "officialDisclaimer": "Peman an Gourdes Ayisyen",
+  "officialFee": "Tarif ofisyèl US$1.50",
+  "printReceipt": "Enprime",
+  "downloadPDF": "Telechaje PDF"
 }
