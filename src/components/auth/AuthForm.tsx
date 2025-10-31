@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { loginSchema, signupSchema } from "@/lib/validations";
 import { supabase } from "@/integrations/supabase/client";
+import { checkPasswordLeak, getPasswordLeakMessage } from "@/lib/passwordLeakCheck";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +64,16 @@ export function AuthForm() {
         if (error) throw error;
         toast.success("Sesión iniciada correctamente");
       } else {
+        // Check password leak for signup
+        const leakCheck = await checkPasswordLeak(password);
+        if (leakCheck.isCompromised) {
+          const message = getPasswordLeakMessage(leakCheck.count);
+          setErrors({ password: message });
+          toast.error(message);
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { checkPasswordLeak, getPasswordLeakMessage } from "@/lib/passwordLeakCheck";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -56,6 +57,16 @@ export function useAuth() {
   };
 
   const signUp = async (email: string, password: string) => {
+    // Check password leak
+    const leakCheck = await checkPasswordLeak(password);
+    if (leakCheck.isCompromised) {
+      const message = getPasswordLeakMessage(leakCheck.count);
+      return { 
+        data: null, 
+        error: { message } 
+      };
+    }
+
     const redirectUrl = `${window.location.origin}/`;
     
     const { data, error } = await supabase.auth.signUp({

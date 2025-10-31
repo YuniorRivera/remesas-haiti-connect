@@ -1,18 +1,20 @@
 import { z } from 'zod';
 import { sanitizeText, sanitizeName, sanitizePhone, sanitizeDocumentNumber } from './sanitize';
 
-// Auth validations
+// Auth validations with password leak check
+const passwordBaseSchema = z.string()
+  .min(8, { message: "Contraseña debe tener al menos 8 caracteres" })
+  .max(100, { message: "Contraseña demasiado larga" })
+  .regex(/[A-Z]/, { message: "Debe contener al menos una mayúscula" })
+  .regex(/[a-z]/, { message: "Debe contener al menos una minúscula" })
+  .regex(/[0-9]/, { message: "Debe contener al menos un número" });
+
 export const authSchema = z.object({
   email: z.string()
     .trim()
     .email({ message: "Email inválido" })
     .max(255, { message: "Email demasiado largo" }),
-  password: z.string()
-    .min(8, { message: "Contraseña debe tener al menos 8 caracteres" })
-    .max(100, { message: "Contraseña demasiado larga" })
-    .regex(/[A-Z]/, { message: "Debe contener al menos una mayúscula" })
-    .regex(/[a-z]/, { message: "Debe contener al menos una minúscula" })
-    .regex(/[0-9]/, { message: "Debe contener al menos un número" }),
+  password: passwordBaseSchema,
   fullName: z.string()
     .trim()
     .min(3, { message: "Nombre debe tener al menos 3 caracteres" })
