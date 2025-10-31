@@ -46,6 +46,7 @@ const Security = lazy(() => import("./pages/Security"));
 const AgentLocator = lazy(() => import("./pages/AgentLocator"));
 const MonCashPlusWizard = lazy(() => import("./pages/MonCashPlusWizard"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const AdminKPIs = lazy(() => import("./pages/AdminKPIs"));
 
 const queryClient = new QueryClient();
 
@@ -228,6 +229,13 @@ const App = () => (
               <ProtectedRoute requireAuth allowedRoles={['admin']}>
                 <Suspense fallback={<LoadingFallback />}>
                   <AdminLedger />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-kpis" element={
+              <ProtectedRoute requireAuth allowedRoles={['admin']}>
+                <Suspense fallback={<LoadingFallback />}>
+                  <AdminKPIs />
                 </Suspense>
               </ProtectedRoute>
             } />

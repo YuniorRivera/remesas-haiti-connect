@@ -205,6 +205,10 @@ const AdminDashboard = () => {
                 Acceso restringido a administradores - Márgenes y Analítica de Plataforma
               </p>
             </div>
+            <Button onClick={() => navigate("/admin-kpis")} variant="outline">
+              <BarChart3 className="mr-2 h-4 w-4" />
+              KPIs Operativos
+            </Button>
           </div>
         </div>
       </header>
