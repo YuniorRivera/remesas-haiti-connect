@@ -177,5 +177,18 @@
   "officialDisclaimer": "Peman an Gourdes Ayisyen",
   "officialFee": "Tarif ofisyèl US$1.50",
   "printReceipt": "Enprime",
-  "downloadPDF": "Telechaje PDF"
+  "downloadPDF": "Telechaje PDF",
+  "findAgentLocations": "Jwenn Pwen Kolekt",
+  "findAgentDesc": "Jwenn ajan MoneyGram ak MonCash tou pre ou",
+  "searchByAddress": "Chèche nan adrès...",
+  "filterByNetwork": "Filtre nan rezo",
+  "allNetworks": "Tout Rezo",
+  "locationsFound": "kote",
+  "loadingMap": "Ap chaje kat...",
+  "yourLocation": "Kote ou ye",
+  "code": "Kòd",
+  "away": "depi kote",
+  "getDirections": "Kijan pou rive",
+  "errorLoadingLocations": "Erè nan chajman kote yo",
+  "addressNotFound": "Pa jwenn adrès la. Eseye ak yon lòt."
 }

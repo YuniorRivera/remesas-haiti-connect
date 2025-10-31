@@ -174,5 +174,18 @@
   "officialDisclaimer": "Pago en Gourdes Haitianos",
   "officialFee": "Tarifa oficial de US$1.50",
   "printReceipt": "Imprimir",
-  "downloadPDF": "Descargar PDF"
+  "downloadPDF": "Descargar PDF",
+  "findAgentLocations": "Encontrar Puntos de Cobro",
+  "findAgentDesc": "Localiza agentes MoneyGram y MonCash cerca de ti",
+  "searchByAddress": "Buscar por dirección...",
+  "filterByNetwork": "Filtrar por red",
+  "allNetworks": "Todas las Redes",
+  "locationsFound": "ubicaciones",
+  "loadingMap": "Cargando mapa...",
+  "yourLocation": "Tu ubicación",
+  "code": "Código",
+  "away": "de distancia",
+  "getDirections": "Cómo llegar",
+  "errorLoadingLocations": "Error al cargar ubicaciones",
+  "addressNotFound": "No se encontró la dirección. Intenta con otra."
 }
