@@ -145,5 +145,13 @@
   "feature24hDesc": "Accede a tu cuenta y consulta transacciones en cualquier momento",
   "featureBest": "Mejor Tasa",
   "featureBestDesc": "Tasas de cambio competitivas y comisiones transparentes",
-  "copyright": "© 2025 kobcash. Sistema seguro de transferencias."
+  "copyright": "© 2025 kobcash. Sistema seguro de transferencias.",
+  "calculatorTitle": "Calculadora de Remesas",
+  "sendAmount": "Monto a enviar",
+  "recipientWillReceive": "El beneficiario recibirá",
+  "kobcashFee": "Comisión Kobcash",
+  "calculating": "Calculando...",
+  "calculatorError": "Error al calcular. Intente nuevamente.",
+  "governmentFee": "Tarifa BRH",
+  "totalToPay": "Total a pagar"
 }

@@ -6,6 +6,7 @@ import { useLocale } from "@/lib/i18n";
 import { SkipLinks } from "@/components/SkipLink";
 import { Button } from "@/components/ui/button";
 import { Send, Shield, Clock, TrendingUp } from "lucide-react";
+import { PricingCalculator } from "@/components/PricingCalculator";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -74,6 +75,13 @@ const Index = () => {
             >
               {t("ctaSecondary")}
             </Button>
+          </div>
+        </section>
+
+        {/* Calculator Section */}
+        <section className="container mx-auto px-4 py-12" aria-labelledby="calculator-heading">
+          <div className="max-w-2xl mx-auto">
+            <PricingCalculator />
           </div>
         </section>
 

@@ -22,13 +22,31 @@ export interface Remittance {
 
 // Quote response from pricing-quote function
 export interface PricingQuote {
-  success: boolean;
-  remittance: Remittance;
-  fees: {
-    total_fee_dop: number;
-    exchange_rate: number;
-    payout_htg: number;
-  };
+  principal_dop: number;
+  channel: 'MONCASH' | 'SPIH';
+  fx_client_sell: number;
+  htg_to_beneficiary: number;
+  client_fee_fixed_dop: number;
+  client_fee_pct_dop: number;
+  total_client_fees_dop: number;
+  total_client_pays_dop: number;
+  acquiring_cost_dop: number;
+  gov_fee_dop: number;
+  gov_fee_usd: number;
+  store_commission_dop: number;
+  quoted_at: string;
+  // Admin-only fields
+  fx_mid_dop_htg?: number;
+  fx_spread_bps?: number;
+  fx_spread_rev_dop?: number;
+  htg_before_partner?: number;
+  partner_fee_htg?: number;
+  partner_cost_dop_equiv?: number;
+  platform_commission_dop?: number;
+  platform_gross_margin_dop?: number;
+  total_platform_revenue?: number;
+  total_costs?: number;
+  breakdown?: any;
   error?: string;
 }
 

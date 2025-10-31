@@ -148,5 +148,13 @@
   "feature24hDesc": "Jwenn aksè nan kont ou ak konsilte tranzaksyon nenpòt lè",
   "featureBest": "To Chanj Pi Bon",
   "featureBestDesc": "To chanj konpetitif ak komisyon transparan",
-  "copyright": "© 2025 kobcash. Sistèm transfè sekirite."
+  "copyright": "© 2025 kobcash. Sistèm transfè sekirite.",
+  "calculatorTitle": "Kalkilatris Remès",
+  "sendAmount": "Montan pou voye",
+  "recipientWillReceive": "Benefisyè a ap resevwa",
+  "kobcashFee": "Komisyon Kobcash",
+  "calculating": "Ap kalkile...",
+  "calculatorError": "Erè nan kalkil. Tanpri eseye ankò.",
+  "governmentFee": "Fee Gouvènman BRH",
+  "totalToPay": "Total pou peye"
 }

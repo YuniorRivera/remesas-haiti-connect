@@ -145,5 +145,13 @@
   "feature24hDesc": "Accédez à votre compte et consultez les transactions à tout moment",
   "featureBest": "Meilleur Taux",
   "featureBestDesc": "Taux de change compétitifs et commissions transparentes",
-  "copyright": "© 2025 kobcash. Système de transferts sécurisé."
+  "copyright": "© 2025 kobcash. Système de transferts sécurisé.",
+  "calculatorTitle": "Calculateur de Virements",
+  "sendAmount": "Montant à envoyer",
+  "recipientWillReceive": "Le bénéficiaire recevra",
+  "kobcashFee": "Commission Kobcash",
+  "calculating": "Calcul en cours...",
+  "calculatorError": "Erreur de calcul. Veuillez réessayer.",
+  "governmentFee": "Frais BRH",
+  "totalToPay": "Total à payer"
 }
