@@ -99,14 +99,12 @@ export function PricingCalculator() {
         {quote && !loading && (
           <div className="space-y-4">
             {/* HTG Neto en Grande */}
-            <div className={`rounded-lg p-6 text-center ${
-              isLite 
-                ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800' 
-                : 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-300 dark:border-green-700'
-            }`}>
-              <p className={`text-5xl font-bold mb-4 ${
-                isLite ? 'text-green-700 dark:text-green-400' : 'text-green-600 dark:text-green-500'
+            <div className={`rounded-lg p-6 text-center ${isLite
+              ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800'
+              : 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-300 dark:border-green-700'
               }`}>
+              <p className={`text-5xl font-bold mb-4 ${isLite ? 'text-green-700 dark:text-green-400' : 'text-green-600 dark:text-green-500'
+                }`}>
                 {quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} HTG
               </p>
             </div>

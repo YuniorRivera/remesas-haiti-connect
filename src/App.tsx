@@ -39,6 +39,8 @@ const AdminLedger = lazy(() => import("./pages/AdminLedger"));
 const Stores = lazy(() => import("./pages/Stores"));
 const AgentEarnings = lazy(() => import("./pages/AgentEarnings"));
 const SenderSend = lazy(() => import("./pages/SenderSend"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
 
 const queryClient = new QueryClient();
 
@@ -94,6 +96,20 @@ const App = () => (
               <ProtectedRoute requireAuth>
                 <Suspense fallback={<LoadingFallback />}>
                   <SenderSend />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/checkout" element={
+              <ProtectedRoute requireAuth>
+                <Suspense fallback={<LoadingFallback />}>
+                  <Checkout />
+                </Suspense>
+              </ProtectedRoute>
+            } />
+            <Route path="/payment-callback" element={
+              <ProtectedRoute requireAuth>
+                <Suspense fallback={<LoadingFallback />}>
+                  <PaymentCallback />
                 </Suspense>
               </ProtectedRoute>
             } />

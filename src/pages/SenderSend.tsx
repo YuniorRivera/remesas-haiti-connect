@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { secureSupabase } from "@/lib/secureSupabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PricingQuote } from "@/types/api";
+import { CreateRemittanceResponse, Remittance } from "@/types/api";
 
 export default function SenderSend() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [quote, setQuote] = useState<any>(null);
+  const [quote, setQuote] = useState<PricingQuote | null>(null);
   
   const [formData, setFormData] = useState({
     beneficiario_nombre: "",
@@ -51,11 +55,53 @@ export default function SenderSend() {
 
       if (error) throw error;
       
-      setQuote(data);
+      setQuote(data as PricingQuote);
       toast.success("Cotización generada");
     } catch (error: any) {
       console.error("Error obteniendo cotización:", error);
       toast.error(error.message || "Error al generar cotización");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProceedToCheckout = async () => {
+    if (!quote || !user) {
+      toast.error("Obtén una cotización primero");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Crear remesa
+      const { data, error } = await secureSupabase.functions.invoke("remittances-create", {
+        body: {
+          beneficiario_nombre: formData.beneficiario_nombre,
+          beneficiario_telefono: formData.beneficiario_telefono,
+          principal_dop: parseFloat(formData.principal_dop),
+          channel: formData.channel,
+          origin_ip: typeof window !== "undefined" ? window.location.hostname : "unknown",
+        },
+      });
+
+      if (error) throw error;
+
+      const result = data as CreateRemittanceResponse;
+      if (result?.remittance) {
+        toast.success("Orden creada exitosamente");
+        // Redirigir a checkout con remittance y quote
+        navigate("/checkout", {
+          state: {
+            remittance: result.remittance,
+            quote: quote,
+          },
+        });
+      } else {
+        throw new Error("No se pudo crear la orden");
+      }
+    } catch (error: any) {
+      console.error("Error creando remesa:", error);
+      toast.error(error.message || "Error al crear la orden");
     } finally {
       setLoading(false);
     }
@@ -199,27 +245,21 @@ export default function SenderSend() {
                   </div>
                 </div>
 
-                <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
-                  <h3 className="font-semibold text-sm mb-2">Siguientes Pasos</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Para completar tu envío, acércate a una tienda/agente autorizado con:
-                  </p>
-                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                    <li>El monto total a pagar (${quote.total_charge_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP)</li>
-                    <li>Tu documento de identidad</li>
-                    <li>Los datos del beneficiario</li>
-                  </ul>
-                  <p className="text-sm text-muted-foreground mt-3">
-                    Pronto habilitaremos el pago en línea.
-                  </p>
-                </div>
+                <Button
+                  onClick={handleProceedToCheckout}
+                  disabled={loading}
+                  size="lg"
+                  className="w-full"
+                >
+                  {loading ? "Creando orden..." : "Proceder al Pago"} <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
 
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => navigate("/stores")}
+                  onClick={() => navigate("/dashboard")}
                 >
-                  Ver Tiendas Cercanas
+                  Cancelar
                 </Button>
               </CardContent>
             </Card>
