@@ -5,6 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useLocale } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -192,6 +193,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </header>
           <main id="main-content" className="flex-1 overflow-auto" role="main" tabIndex={-1}>{children}</main>
+          <Footer />
         </div>
       </div>
     </SidebarProvider>

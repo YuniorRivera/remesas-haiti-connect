@@ -10,6 +10,7 @@ import { PricingCalculator } from "@/components/PricingCalculator";
 import { StatisticsDisplay } from "@/components/StatisticsDisplay";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { StablecoinsInfo } from "@/components/StablecoinsInfo";
+import { Footer } from "@/components/Footer";
 
 // Lazy load heavy p5.js animation only when needed
 const HeroBackground = lazy(() => import("@/components/animations/HeroBackground").then(module => ({ default: module.HeroBackground })));
@@ -179,46 +180,7 @@ const Index = () => {
         </section>
       </main>
 
-      <footer 
-        id="footer"
-        className={`border-t border-primary/20 ${isLite ? 'bg-card py-8' : 'bg-card/30 md:backdrop-blur-sm py-8'} relative z-10`}
-        role="contentinfo"
-        tabIndex={-1}
-      >
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="mb-2">{t("copyright")}</p>
-          <nav aria-label="Enlaces legales">
-            <div className="flex justify-center gap-4">
-              <Button 
-                variant="link" 
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
-                onClick={() => navigate("/legal")}
-                aria-label="Ver política de privacidad"
-              >
-                Política de Privacidad
-              </Button>
-              <span aria-hidden="true">•</span>
-              <Button 
-                variant="link" 
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
-                onClick={() => navigate("/legal")}
-                aria-label="Ver términos y condiciones"
-              >
-                Términos y Condiciones
-              </Button>
-              <span aria-hidden="true">•</span>
-              <Button 
-                variant="link" 
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
-                onClick={() => navigate("/legal")}
-                aria-label="Ver política de cookies"
-              >
-                Cookies
-              </Button>
-            </div>
-          </nav>
-        </div>
-      </footer>
+      <Footer />
       </div>
     </>
   );
