@@ -84,10 +84,10 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
           containerRef.current?.clientWidth || 1200,
           containerRef.current?.clientHeight || 600
         );
-        canvas.style.position = "absolute";
-        canvas.style.top = "0";
-        canvas.style.left = "0";
-        canvas.style.zIndex = "0";
+        canvas.elt.style.position = "absolute";
+        canvas.elt.style.top = "0";
+        canvas.elt.style.left = "0";
+        canvas.elt.style.zIndex = "0";
         p.noLoop(); // Start paused for LCP optimization
         
         // Initialize particles AFTER canvas is created
