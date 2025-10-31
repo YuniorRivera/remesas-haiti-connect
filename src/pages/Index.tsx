@@ -7,6 +7,8 @@ import { SkipLinks } from "@/components/SkipLink";
 import { Button } from "@/components/ui/button";
 import { Send, Shield, Clock, TrendingUp } from "lucide-react";
 import { PricingCalculator } from "@/components/PricingCalculator";
+import { StatisticsDisplay } from "@/components/StatisticsDisplay";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -85,6 +87,14 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Statistics Section */}
+        <section className="container mx-auto px-4 py-16" aria-labelledby="statistics-heading">
+          <h2 id="statistics-heading" className="text-3xl font-bold text-center mb-8">
+            {t('trustMetrics') || "Confianza que Habla por Sí Misma"}
+          </h2>
+          <StatisticsDisplay />
+        </section>
+
         <section id="features" className="container mx-auto px-4 py-16" aria-labelledby="features-heading">
           <h2 id="features-heading" className="sr-only">{t("features")}</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" role="list">
@@ -143,6 +153,16 @@ const Index = () => {
                 {t("featureBestDesc")}
               </p>
             </article>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="container mx-auto px-4 py-16" aria-labelledby="testimonials-heading">
+          <h2 id="testimonials-heading" className="text-3xl font-bold text-center mb-8">
+            {t('whatOurUsersSay') || "Lo que Dicen Nuestros Usuarios"}
+          </h2>
+          <div className="max-w-3xl mx-auto">
+            <TestimonialsCarousel />
           </div>
         </section>
       </main>
