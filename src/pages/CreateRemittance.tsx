@@ -92,6 +92,29 @@ export default function CreateRemittance() {
   };
 
   const handleCreateRemittance = async () => {
+    // Check PRISM status if channel is MONCASH
+    if (formData.channel === 'MONCASH' && formData.beneficiario_telefono) {
+      const { data: prismStatus } = await supabase
+        .from('beneficiary_prism_status')
+        .select('prism_opt_in, upgrade_status')
+        .eq('beneficiary_phone', formData.beneficiario_telefono)
+        .maybeSingle();
+
+      // If not opt-in, show wizard
+      if (!prismStatus || !prismStatus.prism_opt_in) {
+        toast.warning(t('prismWarningTitle') || 'PRISM No Autorizado');
+        const shouldStartWizard = confirm(
+          t('prismWarningDesc') || 
+          'El beneficiario debe autorizar PRISM para recibir remesas en MonCash Plus.\n\n¿Deseas iniciar el proceso?'
+        );
+        
+        if (shouldStartWizard) {
+          navigate(`/moncash-plus?phone=${encodeURIComponent(formData.beneficiario_telefono)}&name=${encodeURIComponent(formData.beneficiario_nombre)}&return=/remittances/create`);
+          return;
+        }
+      }
+    }
+
     const remittance = await createRemittance();
     if (remittance) {
       setStep(4);
