@@ -2,12 +2,15 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { buildCorsHeaders, preflight, json } from '../_shared/security.ts';
+import { scoreFraud, mlScoreToRiskLevel, MLFraudScoreRequest, MLFraudScoreResponse } from '../_shared/fraudMLHook.ts';
 
 const fraudCheckSchema = z.object({
   emisor_documento: z.string().min(1, "Documento del emisor requerido"),
   beneficiario_telefono: z.string().min(1, "Teléfono del beneficiario requerido"),
   principal_dop: z.number().positive("El monto debe ser positivo"),
   origin_ip: z.string().optional(),
+  origin_device_fingerprint: z.string().optional(),
+  channel: z.enum(['MONCASH', 'SPIH']).optional(),
 });
 
 interface FraudCheckRequest {
@@ -15,6 +18,8 @@ interface FraudCheckRequest {
   beneficiario_telefono: string;
   principal_dop: number;
   origin_ip: string;
+  origin_device_fingerprint?: string;
+  channel?: 'MONCASH' | 'SPIH';
 }
 
 interface FraudCheckResponse {
@@ -79,12 +84,57 @@ serve(async (req) => {
     
     const body: FraudCheckRequest = validationResult.data as FraudCheckRequest;
 
-    const { emisor_documento, beneficiario_telefono, principal_dop, origin_ip } = body;
+    const { emisor_documento, beneficiario_telefono, principal_dop, origin_ip, origin_device_fingerprint, channel } = body;
 
     const flags: string[] = [];
     let risk_level: 'low' | 'medium' | 'high' = 'low';
 
     const now = new Date();
+
+    // Check greylist first
+    if (emisor_documento) {
+      const { data: greylisted } = await supabaseClient
+        .from('greylist')
+        .select('risk_level, reason')
+        .eq('entity_type', 'documento')
+        .eq('entity_value', emisor_documento)
+        .maybeSingle();
+
+      if (greylisted) {
+        flags.push(`Documento en lista gris: ${greylisted.reason || 'Revisión manual requerida'}`);
+        risk_level = greylisted.risk_level === 'high' ? 'high' : greylisted.risk_level === 'medium' ? 'medium' : 'low';
+      }
+    }
+
+    if (beneficiario_telefono) {
+      const { data: greylisted } = await supabaseClient
+        .from('greylist')
+        .select('risk_level, reason')
+        .eq('entity_type', 'telefono')
+        .eq('entity_value', beneficiario_telefono)
+        .maybeSingle();
+
+      if (greylisted) {
+        flags.push(`Teléfono en lista gris: ${greylisted.reason || 'Revisión manual requerida'}`);
+        const newRisk = greylisted.risk_level === 'high' ? 'high' : greylisted.risk_level === 'medium' ? 'medium' : 'low';
+        risk_level = risk_level === 'high' ? 'high' : newRisk === 'high' ? 'high' : newRisk === 'medium' ? 'medium' : risk_level;
+      }
+    }
+
+    if (origin_ip) {
+      const { data: greylisted } = await supabaseClient
+        .from('greylist')
+        .select('risk_level, reason')
+        .eq('entity_type', 'ip')
+        .eq('entity_value', origin_ip)
+        .maybeSingle();
+
+      if (greylisted) {
+        flags.push(`IP en lista gris: ${greylisted.reason || 'Revisión manual requerida'}`);
+        const newRisk = greylisted.risk_level === 'high' ? 'high' : greylisted.risk_level === 'medium' ? 'medium' : 'low';
+        risk_level = risk_level === 'high' ? 'high' : newRisk === 'high' ? 'high' : newRisk === 'medium' ? 'medium' : risk_level;
+      }
+    }
     const today_start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const hour_ago = new Date(now.getTime() - 60 * 60 * 1000);
     const month_start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -213,6 +263,39 @@ serve(async (req) => {
       }
     }
 
+    // Call ML hook for additional scoring
+    let mlScore = 0;
+    let mlRiskLevel: 'low' | 'medium' | 'high' = 'low';
+    try {
+      const mlRequest: MLFraudScoreRequest = {
+        emisor_documento,
+        beneficiario_telefono,
+        principal_dop,
+        origin_ip: origin_ip || null,
+        origin_device_fingerprint,
+        channel: channel || 'MONCASH',
+      };
+      
+      const mlResult = await scoreFraud(mlRequest);
+      mlScore = mlResult.score;
+      mlRiskLevel = mlScoreToRiskLevel(mlScore);
+      
+      // Add ML flags if score is significant
+      if (mlScore > 50) {
+        flags.push(`Score ML alto: ${mlScore.toFixed(1)}/100`);
+      }
+      
+      // Upgrade risk level if ML detects high risk
+      if (mlRiskLevel === 'high' && risk_level !== 'high') {
+        risk_level = 'medium';
+      } else if (mlRiskLevel === 'medium' && risk_level === 'low') {
+        risk_level = 'medium';
+      }
+    } catch (mlError) {
+      console.error('ML scoring error:', mlError);
+      // Fail gracefully: continue with rule-based scoring
+    }
+
     const response: FraudCheckResponse = {
       is_suspicious: flags.length > 0,
       risk_level,
@@ -231,6 +314,7 @@ serve(async (req) => {
           principal_dop,
           risk_level,
           flags,
+          ml_score: mlScore,
         },
         ip: origin_ip,
       });

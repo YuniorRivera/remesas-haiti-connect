@@ -128,12 +128,47 @@ Deno.serve(async (req) => {
 
     console.log('Quote received for remittance');
 
+    // Run fraud detection check
+    const { data: fraudCheck, error: fraudError } = await supabaseClient.functions.invoke(
+      'fraud-detection',
+      {
+        body: {
+          emisor_documento: requestData.emisor_documento || '',
+          beneficiario_telefono: requestData.beneficiario_telefono || '',
+          principal_dop: requestData.principal_dop,
+          origin_ip: requestData.origin_ip,
+          origin_device_fingerprint: requestData.origin_device_fingerprint,
+          channel: requestData.channel,
+        },
+      }
+    );
+
+    let finalState: 'QUOTED' | 'REVIEW' = 'QUOTED';
+    let fraudScore: number | null = null;
+    let fraudFlags: any = null;
+
+    if (!fraudError && fraudCheck) {
+      const fraud = fraudCheck as any;
+      fraudScore = 0; // Will be set by fraud-detection if ML is enabled
+      fraudFlags = {
+        is_suspicious: fraud.is_suspicious,
+        risk_level: fraud.risk_level,
+        flags: fraud.flags,
+      };
+
+      // If high risk, set to REVIEW state for manual approval
+      if (fraud.should_block) {
+        finalState = 'REVIEW';
+        console.log('Remittance flagged for review:', fraud.flags);
+      }
+    }
+
     // Generar código de referencia único
     const timestamp = Date.now().toString(36).toUpperCase();
     const random = Math.random().toString(36).substring(2, 6).toUpperCase();
     const codigo_referencia = `REM-${timestamp}-${random}`;
 
-    // Crear remesa en estado QUOTED
+    // Crear remesa en estado QUOTED o REVIEW
     const { data: remittance, error: createError } = await supabaseClient
       .from('remittances')
       .insert({
@@ -149,7 +184,9 @@ Deno.serve(async (req) => {
         channel: requestData.channel,
         agent_id: profile.agent_id,
         agente_id: user.id,
-        state: 'QUOTED',
+        state: finalState,
+        fraud_score: fraudScore,
+        fraud_flags: fraudFlags,
         
         // Datos de la cotización
         fx_mid_dop_htg: quoteData.fx_mid_dop_htg || quoteData.fx_client_sell,
@@ -214,6 +251,7 @@ Deno.serve(async (req) => {
         id: remittance.id,
         codigo_referencia: remittance.codigo_referencia,
         state: remittance.state,
+        requires_review: finalState === 'REVIEW',
         principal_dop: remittance.principal_dop,
         htg_to_beneficiary: remittance.htg_to_beneficiary,
         total_client_pays_dop: remittance.total_client_pays_dop,
