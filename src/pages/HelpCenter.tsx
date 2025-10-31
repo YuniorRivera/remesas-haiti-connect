@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, BookOpen, Wallet, Lock, DollarSign, Clock, MapPin, HelpCircle, ChevronRight, Home } from "lucide-react";
+import { Search, BookOpen, Wallet, Lock, DollarSign, Clock, MapPin, HelpCircle, ChevronRight, Home, MessageCircle, Clock as ClockIcon } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { helpArticles, getCategoryLabel, ArticleCategory, HelpArticle } from "@/data/helpArticles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -307,6 +307,33 @@ export default function HelpCenter() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {/* Support Contact Card */}
+          {!searchQuery && selectedCategory === 'all' && (
+            <div className="mt-8">
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <MessageCircle className="h-8 w-8 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold mb-2">{t('support24Hours') || "Soporte 24/7"}</h3>
+                      <p className="text-muted-foreground mb-4">
+                        {t('support24HoursDesc') || "¿No encuentras lo que buscas? Contáctanos por WhatsApp"}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <ClockIcon className="h-4 w-4" />
+                          <span>{t('whatsappSupportInfo') || "Horario: 24/7 | Tiempo de respuesta: < 5 minutos"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </main>

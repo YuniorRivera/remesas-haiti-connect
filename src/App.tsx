@@ -12,6 +12,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipLinks } from "@/components/SkipLink";
 import { LoadingFallback } from "@/components/ui/loading";
 import { ThemeProvider } from "next-themes";
+import { SupportIntegration } from "@/components/support/SupportIntegration";
 // Critical above-the-fold pages (no lazy loading for LCP)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -62,6 +63,7 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <CookieBanner />
+                <SupportIntegration />
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
