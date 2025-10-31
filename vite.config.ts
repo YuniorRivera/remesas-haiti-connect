@@ -37,6 +37,10 @@ export default defineConfig(({ mode }) => ({
             if (id.includes('recharts')) {
               return 'chart-vendor';
             }
+            // p5.js animations (optional, heavy)
+            if (id.includes('p5')) {
+              return 'p5-vendor';
+            }
             // Date utilities
             if (id.includes('date-fns')) {
               return 'date-vendor';

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLite } from "@/contexts/LiteModeContext";
@@ -9,6 +9,9 @@ import { Send, Shield, Clock, TrendingUp } from "lucide-react";
 import { PricingCalculator } from "@/components/PricingCalculator";
 import { StatisticsDisplay } from "@/components/StatisticsDisplay";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+
+// Lazy load heavy p5.js animation only when needed
+const HeroBackground = lazy(() => import("@/components/animations/HeroBackground").then(module => ({ default: module.HeroBackground })));
 
 const Index = () => {
   const navigate = useNavigate();
@@ -26,6 +29,13 @@ const Index = () => {
     <>
       <SkipLinks />
       <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* P5.js animated background - hidden in lite mode, lazy loaded for performance */}
+        {!isLite && (
+          <Suspense fallback={null}>
+            <HeroBackground />
+          </Suspense>
+        )}
+        
         {/* Red gradient overlay - hidden in lite mode */}
         {!isLite && (
           <div 
