@@ -15,6 +15,7 @@ export function LanguageSelector() {
     { code: 'es' as const, label: 'Español', flag: '🇩🇴' },
     { code: 'ht' as const, label: 'Kreyòl', flag: '🇭🇹' },
     { code: 'fr' as const, label: 'Français', flag: '🇫🇷' },
+    { code: 'en' as const, label: 'English', flag: '🇬🇧' },
   ];
 
   const currentLang = languages.find(l => l.code === language);

@@ -9,7 +9,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const VALID_LANGUAGES: Language[] = ['ht', 'es', 'fr'];
+const VALID_LANGUAGES: Language[] = ['ht', 'es', 'fr', 'en'];
 
 function getInitialLanguage(): Language {
   // SSR-safe: check if we're on client

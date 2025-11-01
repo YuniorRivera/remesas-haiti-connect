@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { User, Store, ArrowLeft, LogOut } from "lucide-react";
 import { logger } from "@/lib/logger";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { z } from "zod";
 const agentFormSchema = z.object({
   trade_name: z.string().min(3, "El nombre comercial debe tener al menos 3 caracteres"),
@@ -127,30 +128,33 @@ const Onboarding = () => {
   
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
-        <div className="mb-8">
-          {hasAnyRole ? (
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/dashboard')}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver al Dashboard
-            </Button>
-          ) : (
-            <Button 
-              variant="ghost" 
-              onClick={async () => {
-                await signOut();
-                // Use window.location instead of navigate to force a full page reload
-                window.location.href = '/';
-              }}
-              className="gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Cerrar Sesión
-            </Button>
-          )}
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            {hasAnyRole ? (
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/dashboard')}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver al Dashboard
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                onClick={async () => {
+                  await signOut();
+                  // Use window.location instead of navigate to force a full page reload
+                  window.location.href = '/';
+                }}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Cerrar Sesión
+              </Button>
+            )}
+          </div>
+          <LanguageSelector />
         </div>
         
         <div className="mb-12 text-center">

@@ -1,13 +1,14 @@
 import es from "@/locales/es.json";
 import ht from "@/locales/ht.json";
 import fr from "@/locales/fr.json";
+import en from "@/locales/en.json";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-export type Language = 'es' | 'ht' | 'fr';
+export type Language = 'es' | 'ht' | 'fr' | 'en';
 
 type Dict = Record<string, string>;
 
-const DICTS: Record<Language, Dict> = { es, ht, fr } as const;
+const DICTS: Record<Language, Dict> = { es, ht, fr, en } as const;
 
 export function useLocale() {
   const { language, setLanguage } = useLanguage();
