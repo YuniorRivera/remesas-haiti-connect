@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
@@ -9,18 +8,11 @@ import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 const Welcome = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isSenderUser, loading: roleLoading } = useUserRole(user?.id);
 
   useEffect(() => {
     // If not authenticated, go to auth
     if (!authLoading && !user) {
       navigate("/auth");
-      return;
-    }
-
-    // If user is authenticated but doesn't have sender role, go to onboarding
-    if (!roleLoading && user && !isSenderUser) {
-      navigate("/onboarding");
       return;
     }
 
@@ -30,9 +22,10 @@ const Welcome = () => {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [user, authLoading, roleLoading, isSenderUser, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
-  if (authLoading || roleLoading) {
+  if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-muted-foreground">Cargando...</p>
