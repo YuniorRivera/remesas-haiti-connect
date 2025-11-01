@@ -15,9 +15,9 @@ const Auth = () => {
   }, [user, navigate]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 py-8">
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      <div className="relative">
+      <div className="relative w-full max-w-md">
         <Button 
           variant="ghost" 
           onClick={() => navigate("/")}
