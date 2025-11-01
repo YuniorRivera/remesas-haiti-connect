@@ -115,11 +115,11 @@ const Onboarding = () => {
         <div className="mb-8">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver al inicio
+            Volver al Dashboard
           </Button>
         </div>
         
