@@ -71,7 +71,8 @@ const OnboardingSender = () => {
       if (roleError) throw roleError;
 
       toast.success("¡Perfil configurado exitosamente!");
-      navigate("/welcome");
+      // Force full page reload to ensure role is updated
+      window.location.href = "/welcome";
     } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];
