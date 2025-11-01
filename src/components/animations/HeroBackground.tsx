@@ -8,6 +8,7 @@ interface HeroBackgroundProps {
 export function HeroBackground({ className }: HeroBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5Instance = useRef<p5 | null>(null);
+  const animationTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -142,7 +143,7 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
       };
 
       // Delayed animation start for LCP optimization
-      setTimeout(() => {
+      animationTimeoutRef.current = window.setTimeout(() => {
         p.loop();
       }, 1000); // Start animation 1s after load
     };
@@ -152,6 +153,12 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
 
     // Cleanup
     return () => {
+      // Clear timeout if component unmounts before animation starts
+      if (animationTimeoutRef.current !== null) {
+        clearTimeout(animationTimeoutRef.current);
+        animationTimeoutRef.current = null;
+      }
+      
       if (p5Instance.current) {
         p5Instance.current.remove();
         p5Instance.current = null;
