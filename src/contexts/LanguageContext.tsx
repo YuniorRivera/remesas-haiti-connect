@@ -41,11 +41,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Sync with URL parameter on mount and when URL changes
   useEffect(() => {
     const langParam = searchParams.get('lang');
-    if (langParam && VALID_LANGUAGES.includes(langParam as Language)) {
+    if (langParam && VALID_LANGUAGES.includes(langParam as Language) && langParam !== language) {
       setLanguageState(langParam as Language);
       localStorage.setItem('locale', langParam);
     }
-  }, [searchParams]);
+  }, [searchParams, language]);
 
   const setLanguage = (lang: Language) => {
     // Update state
