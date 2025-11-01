@@ -118,7 +118,6 @@ const Onboarding = () => {
   
   // Show loading state while checking authentication
   if (authLoading || roleLoading) {
-    console.log('🔵 Onboarding: Loading state', { authLoading, roleLoading });
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-muted-foreground">Cargando...</p>
@@ -126,7 +125,6 @@ const Onboarding = () => {
     );
   }
   
-  console.log('🟢 Onboarding: Rendering content', { hasAnyRole, user: !!user });
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
         <div className="mb-8">
@@ -143,9 +141,7 @@ const Onboarding = () => {
             <Button 
               variant="ghost" 
               onClick={async () => {
-                console.log('🔴 Onboarding: Cerrar sesión clicked');
                 await signOut();
-                console.log('🔴 Onboarding: signOut complete, navigating');
                 // Use window.location instead of navigate to force a full page reload
                 window.location.href = '/';
               }}
