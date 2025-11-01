@@ -50,6 +50,7 @@ export function useRemittanceForm(initialData?: Partial<RemittanceFormData>) {
   });
 
   const [quote, setQuote] = useState<PricingQuote | null>(null);
+  const [remittance, setRemittance] = useState<Remittance | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [feesAvailable, setFeesAvailable] = useState(true);
   const [confirmedRemittance, setConfirmedRemittance] = useState<Remittance | null>(null);
@@ -205,6 +206,7 @@ export function useRemittanceForm(initialData?: Partial<RemittanceFormData>) {
 
       const result = data as CreateRemittanceResponse;
       if (result?.success) {
+        setRemittance(result.remittance);
         toast.success("Remesa creada exitosamente");
         return result.remittance;
       }
@@ -219,8 +221,8 @@ export function useRemittanceForm(initialData?: Partial<RemittanceFormData>) {
   }, [formData, validateForm, checkFraud]);
 
   const confirmRemittance = useCallback(async (): Promise<Remittance | null> => {
-    if (!quote?.remittance?.id) {
-      toast.error("No hay cotización para confirmar");
+    if (!remittance?.id) {
+      toast.error("No hay remesa para confirmar");
       return null;
     }
 
@@ -228,16 +230,16 @@ export function useRemittanceForm(initialData?: Partial<RemittanceFormData>) {
     try {
       const { data, error } = await secureSupabase.functions.invoke("remittances-confirm", {
         body: {
-          remittance_id: quote.remittance.id,
+          remittance_id: remittance.id,
         },
       });
 
       if (error) throw error;
 
       const result = data as ConfirmRemittanceResponse;
-      if (result?.success && quote?.remittance) {
+      if (result?.success && remittance) {
         const confirmed: Remittance = {
-          ...quote.remittance,
+          ...remittance,
           ...result.remittance,
           emisor_nombre: formData.emisor_nombre,
           beneficiario_nombre: formData.beneficiario_nombre,
@@ -256,7 +258,7 @@ export function useRemittanceForm(initialData?: Partial<RemittanceFormData>) {
     } finally {
       setLoading(false);
     }
-  }, [quote, formData]);
+  }, [remittance, formData]);
 
   return {
     formData,
