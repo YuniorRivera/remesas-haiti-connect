@@ -78,7 +78,11 @@ export default function AdminRiskFlags() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setFlags(data || []);
+      setFlags((data || []).map(flag => ({ 
+        ...flag, 
+        auto_generated: flag.auto_generated ?? false,
+        resolved: flag.resolved ?? false
+      })));
     } catch (error) {
       console.error("Error fetching risk flags:", error);
       toast.error("Error al cargar banderas de riesgo");

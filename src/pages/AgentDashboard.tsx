@@ -61,7 +61,8 @@ const AgentDashboard = () => {
 
       if (profileError) throw profileError;
 
-      if (!profile?.agent_id) {
+      const agentId = profile?.agent_id || '';
+      if (!agentId) {
         toast.error("No tienes una tienda asignada");
         return;
       }
@@ -69,12 +70,12 @@ const AgentDashboard = () => {
       const { data: agentData, error } = await supabase
         .from("agents")
         .select("*")
-        .eq("id", profile.agent_id)
+        .eq("id", agentId)
         .maybeSingle();
 
       if (error) throw error;
       setAgent(agentData);
-      setAgentId(profile.agent_id);
+      setAgentId(agentId);
     } catch (error: any) {
       toast.error("Error al cargar datos del agente");
       console.error(error);
@@ -95,6 +96,8 @@ const AgentDashboard = () => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
       monthAgo.setHours(0, 0, 0, 0);
+
+      if (!agentId) return;
 
       // Ganancias de hoy
       const { data: todayData } = await supabase

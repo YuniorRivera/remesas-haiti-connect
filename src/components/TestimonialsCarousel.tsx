@@ -33,6 +33,8 @@ export function TestimonialsCarousel() {
   if (testimonials.length === 0) return null;
 
   const testimonial = testimonials[currentIndex];
+  
+  if (!testimonial) return null;
 
   return (
     <div className="relative w-full">

@@ -73,7 +73,7 @@ export default function AdminLimits() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setLimits(data || []);
+      setLimits((data || []).map(limit => ({ ...limit, is_active: limit.is_active ?? false })));
     } catch (error) {
       console.error("Error fetching limits:", error);
       toast.error("Error al cargar límites");

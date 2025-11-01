@@ -72,7 +72,7 @@ export default function AdminLedger() {
       if (accountsRes.error) throw accountsRes.error;
       if (entriesRes.error) throw entriesRes.error;
 
-      setAccounts(accountsRes.data || []);
+      setAccounts((accountsRes.data || []).map(acc => ({ ...acc, is_active: acc.is_active ?? false })));
       setEntries(entriesRes.data || []);
     } catch (error) {
       console.error("Error fetching ledger data:", error);

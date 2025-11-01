@@ -26,7 +26,7 @@ export const statisticsData: StatisticsData = {
   familiesConnected: 12580,
   remittancesThisMonth: 48230,
   averageDeliveryTime: '3-7 minutos',
-  lastUpdated: new Date().toISOString().split('T')[0],
+  lastUpdated: new Date().toISOString().split('T')[0] || new Date().toISOString(),
 };
 
 // Statistics for display cards

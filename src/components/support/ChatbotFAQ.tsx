@@ -37,21 +37,21 @@ export function ChatbotFAQ() {
 
     // Search in help articles
     const matchedArticle = helpArticles.find(article => {
-      const titleLower = article.title[locale].toLowerCase();
-      const contentLower = article.content[locale].toLowerCase();
-      const keywords = article.keywords.map(k => k.toLowerCase());
+      const titleLower = article[locale].title.toLowerCase();
+      const contentLower = article[locale].content.toLowerCase();
+      const keywords = article.tags.map((k: string) => k.toLowerCase());
       
       return (
         titleLower.includes(lowerMessage) ||
         contentLower.includes(lowerMessage) ||
-        keywords.some(k => k.includes(lowerMessage))
+        keywords.some((k: string) => k.includes(lowerMessage))
       );
     });
 
     if (matchedArticle) {
       // Return first 200 characters of the article
-      const preview = matchedArticle.content[locale].substring(0, 200);
-      return `${matchedArticle.title[locale]}\n\n${preview}...\n\n${t('readFullArticle')} /help?article=${matchedArticle.id}`;
+      const preview = matchedArticle[locale].content.substring(0, 200);
+      return `${matchedArticle[locale].title}\n\n${preview}...\n\n${t('readFullArticle')} /help?article=${matchedArticle.id}`;
     }
 
     // Fallback responses by keyword

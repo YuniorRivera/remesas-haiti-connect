@@ -124,7 +124,7 @@ export default function AdminKPIs() {
         .select("id, principal_dop, state, channel, created_at, confirmed_at, settled_at, failed_at")
         .gte("created_at", startDate.toISOString());
 
-      if (channelFilter !== 'all') {
+      if (channelFilter !== 'all' && (channelFilter === 'MONCASH' || channelFilter === 'SPIH')) {
         query = query.eq('channel', channelFilter);
       }
 
@@ -134,7 +134,7 @@ export default function AdminKPIs() {
 
       // Calculate KPIs
       const total = remittances?.length || 0;
-      const successful = remittances?.filter(r => r.state === 'PAID' || r.state === 'SETTLED').length || 0;
+      const successful = remittances?.filter(r => r.state === 'CONFIRMED' || r.state === 'SENT').length || 0;
       const failed = remittances?.filter(r => r.state === 'FAILED').length || 0;
       
       // Calculate times
@@ -170,7 +170,9 @@ export default function AdminKPIs() {
       // Generate daily chart data
       const dailyData: Record<string, KPIData> = {};
       remittances?.forEach(r => {
-        const date = new Date(r.created_at).toISOString().split('T')[0];
+        const date = r.created_at?.split('T')[0];
+        if (!date) return;
+        
         if (!dailyData[date]) {
           dailyData[date] = {
             date,
@@ -182,7 +184,7 @@ export default function AdminKPIs() {
           };
         }
         dailyData[date].volume += r.principal_dop || 0;
-        if (r.state === 'PAID' || r.state === 'SETTLED') {
+        if (r.state === 'CONFIRMED' || r.state === 'SENT') {
           dailyData[date].success += 1;
         } else if (r.state === 'FAILED') {
           dailyData[date].failed += 1;
@@ -510,7 +512,7 @@ export default function AdminKPIs() {
                       fill="#8884d8"
                       dataKey="volume"
                     >
-                      {channelData.map((entry, index) => (
+                      {channelData.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

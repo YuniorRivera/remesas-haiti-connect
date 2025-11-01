@@ -141,7 +141,6 @@ export function validateFileType(
   }
   
   const fileType = file.type.toLowerCase();
-  const fileExtension = file.name.split('.').pop()?.toLowerCase();
   
   // Check MIME type
   const isValidMimeType = allowedTypes.some(type => {

@@ -20,7 +20,6 @@ interface TimelineProps {
 
 const RemittanceTimeline = ({ 
   events, 
-  currentState, 
   payout_lat, 
   payout_lon,
   payout_address 
@@ -96,7 +95,7 @@ const RemittanceTimeline = ({
             {events.length === 0 ? (
               <p className="text-sm text-muted-foreground">No hay eventos registrados</p>
             ) : (
-              events.map((event, index) => (
+              events.map((event) => (
                 <div
                   key={event.id}
                   className={`relative flex gap-4 pb-4 border-l-4 pl-4 ${getEventColor(event.event)}`}

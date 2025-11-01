@@ -52,7 +52,7 @@ export default function AdminReconciliation() {
 
       // Calcular stats
       const pending = data?.filter(r => r.status === 'pending').length || 0;
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0] || new Date().toISOString();
       const reconciledToday = data?.filter(r => 
         r.status === 'reconciled' && 
         r.processed_at?.startsWith(today)
