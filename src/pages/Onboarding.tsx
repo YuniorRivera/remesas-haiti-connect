@@ -146,10 +146,8 @@ const Onboarding = () => {
                 console.log('🔴 Onboarding: Cerrar sesión clicked');
                 await signOut();
                 console.log('🔴 Onboarding: signOut complete, navigating');
-                // Small delay to ensure state is cleared
-                setTimeout(() => {
-                  navigate('/');
-                }, 100);
+                // Use window.location instead of navigate to force a full page reload
+                window.location.href = '/';
               }}
               className="gap-2"
             >
