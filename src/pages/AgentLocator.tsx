@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 interface AgentLocation {
   id: string;
-  legal_name: string;
+  legal_name: string | null;
   trade_name: string | null;
   code: string | null;
   gps_lat: number | null;
