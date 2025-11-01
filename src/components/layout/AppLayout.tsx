@@ -101,10 +101,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="min-h-screen flex w-full">
         <Sidebar className="border-r" id="main-navigation" role="navigation" aria-label="Navegación principal">
           <SidebarHeader className="border-b p-4">
-            <div className="flex items-center gap-2">
-              <Store className="h-6 w-6" aria-hidden="true" />
-              <span className="font-semibold">RemitApp</span>
-            </div>
+            <SidebarMenuButton asChild>
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/");
+                }}
+                className="flex items-center gap-2"
+                aria-label="Volver a Inicio"
+              >
+                <Home className="h-6 w-6 text-primary" />
+                <span className="font-semibold">RemitApp</span>
+              </a>
+            </SidebarMenuButton>
           </SidebarHeader>
 
           <SidebarContent>

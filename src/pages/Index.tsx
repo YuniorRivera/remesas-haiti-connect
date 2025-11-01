@@ -47,7 +47,18 @@ const Index = () => {
         )}
         <header className="container mx-auto px-4 py-6 relative z-10" role="banner">
         <div className="flex items-center justify-between">
-          <h1 className={`text-2xl font-bold text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_10px_hsl(0_85%_50%_/_0.5)]'}`}>
+          <h1 
+            className={`text-2xl font-bold text-primary cursor-pointer ${isLite ? '' : 'md:drop-shadow-[0_0_10px_hsl(0_85%_50%_/_0.5)]'}`}
+            onClick={() => navigate("/")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                navigate("/");
+              }
+            }}
+            aria-label="Volver a Inicio"
+          >
             kobcash
           </h1>
           <Button 

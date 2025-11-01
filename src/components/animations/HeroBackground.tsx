@@ -157,9 +157,6 @@ export function HeroBackground({ className }: HeroBackgroundProps) {
         p5Instance.current.remove();
         p5Instance.current = null;
       }
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
     };
   }, []);
 
