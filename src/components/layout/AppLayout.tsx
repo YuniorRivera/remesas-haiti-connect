@@ -96,6 +96,15 @@ export function AppLayout({ children }: AppLayoutProps) {
     return <div className="flex items-center justify-center min-h-screen">{t("loading")}</div>;
   }
 
+  // Determine home URL based on role
+  const getHomeUrl = () => {
+    if (isAdmin) return "/admin-dashboard";
+    if (isAgent) return "/agent-dashboard";
+    return "/dashboard";
+  };
+
+  const homeUrl = getHomeUrl();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -103,13 +112,13 @@ export function AppLayout({ children }: AppLayoutProps) {
           <SidebarHeader className="border-b p-4">
             <SidebarMenuButton asChild>
               <a
-                href="/"
+                href={homeUrl}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/");
+                  navigate(homeUrl);
                 }}
                 className="flex items-center gap-2"
-                aria-label="Volver a Inicio"
+                aria-label="Volver al Dashboard"
               >
                 <Home className="h-6 w-6 text-primary" />
                 <span className="font-semibold">RemitApp</span>
