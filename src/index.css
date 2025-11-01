@@ -161,7 +161,7 @@ All colors MUST be HSL.
     /* Primary: Dark slate background (AA compliant: 4.5:1+ on white text) */
     --primary: 222 47% 11%; /* hsl(222, 47%, 11%) ≈ #0F172A - AA compliant */
     --primary-foreground: 0 0% 100%; /* White text on dark bg */
-    --primary-glow: 350 89% 70%;
+    --primary-glow: 0 85% 75%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -169,28 +169,28 @@ All colors MUST be HSL.
     --muted: 215 25% 27%;
     --muted-foreground: 214 32% 71%;
 
-    /* Accent: Red #EF4444 - AA compliant (4.5:1+ on white) */
-    --accent: 0 84% 60%; /* hsl(0, 84%, 60%) ≈ #EF4444 - AA compliant */
+    /* Accent: Light Red #F87171 - AA compliant (4.5:1+ on white) */
+    --accent: 0 85% 72%; /* hsl(0, 85%, 72%) ≈ #F87171 - lighter red, AA compliant */
     --accent-foreground: 0 0% 100%; /* White text */
 
     /* Success: Green #10B981 - AA compliant (4.5:1+ on white) */
     --success: 160 84% 39%; /* hsl(160, 84%, 39%) ≈ #10B981 - AA compliant */
     --success-foreground: 0 0% 100%; /* White text */
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 85% 72%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 217 33% 17%;
     --input: 215 25% 27%;
-    --ring: 350 89% 60%;
+    --ring: 0 85% 72%;
 
     --radius: 0.75rem;
     
-    --gradient-primary: linear-gradient(135deg, hsl(350 89% 50%), hsl(350 89% 60%));
+    --gradient-primary: linear-gradient(135deg, hsl(0 85% 65%), hsl(0 85% 75%));
     --gradient-success: linear-gradient(135deg, hsl(160 84% 30%), hsl(160 84% 39%));
     --gradient-dark-slate: radial-gradient(ellipse at center, hsl(222 47% 15% / 0.5), hsl(222 47% 11%));
-    --shadow-elevated: 0 10px 40px -10px hsl(350 89% 60% / 0.3);
-    --shadow-rose-glow: 0 0 40px hsl(350 89% 60% / 0.2);
+    --shadow-elevated: 0 10px 40px -10px hsl(0 85% 72% / 0.3);
+    --shadow-rose-glow: 0 0 40px hsl(0 85% 72% / 0.2);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
@@ -223,7 +223,7 @@ All colors MUST be HSL.
     /* Primary: Dark slate for dark mode (AA compliant) */
     --primary: 222 47% 8%; /* Darker for dark mode */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 350 89% 72%;
+    --primary-glow: 0 85% 75%;
 
     --secondary: 217 33% 15%;
     --secondary-foreground: 210 40% 98%;
@@ -231,20 +231,20 @@ All colors MUST be HSL.
     --muted: 215 25% 25%;
     --muted-foreground: 214 32% 73%;
 
-    /* Accent: Red #EF4444 for dark mode (AA compliant) */
-    --accent: 0 84% 60%; /* hsl(0, 84%, 60%) ≈ #EF4444 */
+    /* Accent: Light Red for dark mode (AA compliant) */
+    --accent: 0 85% 72%; /* hsl(0, 85%, 72%) - lighter red */
     --accent-foreground: 0 0% 100%;
 
     /* Success: Green #10B981 for dark mode (AA compliant) */
     --success: 160 84% 39%; /* hsl(160, 84%, 39%) ≈ #10B981 */
     --success-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 85% 72%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 217 33% 15%;
     --input: 215 25% 25%;
-    --ring: 350 89% 62%;
+    --ring: 0 85% 72%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

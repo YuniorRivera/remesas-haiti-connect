@@ -158,17 +158,17 @@ const Onboarding = () => {
         </div>
         
         <div className="mb-12 text-center">
-          <h1 className="mb-3 text-4xl font-bold text-primary">Bienvenidos a KòbCash Remesas RD-Haití</h1>
+          <h1 className="mb-3 text-4xl font-bold text-accent">Bienvenidos a KòbCash Remesas RD-Haití</h1>
           <p className="text-lg text-muted-foreground">
             Selecciona el tipo de cuenta que deseas crear
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="cursor-pointer border-2 transition-all hover:border-primary hover:shadow-lg">
+          <Card className="cursor-pointer border-2 transition-all hover:border-accent hover:shadow-lg">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                <User className="h-10 w-10 text-primary" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10">
+                <User className="h-10 w-10 text-accent" />
               </div>
               <CardTitle className="text-2xl">Usuario Final</CardTitle>
               <CardDescription className="text-base">
@@ -196,10 +196,10 @@ const Onboarding = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer border-2 transition-all hover:border-primary hover:shadow-lg">
+          <Card className="cursor-pointer border-2 transition-all hover:border-accent hover:shadow-lg">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                <Store className="h-10 w-10 text-primary" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10">
+                <Store className="h-10 w-10 text-accent" />
               </div>
               <CardTitle className="text-2xl">Agente / Tienda</CardTitle>
               <CardDescription className="text-base">

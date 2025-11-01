@@ -66,7 +66,7 @@ export function PricingCalculator() {
   }, [amount]);
 
   return (
-    <Card className={`w-full ${isLite ? 'border border-primary/30' : 'border-primary/30 bg-card/30 backdrop-blur-md shadow-2xl hover:shadow-[0_0_30px_hsl(0_85%_50%_/_0.4)] transition-all duration-300'}`}>
+    <Card className={`w-full ${isLite ? 'border border-accent/30' : 'border-accent/30 bg-card/30 backdrop-blur-md shadow-2xl hover:shadow-[0_0_30px_hsl(0_85%_72%_/_0.4)] transition-all duration-300'}`}>
       <CardHeader>
         <CardTitle className="text-2xl text-center">
           {t("calculatorTitle") || "Calculadora de Remesas"}

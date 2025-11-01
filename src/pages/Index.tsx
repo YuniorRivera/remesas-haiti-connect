@@ -42,14 +42,14 @@ const Index = () => {
         {/* Red gradient overlay - hidden in lite mode */}
         {!isLite && (
           <div 
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(0_80%_15%_/_0.4),_hsl(0_0%_5%))] pointer-events-none hidden md:block"
+            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(0_85%_50%_/_0.2),_hsl(0_0%_5%))] pointer-events-none hidden md:block"
             aria-hidden="true"
           />
         )}
         <header className="container mx-auto px-4 py-6 relative z-10" role="banner">
         <div className="flex items-center justify-between">
           <h1 
-            className={`text-2xl font-bold text-primary cursor-pointer ${isLite ? '' : 'md:drop-shadow-[0_0_10px_hsl(0_85%_50%_/_0.5)]'}`}
+            className={`text-2xl font-bold text-accent cursor-pointer ${isLite ? '' : 'md:drop-shadow-[0_0_10px_hsl(0_85%_72%_/_0.5)]'}`}
             onClick={() => navigate("/")}
             role="button"
             tabIndex={0}
@@ -67,7 +67,7 @@ const Index = () => {
             <Button 
               onClick={() => navigate("/auth")} 
               variant="outline" 
-              className="border-primary/50 hover:bg-primary/10 hover:border-primary"
+              className="border-accent/50 hover:bg-accent/10 hover:border-accent"
               aria-label={`Ir a la página de inicio de sesión / ${t("signIn")}`}
             >
               {t("signIn")}
@@ -127,11 +127,11 @@ const Index = () => {
           <h2 id="features-heading" className="sr-only">{t("features")}</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" role="list">
             <article 
-              className={`rounded-lg border border-primary/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_50%_/_0.3)] hover:border-primary/60 hover:bg-card/70'}`}
+              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
               role="listitem"
             >
               <Send 
-                className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
+                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureFast")}</h3>
@@ -141,11 +141,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-primary/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_50%_/_0.3)] hover:border-primary/60 hover:bg-card/70'}`}
+              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
               role="listitem"
             >
               <Shield 
-                className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
+                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureSecure")}</h3>
@@ -155,11 +155,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-primary/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_50%_/_0.3)] hover:border-primary/60 hover:bg-card/70'}`}
+              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
               role="listitem"
             >
               <Clock 
-                className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
+                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("feature24h")}</h3>
@@ -169,11 +169,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-primary/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_50%_/_0.3)] hover:border-primary/60 hover:bg-card/70'}`}
+              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
               role="listitem"
             >
               <TrendingUp 
-                className={`mb-4 h-10 w-10 text-primary ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_50%_/_0.6)]'}`}
+                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureBest")}</h3>
