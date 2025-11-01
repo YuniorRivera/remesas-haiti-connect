@@ -165,13 +165,13 @@ const Onboarding = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="cursor-pointer border-2 transition-all hover:border-accent hover:shadow-lg">
+          <Card className="cursor-pointer border-2 bg-card/80 backdrop-blur-sm transition-all hover:border-accent hover:shadow-lg">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10">
                 <User className="h-10 w-10 text-accent" />
               </div>
-              <CardTitle className="text-2xl">Usuario Final</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="text-2xl text-card-foreground">Usuario Final</CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
                 Envío remesas para mí o mis familiares
               </CardDescription>
             </CardHeader>
@@ -196,13 +196,13 @@ const Onboarding = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer border-2 transition-all hover:border-accent hover:shadow-lg">
+          <Card className="cursor-pointer border-2 bg-card/80 backdrop-blur-sm transition-all hover:border-accent hover:shadow-lg">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-accent/10">
                 <Store className="h-10 w-10 text-accent" />
               </div>
-              <CardTitle className="text-2xl">Agente / Tienda</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="text-2xl text-card-foreground">Agente / Tienda</CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
                 Proceso remesas para mis clientes
               </CardDescription>
             </CardHeader>
