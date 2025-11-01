@@ -102,7 +102,7 @@ export function AuthForm() {
               if (!roles || roles.length === 0) {
                 navigate('/onboarding');
               } else {
-                navigate('/dashboard');
+                navigate('/welcome');
               }
             }
           } catch (err) {

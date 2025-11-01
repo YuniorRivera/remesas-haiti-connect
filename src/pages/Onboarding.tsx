@@ -54,7 +54,7 @@ const Onboarding = () => {
 
       if (!rolesError && (existingRoles?.some(r => r.role === "sender_user") || (existingRoles && existingRoles.length > 0))) {
         toast.success("Ya tienes tu perfil listo.");
-        navigate("/dashboard");
+        navigate("/welcome");
         return;
       }
 
@@ -68,7 +68,7 @@ const Onboarding = () => {
       const result = data as unknown as AssignResult;
       if (result?.ok) {
         toast.success(result.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
-        navigate("/dashboard");
+        navigate("/welcome");
       } else {
         toast.error(result?.reason ? `No se pudo configurar el perfil: ${result.reason}` : "No se pudo configurar el perfil. Intenta nuevamente.");
       }

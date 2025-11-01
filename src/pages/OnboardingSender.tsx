@@ -171,7 +171,7 @@ const OnboardingSender = () => {
       if (roleError) throw roleError;
 
       toast.success("¡Perfil configurado exitosamente!");
-      navigate("/dashboard");
+      navigate("/welcome");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];

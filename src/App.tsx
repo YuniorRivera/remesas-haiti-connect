@@ -18,6 +18,7 @@ import { WebVitalsMonitor } from "@/components/WebVitalsMonitor";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Welcome from "./pages/Welcome";
 import Onboarding from "./pages/Onboarding";
 import OnboardingSender from "./pages/OnboardingSender";
 import Legal from "./pages/Legal";
@@ -110,6 +111,11 @@ const App = () => (
           <Route path="/onboarding/sender" element={
             <ProtectedRoute requireAuth>
               <OnboardingSender />
+            </ProtectedRoute>
+          } />
+          <Route path="/welcome" element={
+            <ProtectedRoute requireAuth>
+              <Welcome />
             </ProtectedRoute>
           } />
             
