@@ -3,7 +3,6 @@
 export interface Metric {
   name: string;
   value: number;
-  id: string;
   rating: 'good' | 'needs-improvement' | 'poor';
   delta?: number;
   navigationType?: string;
@@ -28,27 +27,29 @@ export function getRating(name: string, value: number): 'good' | 'needs-improvem
   return 'poor';
 }
 
+// CLS (Cumulative Layout Shift)
 export function onCLS(onPerfEntry?: (metric: Metric) => void) {
   if (!onPerfEntry) return;
 
   try {
     const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry instanceof PerformanceObserverEntryList) {
-          for (const clsEntry of entry) {
-            if ('value' in clsEntry) {
-              const metric: Metric = {
-                name: 'CLS',
-                value: clsEntry.value as number,
-                id: clsEntry.id || '',
-                rating: getRating('CLS', clsEntry.value as number),
-                delta: clsEntry.delta || undefined,
-              };
-              onPerfEntry(metric);
-            }
-          }
+      const entries = list.getEntries();
+      let clsValue = 0;
+      
+      for (const entry of entries) {
+        // Check if entry has the value property (LayoutShift)
+        if ('value' in entry && typeof entry.value === 'number') {
+          clsValue += entry.value as number;
         }
       }
+      
+      const metric: Metric = {
+        name: 'CLS',
+        value: clsValue,
+        rating: getRating('CLS', clsValue),
+        delta: clsValue,
+      };
+      onPerfEntry(metric);
     });
     observer.observe({ type: 'layout-shift', buffered: true });
   } catch (e) {
@@ -56,20 +57,23 @@ export function onCLS(onPerfEntry?: (metric: Metric) => void) {
   }
 }
 
+// FID (First Input Delay)
 export function onFID(onPerfEntry?: (metric: Metric) => void) {
   if (!onPerfEntry) return;
 
   try {
     const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry instanceof PerformanceEventTiming && 'processingStart' in entry) {
-          const fid = entry.processingStart - entry.startTime;
+      const entries = list.getEntries();
+      
+      for (const entry of entries) {
+        // Check if entry has processingStart and startTime
+        if ('processingStart' in entry && 'startTime' in entry) {
+          const fid = (entry.processingStart as number) - (entry.startTime as number);
           const metric: Metric = {
             name: 'FID',
             value: fid,
-            id: entry.id || '',
             rating: getRating('FID', fid),
-            delta: entry.delta || undefined,
+            delta: fid,
           };
           onPerfEntry(metric);
         }
@@ -81,22 +85,25 @@ export function onFID(onPerfEntry?: (metric: Metric) => void) {
   }
 }
 
+// LCP (Largest Contentful Paint)
 export function onLCP(onPerfEntry?: (metric: Metric) => void) {
   if (!onPerfEntry) return;
 
   try {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1] as PerformancePaintTiming | PerformanceResourceTiming;
+      // Get the last entry (most recent LCP)
+      const lastEntry = entries[entries.length - 1];
       
-      const metric: Metric = {
-        name: 'LCP',
-        value: lastEntry.startTime,
-        id: lastEntry.id || '',
-        rating: getRating('LCP', lastEntry.startTime),
-        delta: 'renderTime' in lastEntry ? lastEntry.renderTime : undefined,
-      };
-      onPerfEntry(metric);
+      if (lastEntry && 'startTime' in lastEntry) {
+        const metric: Metric = {
+          name: 'LCP',
+          value: lastEntry.startTime as number,
+          rating: getRating('LCP', lastEntry.startTime as number),
+          delta: lastEntry.startTime as number,
+        };
+        onPerfEntry(metric);
+      }
     });
     observer.observe({ type: 'largest-contentful-paint', buffered: true });
   } catch (e) {
@@ -104,18 +111,21 @@ export function onLCP(onPerfEntry?: (metric: Metric) => void) {
   }
 }
 
+// FCP (First Contentful Paint)
 export function onFCP(onPerfEntry?: (metric: Metric) => void) {
   if (!onPerfEntry) return;
 
   try {
     const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry instanceof PerformancePaintTiming && entry.name === 'first-contentful-paint') {
+      const entries = list.getEntries();
+      
+      for (const entry of entries) {
+        // Check for first-contentful-paint
+        if ('name' in entry && entry.name === 'first-contentful-paint' && 'startTime' in entry) {
           const metric: Metric = {
             name: 'FCP',
-            value: entry.startTime,
-            id: entry.id || '',
-            rating: getRating('FCP', entry.startTime),
+            value: entry.startTime as number,
+            rating: getRating('FCP', entry.startTime as number),
           };
           onPerfEntry(metric);
         }
@@ -127,28 +137,26 @@ export function onFCP(onPerfEntry?: (metric: Metric) => void) {
   }
 }
 
+// TTFB (Time to First Byte)
 export function onTTFB(onPerfEntry?: (metric: Metric) => void) {
   if (!onPerfEntry) return;
 
   try {
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry instanceof PerformanceNavigationTiming) {
-          const ttfb = entry.responseStart - entry.requestStart;
-          const metric: Metric = {
-            name: 'TTFB',
-            value: ttfb,
-            id: entry.id || '',
-            rating: getRating('TTFB', ttfb),
-            navigationType: entry.type,
-          };
-          onPerfEntry(metric);
-        }
-      }
-    });
-    observer.observe({ type: 'navigation', buffered: true });
+    // For TTFB, we use navigation timing
+    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    
+    if (navigationEntry) {
+      const ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
+      const metric: Metric = {
+        name: 'TTFB',
+        value: ttfb,
+        rating: getRating('TTFB', ttfb),
+        navigationType: navigationEntry.type,
+      };
+      onPerfEntry(metric);
+    }
   } catch (e) {
-    console.warn('TTFB observer not supported:', e);
+    console.warn('TTFB calculation not supported:', e);
   }
 }
 
@@ -161,9 +169,13 @@ export function reportWebVital(metric: Metric) {
   });
 
   // In production, send to analytics service
-  if (import.meta.env.PROD) {
+  const isProd = typeof window !== 'undefined' && 
+    (window.location.hostname === 'kobcash.com' || 
+     window.location.hostname.includes('netlify') ||
+     window.location.hostname.includes('vercel'));
+  
+  if (isProd) {
     // Example: send to analytics
     // analytics.track('web_vital', metric);
   }
 }
-
