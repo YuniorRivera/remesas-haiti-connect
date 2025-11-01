@@ -106,11 +106,11 @@ const OnboardingSender = () => {
           profile: profile ? { full_name: profile.full_name, phone: profile.phone } : null 
         });
 
-        // 4. Si tiene rol Y perfil completo Y no forzamos -> dashboard
+        // 4. Si tiene rol Y perfil completo Y no forzamos -> welcome
         if (hasSenderRole && profileComplete && !force) {
-          logger.debug("✅ User has role and complete profile, redirecting to dashboard (not forced)");
+          logger.debug("✅ User has role and complete profile, redirecting to welcome (not forced)");
           toast.success("¡Ya estás listo!");
-          navigate("/dashboard");
+          navigate("/welcome");
           return;
         }
 
