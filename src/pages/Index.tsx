@@ -11,6 +11,7 @@ import { StatisticsDisplay } from "@/components/StatisticsDisplay";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { StablecoinsInfo } from "@/components/StablecoinsInfo";
 import { Footer } from "@/components/Footer";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Lazy load heavy p5.js animation only when needed
 const HeroBackground = lazy(() => import("@/components/animations/HeroBackground").then(module => ({ default: module.HeroBackground })));
@@ -61,14 +62,17 @@ const Index = () => {
           >
             kobcash
           </h1>
-          <Button 
-            onClick={() => navigate("/auth")} 
-            variant="outline" 
-            className="border-primary/50 hover:bg-primary/10 hover:border-primary"
-            aria-label={`Ir a la página de inicio de sesión / ${t("signIn")}`}
-          >
-            {t("signIn")}
-          </Button>
+          <div className="flex items-center gap-3">
+            <LanguageSelector />
+            <Button 
+              onClick={() => navigate("/auth")} 
+              variant="outline" 
+              className="border-primary/50 hover:bg-primary/10 hover:border-primary"
+              aria-label={`Ir a la página de inicio de sesión / ${t("signIn")}`}
+            >
+              {t("signIn")}
+            </Button>
+          </div>
         </div>
       </header>
 
