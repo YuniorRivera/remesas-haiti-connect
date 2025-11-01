@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useLocale } from "@/lib/i18n";
-import { secureSupabase } from "@/lib/secureSupabase";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Check, ExternalLink, CreditCard } from "lucide-react";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Check, CreditCard } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PricingQuote } from "@/types/api";
 import { Remittance } from "@/types/api";
@@ -19,9 +15,6 @@ interface CheckoutState {
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-  const { t } = useLocale();
-  const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
   // Get remittance and quote from location state

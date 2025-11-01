@@ -7,7 +7,6 @@ import {
   Shield, 
   Cookie, 
   AlertCircle,
-  Languages,
   Facebook,
   Twitter,
   Instagram,
@@ -18,10 +17,8 @@ import {
   History,
 } from "lucide-react";
 import { LanguageSelector } from "./LanguageSelector";
-import { useLocale } from "@/lib/i18n";
 
 export function Footer() {
-  const { t } = useLocale();
   const currentYear = new Date().getFullYear();
 
   return (

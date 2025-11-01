@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  BarChart3, 
   TrendingUp, 
   Clock, 
   AlertTriangle, 
@@ -99,13 +98,7 @@ export default function AdminKPIs() {
     }
   }, [user, authLoading, isAdmin, roleLoading, navigate]);
 
-  useEffect(() => {
-    if (user && isAdmin) {
-      fetchKPIData();
-    }
-  }, [user, isAdmin, dateRange, channelFilter]);
-
-  const fetchKPIData = async () => {
+  const fetchKPIData = useCallback(async () => {
     setLoading(true);
     try {
       const now = new Date();
@@ -148,10 +141,12 @@ export default function AdminKPIs() {
       const times = remittances
         ?.filter(r => r.confirmed_at && r.settled_at)
         .map(r => {
-          const start = new Date(r.confirmed_at!).getTime();
-          const end = new Date(r.settled_at!).getTime();
+          if (!r.confirmed_at || !r.settled_at) return null;
+          const start = new Date(r.confirmed_at).getTime();
+          const end = new Date(r.settled_at).getTime();
           return (end - start) / 1000 / 60; // minutes
-        }) || [];
+        })
+        .filter((t): t is number => t !== null) || [];
 
       const avgTime = times.length > 0 
         ? times.reduce((sum, t) => sum + t, 0) / times.length 
@@ -224,13 +219,19 @@ export default function AdminKPIs() {
         { id: '3', severity: 'low', message: 'Nuevo agente registrado', timestamp: new Date().toISOString() },
       ]);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching KPI data:', error);
       toast.error("Error al cargar métricas operativas");
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange, channelFilter]);
+
+  useEffect(() => {
+    if (user && isAdmin) {
+      fetchKPIData();
+    }
+  }, [user, isAdmin, fetchKPIData]);
 
   const handleExportCSV = () => {
     // Generate CSV from chart data

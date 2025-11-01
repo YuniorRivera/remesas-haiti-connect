@@ -6,7 +6,7 @@ import { getStatistics } from "@/data/statistics";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 export function StatisticsDisplay() {
-  const { t, locale } = useLocale();
+  const { locale } = useLocale();
   const isLite = useLite();
   const stats = getStatistics(locale as 'es' | 'ht' | 'fr');
 

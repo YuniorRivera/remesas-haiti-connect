@@ -4,16 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocale } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle2, XCircle, Loader2, ExternalLink } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Remittance } from "@/types/api";
 
 export default function PaymentCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
-  const { t } = useLocale();
   const [loading, setLoading] = useState(true);
   const [remittance, setRemittance] = useState<Remittance | null>(null);
   const [status, setStatus] = useState<'processing' | 'paid' | 'failed' | 'pending'>('processing');

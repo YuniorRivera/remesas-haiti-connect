@@ -2,11 +2,11 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "@/lib/i18n";
 import { useLite } from "@/contexts/LiteModeContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, BookOpen, Wallet, Lock, DollarSign, Clock, MapPin, HelpCircle, ChevronRight, Home, MessageCircle, Clock as ClockIcon } from "lucide-react";
+import { Search, Wallet, Lock, DollarSign, Clock, MapPin, HelpCircle, ChevronRight, MessageCircle, Clock as ClockIcon } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { helpArticles, getCategoryLabel, ArticleCategory, HelpArticle } from "@/data/helpArticles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -84,7 +84,7 @@ export default function HelpCenter() {
               {/* Breadcrumbs */}
               <nav aria-label="Breadcrumb" className="mb-3">
                 <ol className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {getBreadcrumbs().map((crumb, idx, arr) => (
+                  {getBreadcrumbs().map((crumb, idx) => (
                     <li key={idx} className="flex items-center gap-2">
                       {idx > 0 && <ChevronRight className="h-4 w-4" />}
                       {crumb.onClick ? (

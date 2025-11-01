@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import { useLocale } from "@/lib/i18n";
 import { useLite } from "@/contexts/LiteModeContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getVerifiedTestimonials, Testimonial } from "@/data/testimonials";
+import { getVerifiedTestimonials } from "@/data/testimonials";
 
 export function TestimonialsCarousel() {
-  const { t } = useLocale();
   const isLite = useLite();
   const [currentIndex, setCurrentIndex] = useState(0);
   const testimonials = getVerifiedTestimonials();

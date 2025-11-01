@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { onCLS, onFID, onLCP, onFCP, onTTFB, reportWebVital, Metric } from "@/lib/webVitals";
+import { onCLS, onFID, onLCP, onFCP, onTTFB, reportWebVital } from "@/lib/webVitals";
 
 export function WebVitalsMonitor() {
   useEffect(() => {

@@ -29,7 +29,7 @@ interface RemittanceReceiptProps {
 export function RemittanceReceipt({ remittance, agentName }: RemittanceReceiptProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [qrCodeUrl, setQrCodeUrl] = React.useState<string>('');
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
 
   React.useEffect(() => {
     if (remittance.receipt_hash) {

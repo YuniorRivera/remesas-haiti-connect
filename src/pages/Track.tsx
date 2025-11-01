@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useLocale } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Share2, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import RemittanceTimeline from "@/components/RemittanceTimeline";
-import { format } from "date-fns";
 
 interface RemittanceEvent {
   id: string;
@@ -39,25 +37,13 @@ interface Remittance {
 }
 
 export default function Track() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t } = useLocale();
   const [trackingCode, setTrackingCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [remittance, setRemittance] = useState<Remittance | null>(null);
   const [events, setEvents] = useState<RemittanceEvent[]>([]);
 
-  // Check for code in URL params and auto-search
-  useEffect(() => {
-    const codeFromUrl = searchParams.get('code');
-    if (codeFromUrl && codeFromUrl !== trackingCode) {
-      setTrackingCode(codeFromUrl.toUpperCase());
-      // Auto-search when code is in URL
-      handleSearchAuto(codeFromUrl.toUpperCase());
-    }
-  }, [searchParams]);
-
-  const handleSearchAuto = async (code: string) => {
+  const handleSearchAuto = useCallback(async (code: string) => {
     if (!code.trim()) return;
 
     setLoading(true);
@@ -86,13 +72,22 @@ export default function Track() {
 
       if (eventsError) throw eventsError;
       setEvents(eventsData || []);
-    } catch (error) {
+    } catch (_error) {
       setRemittance(null);
       setEvents([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Check for code in URL params and auto-search
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('code');
+    if (codeFromUrl && codeFromUrl !== trackingCode) {
+      setTrackingCode(codeFromUrl.toUpperCase());
+      handleSearchAuto(codeFromUrl.toUpperCase());
+    }
+  }, [searchParams, trackingCode, handleSearchAuto]);
 
   const handleSearch = async () => {
     if (!trackingCode.trim()) {
