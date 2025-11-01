@@ -345,7 +345,6 @@ const RemittanceDetail = () => {
         {/* Timeline con Mapa */}
         <RemittanceTimeline 
           events={events}
-          currentState={remittance.state}
           payout_lat={remittance.payout_lat}
           payout_lon={remittance.payout_lon}
           payout_address={remittance.payout_address}

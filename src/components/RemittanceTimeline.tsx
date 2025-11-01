@@ -12,7 +12,6 @@ interface RemittanceEvent {
 
 interface TimelineProps {
   events: RemittanceEvent[];
-  currentState: string;
   payout_lat?: number;
   payout_lon?: number;
   payout_address?: string;
