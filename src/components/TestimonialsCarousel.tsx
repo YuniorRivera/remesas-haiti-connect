@@ -38,7 +38,7 @@ export function TestimonialsCarousel() {
 
   return (
     <div className="relative w-full">
-      <Card className={`${isLite ? 'border border-primary/30' : 'border-primary/30 shadow-lg'}`}>
+      <Card className={`${isLite ? 'border border-primary/30' : 'border-primary/30 bg-card/30 backdrop-blur-md shadow-2xl hover:shadow-[0_0_30px_hsl(0_85%_50%_/_0.4)]'} transition-all duration-300`}>
         <CardContent className="pt-6">
           {/* Stars */}
           <div className="flex gap-1 mb-4 justify-center">
