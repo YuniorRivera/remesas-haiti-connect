@@ -8,7 +8,6 @@ interface HeroBackgroundProps {
 export function HeroBackground({ className }: HeroBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const p5Instance = useRef<p5 | null>(null);
-  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
