@@ -4,7 +4,8 @@ import fr from "@/locales/fr.json";
 import en from "@/locales/en.json";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-export type Language = 'es' | 'ht' | 'fr' | 'en';
+// Re-export Language type from LanguageContext to maintain compatibility
+export type { Language } from "@/contexts/LanguageContext";
 
 type Dict = Record<string, string>;
 

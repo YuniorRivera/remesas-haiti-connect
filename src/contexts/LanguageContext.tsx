@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Language } from "@/lib/i18n";
+
+// Define Language type locally to avoid circular dependency
+export type Language = 'es' | 'ht' | 'fr' | 'en';
 
 interface LanguageContextType {
   language: Language;
