@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Store, ArrowLeft } from "lucide-react";
+import { User, Store, ArrowLeft, LogOut } from "lucide-react";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 const agentFormSchema = z.object({
@@ -24,8 +25,10 @@ type AgentFormData = z.infer<typeof agentFormSchema>;
 const Onboarding = () => {
   const navigate = useNavigate();
   const {
-    user
+    user,
+    signOut
   } = useAuth();
+  const { isAdmin, isAgent, isComplianceOfficer, isSenderUser, loading: roleLoading } = useUserRole(user?.id);
   const [loading, setLoading] = useState(false);
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [formData, setFormData] = useState<AgentFormData>({
@@ -110,17 +113,33 @@ const Onboarding = () => {
       setLoading(false);
     }
   };
+  const hasAnyRole = isAdmin || isAgent || isComplianceOfficer || isSenderUser;
+  
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver a Inicio
-          </Button>
+          {hasAnyRole ? (
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Volver al Dashboard
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              onClick={async () => {
+                await signOut();
+                navigate('/');
+              }}
+              className="gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Cerrar Sesión
+            </Button>
+          )}
         </div>
         
         <div className="mb-12 text-center">
