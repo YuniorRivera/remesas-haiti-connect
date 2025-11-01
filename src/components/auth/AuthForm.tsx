@@ -197,7 +197,7 @@ export function AuthForm() {
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="text-primary hover:underline"
+            className="text-accent hover:text-accent/80 hover:underline font-medium transition-colors"
           >
             {isLogin
               ? "¿No tienes cuenta? Regístrate"
