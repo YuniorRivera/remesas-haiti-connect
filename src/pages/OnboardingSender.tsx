@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { z } from "zod";
 import { User } from "lucide-react";
-import { logger } from "@/lib/logger";
 
 const senderFormSchema = z.object({
   full_name: z.string().trim().min(1, "El nombre es requerido").max(100, "El nombre es muy largo"),
@@ -21,21 +20,12 @@ const senderFormSchema = z.object({
   tipo_documento: z.string().optional().or(z.literal(""))
 });
 
-import { isProfileComplete } from "@/types/profile";
-import type { UserProfile } from "@/types/profile";
-
 type SenderFormData = z.infer<typeof senderFormSchema>;
 
 const OnboardingSender = () => {
-  logger.debug("🔷 OnboardingSender component mounted");
-  
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const force = searchParams.get("force") === "1";
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
-  const ranRef = useRef(false);
   const [formData, setFormData] = useState<SenderFormData>({
     full_name: "",
     phone: "",
@@ -44,120 +34,22 @@ const OnboardingSender = () => {
     tipo_documento: ""
   });
 
+  // Simple auth check - redirect if not authenticated
   useEffect(() => {
-    logger.debug("🔷 useEffect triggered, authLoading:", authLoading, "user:", user ? `${user.id}` : "no user", "force:", force);
-    
-    const initializeForm = async () => {
-      try {
-        setIsChecking(true);
-
-        // 0. Esperar a que termine de cargar la autenticación
-        if (authLoading) {
-          logger.debug("⏳ Auth still loading, waiting...");
-          return;
-        }
-
-        // 1. Verificar autenticación
-        if (!user) {
-          logger.debug("❌ No user found, redirecting to /auth");
-          navigate("/auth");
-          return;
-        }
-
-        // 2. Prevenir doble ejecución en Strict Mode
-        if (ranRef.current) {
-          logger.debug("⏭️ Already ran initialization, skipping");
-          return;
-        }
-        ranRef.current = true;
-
-        logger.debug("✅ User authenticated:", user.id);
-
-        // 2. Cargar perfil y verificar si está completo
-        logger.debug("🔍 Loading profile...");
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("full_name, phone, direccion, documento_identidad, tipo_documento")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("❌ Error loading profile:", profileError);
-        }
-
-        // 3. Verificar si ya tiene el rol sender_user
-        logger.debug("🔍 Checking if user has sender_user role...");
-        const { data: roles, error: rolesError } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id);
-
-        if (rolesError) {
-          console.error("❌ Error checking roles:", rolesError);
-        }
-
-        const hasSenderRole = roles && roles.some(r => r.role === "sender_user");
-        const profileComplete = isProfileComplete(profile as UserProfile | null);
-
-        logger.debug("📊 Status:", { 
-          hasSenderRole, 
-          profileComplete,
-          force,
-          profile: profile ? { full_name: profile.full_name, phone: profile.phone } : null 
-        });
-
-        // 4. Si tiene rol Y perfil completo Y no forzamos -> welcome
-        if (hasSenderRole && profileComplete && !force) {
-          logger.debug("✅ User has role and complete profile, redirecting to welcome (not forced)");
-          toast.success("¡Ya estás listo!");
-          navigate("/welcome");
-          return;
-        }
-
-        // 5. Cargar datos del perfil en el formulario (si existen)
-        if (profile) {
-          logger.debug("✅ Loading profile data into form");
-          setFormData({
-            full_name: profile.full_name || "",
-            phone: profile.phone || "",
-            direccion: profile.direccion || "",
-            documento_identidad: profile.documento_identidad || "",
-            tipo_documento: profile.tipo_documento || ""
-          });
-        } else {
-          logger.debug("ℹ️ No existing profile found");
-        }
-
-        // 6. Mostrar formulario (perfil incompleto o sin rol)
-        logger.debug("✅ Showing form");
-        setIsChecking(false);
-
-      } catch (error) {
-        console.error("❌ Error in initialization:", error);
-        setIsChecking(false);
-      }
-    };
-
-    initializeForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, force]);
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    logger.debug("🔷 handleSubmit called");
-    if (!user) {
-      logger.error("❌ No user in handleSubmit");
-      return;
-    }
+    if (!user) return;
 
     try {
-      logger.debug("🔷 Validating form data...");
       const validatedData = senderFormSchema.parse(formData);
-      logger.debug("✅ Form data validated:", validatedData);
       setLoading(true);
 
       // 1. Guardar/actualizar perfil
-      logger.debug("🔷 Saving profile...");
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert({
@@ -172,26 +64,20 @@ const OnboardingSender = () => {
         });
 
       if (profileError) throw profileError;
-      logger.debug("✅ Profile saved successfully");
 
       // 2. Asignar rol sender_user
-      logger.debug("🔷 Assigning sender_user role...");
       const { error: roleError } = await supabase.rpc("assign_sender_user");
       
       if (roleError) throw roleError;
-      logger.debug("✅ Role assigned successfully");
 
       toast.success("¡Perfil configurado exitosamente!");
-      logger.debug("🔷 Navigating to /welcome");
       navigate("/welcome");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];
-        logger.error("❌ Validation error:", firstError);
         toast.error(firstError.message);
       } else {
         const err = error as { message?: string };
-        logger.error("❌ Error guardando perfil:", error);
         toast.error("Error al guardar el perfil: " + (err.message || "desconocido"));
       }
     } finally {
@@ -199,7 +85,7 @@ const OnboardingSender = () => {
     }
   };
 
-  if (isChecking) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 flex items-center justify-center">
         <div className="text-center">
@@ -220,7 +106,7 @@ const OnboardingSender = () => {
             </div>
             <CardTitle className="text-3xl">Registro de Usuario Final</CardTitle>
             <CardDescription className="text-base">
-              {force && formData.full_name ? "Estás editando tu perfil" : "Completa tu información para comenzar a enviar remesas"}
+              Completa tu información para comenzar a enviar remesas
             </CardDescription>
           </CardHeader>
           <CardContent>
