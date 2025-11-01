@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,7 +139,8 @@ const OnboardingSender = () => {
     };
 
     initializeForm();
-  }, [user, authLoading, navigate, force]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, force]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
