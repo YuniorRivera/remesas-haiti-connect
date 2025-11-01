@@ -143,13 +143,20 @@ const OnboardingSender = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    logger.debug("🔷 handleSubmit called");
+    if (!user) {
+      logger.error("❌ No user in handleSubmit");
+      return;
+    }
 
     try {
+      logger.debug("🔷 Validating form data...");
       const validatedData = senderFormSchema.parse(formData);
+      logger.debug("✅ Form data validated:", validatedData);
       setLoading(true);
 
       // 1. Guardar/actualizar perfil
+      logger.debug("🔷 Saving profile...");
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert({
@@ -164,21 +171,26 @@ const OnboardingSender = () => {
         });
 
       if (profileError) throw profileError;
+      logger.debug("✅ Profile saved successfully");
 
       // 2. Asignar rol sender_user
+      logger.debug("🔷 Assigning sender_user role...");
       const { error: roleError } = await supabase.rpc("assign_sender_user");
       
       if (roleError) throw roleError;
+      logger.debug("✅ Role assigned successfully");
 
       toast.success("¡Perfil configurado exitosamente!");
+      logger.debug("🔷 Navigating to /welcome");
       navigate("/welcome");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];
+        logger.error("❌ Validation error:", firstError);
         toast.error(firstError.message);
       } else {
         const err = error as { message?: string };
-        logger.error("Error guardando perfil:", error);
+        logger.error("❌ Error guardando perfil:", error);
         toast.error("Error al guardar el perfil: " + (err.message || "desconocido"));
       }
     } finally {
