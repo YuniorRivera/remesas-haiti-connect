@@ -143,8 +143,13 @@ const Onboarding = () => {
             <Button 
               variant="ghost" 
               onClick={async () => {
+                console.log('🔴 Onboarding: Cerrar sesión clicked');
                 await signOut();
-                navigate('/');
+                console.log('🔴 Onboarding: signOut complete, navigating');
+                // Small delay to ensure state is cleared
+                setTimeout(() => {
+                  navigate('/');
+                }, 100);
               }}
               className="gap-2"
             >
