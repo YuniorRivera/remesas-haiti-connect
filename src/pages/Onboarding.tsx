@@ -26,7 +26,8 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const {
     user,
-    signOut
+    signOut,
+    loading: authLoading
   } = useAuth();
   const { isAdmin, isAgent, isComplianceOfficer, isSenderUser, loading: roleLoading } = useUserRole(user?.id);
   const [loading, setLoading] = useState(false);
@@ -114,6 +115,15 @@ const Onboarding = () => {
     }
   };
   const hasAnyRole = isAdmin || isAgent || isComplianceOfficer || isSenderUser;
+  
+  // Show loading state while checking authentication
+  if (authLoading || roleLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Cargando...</p>
+      </div>
+    );
+  }
   
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="container mx-auto max-w-4xl py-16">
