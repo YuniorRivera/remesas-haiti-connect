@@ -41,44 +41,7 @@ const Onboarding = () => {
     address: "",
     business_type: ""
   });
-  type AssignResult = { ok: boolean; created?: boolean; reason?: string };
-  const handleSenderUser = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      // 1) Si ya tienes rol, navega directo
-      const { data: existingRoles, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-
-      if (!rolesError && (existingRoles?.some(r => r.role === "sender_user") || (existingRoles && existingRoles.length > 0))) {
-        toast.success("Ya tienes tu perfil listo.");
-        navigate("/welcome");
-        return;
-      }
-
-      // 2) Llama a la función segura para asignar primer rol
-      const { data, error } = await supabase.rpc("assign_sender_user");
-
-      if (error) {
-        throw error;
-      }
-
-      const result = data as unknown as AssignResult;
-      if (result?.ok) {
-        toast.success(result.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
-        navigate("/welcome");
-      } else {
-        toast.error(result?.reason ? `No se pudo configurar el perfil: ${result.reason}` : "No se pudo configurar el perfil. Intenta nuevamente.");
-      }
-    } catch (error: any) {
-      console.error("Error asignando rol:", error);
-      toast.error("Error al configurar el perfil: " + (error?.message || "desconocido"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  
   const handleAgentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
