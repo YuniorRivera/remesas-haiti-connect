@@ -24,7 +24,9 @@ export function useUserRole(userId: string | undefined) {
         console.error("Error fetching roles:", error);
         setRoles([]);
       } else {
-        setRoles(data?.map((r) => r.role as AppRole) || []);
+        const rolesArray = data?.map((r) => r.role as AppRole) || [];
+        console.log("🔷 useUserRole: Fetched roles:", rolesArray, "for user:", userId);
+        setRoles(rolesArray);
       }
       setLoading(false);
     };

@@ -17,6 +17,9 @@ const Dashboard = () => {
   const { t } = useLocale();
 
   useEffect(() => {
+    console.log("🔷 Dashboard: authLoading:", authLoading, "user:", user?.id, "roleLoading:", roleLoading);
+    console.log("🔷 Dashboard: roles:", { isAdmin, isAgent, isComplianceOfficer, isSenderUser });
+    
     if (!authLoading && !user) {
       navigate("/auth");
       return;
@@ -24,6 +27,7 @@ const Dashboard = () => {
     
     // If user is authenticated but has no role, redirect to onboarding
     if (!roleLoading && user && !isAdmin && !isAgent && !isComplianceOfficer && !isSenderUser) {
+      console.log("🔷 Dashboard: No roles found, redirecting to /onboarding");
       navigate("/onboarding");
       return;
     }

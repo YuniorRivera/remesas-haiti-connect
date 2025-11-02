@@ -66,7 +66,9 @@ const OnboardingSender = () => {
       if (profileError) throw profileError;
 
       // 2. Asignar rol sender_user
-      const { error: roleError } = await supabase.rpc("assign_sender_user");
+      const { data: roleResult, error: roleError } = await supabase.rpc("assign_sender_user");
+      
+      console.log("🔷 OnboardingSender: assign_sender_user result:", roleResult);
       
       if (roleError) throw roleError;
 
