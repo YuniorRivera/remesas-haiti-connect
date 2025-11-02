@@ -269,5 +269,17 @@
   "chatbotQuickMoncash": "Ki jan MonCash Plus fonksyone?",
   "chatbotQuickFees": "Konbyen li koute voye lajan?",
   "chatbotQuickTracking": "Ki jan mwen swiv remès mwen an?",
-  "chatbotQuickKYC": "Ki dokiman mwen bezwen?"
+  "chatbotQuickKYC": "Ki dokiman mwen bezwen?",
+  "welcomeTitle": "Byenveni nan Kobcash!",
+  "welcomeSubtitle": "Kont ou te kreye avèk siksè",
+  "welcomeDescription": "Ou ka kòmanse voye remès pou Ayiti rapidman e an sekirite",
+  "welcomeFeatureInstant": "Vwayaj enstan",
+  "welcomeFeatureInstantDesc": "Trete remès ou yo nan minit depi nenpòt pwen otorize",
+  "welcomeFeatureSecure": "100% Sekirite",
+  "welcomeFeatureSecureDesc": "Konfòmite KYC/KYB ak teknoloji chifreman",
+  "welcomeFeatureRates": "Taux konpetitif",
+  "welcomeFeatureRatesDesc": "Pi bon tarif ak komisyon transparan",
+  "welcomeGoDashboard": "Ale nan Tablo Kontròl",
+  "welcomeGoHome": "Ale nan Akèy",
+  "welcomeAutoRedirect": "Ou pral redirekte otomatikman nan 5 segonn..."
 }

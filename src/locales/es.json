@@ -266,5 +266,17 @@
   "chatbotQuickMoncash": "¿Cómo funciona MonCash Plus?",
   "chatbotQuickFees": "¿Cuánto cuesta enviar dinero?",
   "chatbotQuickTracking": "¿Cómo rastreo mi remesa?",
-  "chatbotQuickKYC": "¿Qué documentos necesito?"
+  "chatbotQuickKYC": "¿Qué documentos necesito?",
+  "welcomeTitle": "¡Bienvenido a Kobcash!",
+  "welcomeSubtitle": "Tu cuenta ha sido creada exitosamente",
+  "welcomeDescription": "Ya puedes comenzar a enviar remesas a Haití de forma rápida y segura",
+  "welcomeFeatureInstant": "Envíos instantáneos",
+  "welcomeFeatureInstantDesc": "Procesa tus remesas en minutos desde cualquier punto autorizado",
+  "welcomeFeatureSecure": "100% Seguro",
+  "welcomeFeatureSecureDesc": "Cumplimiento KYC/KYB y tecnología de encriptación",
+  "welcomeFeatureRates": "Tasas competitivas",
+  "welcomeFeatureRatesDesc": "Mejores tarifas y comisiones transparentes",
+  "welcomeGoDashboard": "Ir al Dashboard",
+  "welcomeGoHome": "Ir al Inicio",
+  "welcomeAutoRedirect": "Serás redirigido automáticamente en 5 segundos..."
 }

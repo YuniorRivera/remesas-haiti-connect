@@ -182,5 +182,17 @@
   "chatbotQuickMoncash": "Comment fonctionne MonCash Plus?",
   "chatbotQuickFees": "Combien coûte l'envoi d'argent?",
   "chatbotQuickTracking": "Comment suivre mon transfert?",
-  "chatbotQuickKYC": "Quels documents dois-je fournir?"
+  "chatbotQuickKYC": "Quels documents dois-je fournir?",
+  "welcomeTitle": "Bienvenue chez Kobcash!",
+  "welcomeSubtitle": "Votre compte a été créé avec succès",
+  "welcomeDescription": "Vous pouvez maintenant commencer à envoyer des transferts vers Haïti rapidement et en toute sécurité",
+  "welcomeFeatureInstant": "Envois instantanés",
+  "welcomeFeatureInstantDesc": "Traitez vos transferts en quelques minutes depuis n'importe quel point autorisé",
+  "welcomeFeatureSecure": "100% Sécurisé",
+  "welcomeFeatureSecureDesc": "Conformité KYC/KYB et technologie de cryptage",
+  "welcomeFeatureRates": "Taux compétitifs",
+  "welcomeFeatureRatesDesc": "Meilleurs tarifs et commissions transparentes",
+  "welcomeGoDashboard": "Aller au Tableau de Bord",
+  "welcomeGoHome": "Aller à l'Accueil",
+  "welcomeAutoRedirect": "Vous serez redirigé automatiquement dans 5 secondes..."
 }
