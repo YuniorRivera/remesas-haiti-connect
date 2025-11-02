@@ -40,14 +40,14 @@ const Onboarding = () => {
     address: "",
     business_type: ""
   });
-  
+
   type AssignResult = { ok: boolean; created?: boolean; reason?: string };
-  
-  const handleAssignSenderRole = async () => {
+
+  const handleSenderUser = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      // 1) Si ya tienes rol, navega directo
+      // 1) Si ya tienes rol, no hacer nada adicional
       const { data: existingRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("role")
@@ -55,7 +55,6 @@ const Onboarding = () => {
 
       if (!rolesError && (existingRoles?.some(r => r.role === "sender_user") || (existingRoles && existingRoles.length > 0))) {
         toast.success("Ya tienes tu perfil listo.");
-        navigate("/welcome");
         return;
       }
 
@@ -69,7 +68,6 @@ const Onboarding = () => {
       const result = data as unknown as AssignResult;
       if (result?.ok) {
         toast.success(result.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
-        navigate("/welcome");
       } else {
         toast.error(result?.reason ? `No se pudo configurar el perfil: ${result.reason}` : "No se pudo configurar el perfil. Intenta nuevamente.");
       }
@@ -80,7 +78,7 @@ const Onboarding = () => {
       setLoading(false);
     }
   };
-  
+
   const handleAgentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -191,7 +189,10 @@ const Onboarding = () => {
               <li>✓ Comienza a usar de inmediato</li>
             </ul>
             <Button
-              onClick={handleAssignSenderRole}
+              onClick={async () => {
+                await handleSenderUser();
+                navigate('/onboarding/sender?force=1');
+              }}
               disabled={loading}
               className="w-full"
               size="lg"
