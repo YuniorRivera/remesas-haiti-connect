@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Check, CreditCard } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Check, CreditCard, ExternalLink } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PricingQuote } from "@/types/api";
 import { Remittance } from "@/types/api";
@@ -156,7 +156,7 @@ export default function Checkout() {
 
                 <Button
                   onClick={handlePayNow}
-                  disabled={loading || redirecting}
+                  disabled={redirecting}
                   size="lg"
                   className="w-full"
                 >

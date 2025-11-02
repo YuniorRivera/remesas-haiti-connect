@@ -30,7 +30,6 @@ export default function CreateRemittance() {
     formData,
     updateField,
     quote,
-    feesAvailable,
     confirmedRemittance,
     loading,
     getQuote,
@@ -473,10 +472,6 @@ export default function CreateRemittance() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-muted p-4 rounded-lg space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t("referenceCode")}:</span>
-                  <span className="font-mono font-bold">{quote?.remittance?.codigo_referencia}</span>
-                </div>
                 <div className="flex justify-between text-sm">
                   <span>{t("sender")}:</span>
                   <span>{formData.emisor_nombre}</span>

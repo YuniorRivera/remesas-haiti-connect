@@ -321,7 +321,7 @@ export default function AgentLocator() {
                           lat: agent.gps_lat!,
                           lng: agent.gps_lon!,
                         }}
-                        title={agent.trade_name || agent.legal_name}
+                        title={agent.trade_name || agent.legal_name || "Agente"}
                         onClick={() => setSelectedAgent(agent)}
                         icon={{
                           path: google.maps.SymbolPath.CIRCLE,

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Percent, TrendingUp, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Percent, TrendingUp, Download } from "lucide-react";
 
 export default function AdminMargins() {
   const navigate = useNavigate();

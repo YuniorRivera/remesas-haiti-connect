@@ -148,6 +148,45 @@ export type Database = {
           },
         ]
       }
+      beneficiary_prism_status: {
+        Row: {
+          beneficiary_name: string | null
+          beneficiary_phone: string
+          created_at: string | null
+          id: string
+          prism_authorized_at: string | null
+          prism_opt_in: boolean
+          updated_at: string | null
+          upgrade_completed_at: string | null
+          upgrade_failed_reason: string | null
+          upgrade_status: string
+        }
+        Insert: {
+          beneficiary_name?: string | null
+          beneficiary_phone: string
+          created_at?: string | null
+          id?: string
+          prism_authorized_at?: string | null
+          prism_opt_in?: boolean
+          updated_at?: string | null
+          upgrade_completed_at?: string | null
+          upgrade_failed_reason?: string | null
+          upgrade_status?: string
+        }
+        Update: {
+          beneficiary_name?: string | null
+          beneficiary_phone?: string
+          created_at?: string | null
+          id?: string
+          prism_authorized_at?: string | null
+          prism_opt_in?: boolean
+          updated_at?: string | null
+          upgrade_completed_at?: string | null
+          upgrade_failed_reason?: string | null
+          upgrade_status?: string
+        }
+        Relationships: []
+      }
       fees_matrix: {
         Row: {
           acquiring_dop: number
@@ -889,10 +928,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      assign_sender_user: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      assign_sender_user: { Args: never; Returns: Json }
       get_transaction_for_agent: {
         Args: { transaction_id: string }
         Returns: {
@@ -916,10 +952,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      user_has_no_roles: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      user_has_no_roles: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       actor_type: "USER" | "SYSTEM" | "ADMIN" | "AGENT"

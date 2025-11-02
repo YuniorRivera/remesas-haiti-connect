@@ -5,6 +5,7 @@
 // Remittance types
 export interface Remittance {
   id: string;
+  codigo_referencia: string;
   emisor_nombre: string;
   emisor_telefono?: string | null;
   emisor_documento?: string | null;

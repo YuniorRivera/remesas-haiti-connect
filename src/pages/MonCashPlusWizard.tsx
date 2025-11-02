@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, AlertCircle, ExternalLink, Loader2, ChevronRight, ChevronLeft } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, ExternalLink, Loader2, ChevronLeft } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "sonner";
 import {
