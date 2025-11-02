@@ -43,11 +43,11 @@ const Onboarding = () => {
 
   type AssignResult = { ok: boolean; created?: boolean; reason?: string };
 
-  const handleSenderUser = async () => {
+  const handleAssignSenderRole = async (): Promise<void> => {
     if (!user) return;
     setLoading(true);
     try {
-      // 1) Si ya tienes rol, no hacer nada adicional
+      // 1) Si ya tienes rol, navega a welcome
       const { data: existingRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("role")
@@ -55,6 +55,7 @@ const Onboarding = () => {
 
       if (!rolesError && (existingRoles?.some(r => r.role === "sender_user") || (existingRoles && existingRoles.length > 0))) {
         toast.success("Ya tienes tu perfil listo.");
+        navigate("/welcome");
         return;
       }
 
@@ -68,12 +69,13 @@ const Onboarding = () => {
       const result = data as unknown as AssignResult;
       if (result?.ok) {
         toast.success(result.created ? "¡Perfil configurado exitosamente!" : "Ya tenías tu perfil listo.");
+        navigate("/welcome");
       } else {
-        toast.error(result?.reason ? `No se pudo configurar el perfil: ${result.reason}` : "No se pudo configurar el perfil. Intenta nuevamente.");
+        toast.error("Error al configurar el perfil: " + (result?.reason ?? "desconocido"));
       }
     } catch (error: any) {
       console.error("Error asignando rol:", error);
-      toast.error("Error al configurar el perfil: " + (error?.message || "desconocido"));
+      toast.error("Error al configurar el perfil: " + (error?.message ?? "desconocido"));
     } finally {
       setLoading(false);
     }
@@ -189,10 +191,7 @@ const Onboarding = () => {
               <li>✓ Comienza a usar de inmediato</li>
             </ul>
             <Button
-              onClick={async () => {
-                await handleSenderUser();
-                navigate('/onboarding/sender?force=1');
-              }}
+              onClick={handleAssignSenderRole}
               disabled={loading}
               className="w-full"
               size="lg"
