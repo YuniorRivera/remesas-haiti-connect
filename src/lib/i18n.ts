@@ -2,7 +2,7 @@ import es from "@/locales/es.json";
 import ht from "@/locales/ht.json";
 import fr from "@/locales/fr.json";
 import en from "@/locales/en.json";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
 
 // Re-export Language type from LanguageContext to maintain compatibility
 export type { Language } from "@/contexts/LanguageContext";
@@ -17,9 +17,9 @@ export function useLocale() {
   const t = (key: string): string => {
     // Prefer current language; fallback to HT (default), then ES, else key
     return (
-      DICTS[language][key] ||
-      DICTS.ht[key] ||
-      DICTS.es[key] ||
+      DICTS[language]?.[key] ||
+      DICTS.ht?.[key] ||
+      DICTS.es?.[key] ||
       key
     );
   };

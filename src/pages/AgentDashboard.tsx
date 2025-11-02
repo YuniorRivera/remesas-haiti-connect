@@ -52,11 +52,16 @@ const AgentDashboard = () => {
   }, [agentId]);
 
   const fetchAgentData = async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("agent_id")
-        .eq("id", user?.id)
+        .eq("id", user.id)
         .maybeSingle();
 
       if (profileError) throw profileError;

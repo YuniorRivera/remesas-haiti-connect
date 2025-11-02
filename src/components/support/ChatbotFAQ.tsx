@@ -37,8 +37,12 @@ export function ChatbotFAQ() {
 
     // Search in help articles
     const matchedArticle = helpArticles.find(article => {
-      const titleLower = article[locale].title.toLowerCase();
-      const contentLower = article[locale].content.toLowerCase();
+      const localeKey = locale as 'es' | 'ht' | 'fr';
+      const localizedContent = article[localeKey];
+      if (!localizedContent) return false;
+      
+      const titleLower = localizedContent.title.toLowerCase();
+      const contentLower = localizedContent.content.toLowerCase();
       const keywords = article.tags.map((k: string) => k.toLowerCase());
       
       return (
@@ -49,9 +53,13 @@ export function ChatbotFAQ() {
     });
 
     if (matchedArticle) {
-      // Return first 200 characters of the article
-      const preview = matchedArticle[locale].content.substring(0, 200);
-      return `${matchedArticle[locale].title}\n\n${preview}...\n\n${t('readFullArticle')} /help?article=${matchedArticle.id}`;
+      const localeKey = locale as 'es' | 'ht' | 'fr';
+      const localizedContent = matchedArticle[localeKey];
+      if (localizedContent) {
+        // Return first 200 characters of the article
+        const preview = localizedContent.content.substring(0, 200);
+        return `${localizedContent.title}\n\n${preview}...\n\n${t('readFullArticle')} /help?article=${matchedArticle.id}`;
+      }
     }
 
     // Fallback responses by keyword

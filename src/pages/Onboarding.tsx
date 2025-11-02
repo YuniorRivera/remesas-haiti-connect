@@ -133,11 +133,17 @@ const Onboarding = () => {
             {hasAnyRole ? (
               <Button 
                 variant="ghost" 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => {
+                  if (!roleLoading && hasAnyRole) {
+                    console.log("🔷 Onboarding: Navigating to dashboard, roles:", { isAdmin, isAgent, isComplianceOfficer, isSenderUser });
+                    navigate('/dashboard');
+                  }
+                }}
+                disabled={roleLoading}
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Volver al Dashboard
+                {roleLoading ? "Cargando..." : "Volver al Dashboard"}
               </Button>
             ) : (
               <Button 
