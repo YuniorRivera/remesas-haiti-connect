@@ -113,11 +113,7 @@ const App = () => (
               <OnboardingSender />
             </ProtectedRoute>
           } />
-          <Route path="/welcome" element={
-            <ProtectedRoute requireAuth>
-              <Welcome />
-            </ProtectedRoute>
-          } />
+          <Route path="/welcome" element={<Welcome />} />
             
             {/* Authenticated routes (any role) */}
             <Route path="/dashboard" element={
