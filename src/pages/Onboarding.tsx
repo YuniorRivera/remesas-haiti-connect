@@ -73,9 +73,10 @@ const Onboarding = () => {
       } else {
         toast.error("Error al configurar el perfil: " + (result?.reason ?? "desconocido"));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'desconocido';
       console.error("Error asignando rol:", error);
-      toast.error("Error al configurar el perfil: " + (error?.message ?? "desconocido"));
+      toast.error("Error al configurar el perfil: " + errorMessage);
     } finally {
       setLoading(false);
     }
@@ -105,13 +106,13 @@ const Onboarding = () => {
       toast.success("Solicitud enviada. Un administrador la revisará pronto.");
       setShowAgentForm(false);
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues?.[0];
         toast.error(firstError?.message || "Error de validación");
       } else {
-        console.error("Error creando solicitud de agente:", error);
-        toast.error("Error al enviar solicitud: " + error.message);
+        const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+        toast.error("Error al enviar solicitud: " + errorMessage);
       }
     } finally {
       setLoading(false);
@@ -137,7 +138,6 @@ const Onboarding = () => {
               variant="ghost"
               onClick={() => {
                 if (!roleLoading && hasAnyRole) {
-                  console.log("🔷 Onboarding: Navigating to dashboard, roles:", { isAdmin, isAgent, isComplianceOfficer, isSenderUser });
                   navigate('/dashboard');
                 }
               }}
