@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
 
   useEffect(() => {
     // Auto-redirect to dashboard after 5 seconds
@@ -81,13 +79,10 @@ const Welcome = () => {
             </Button>
             <Button 
               variant="outline" 
-              onClick={async () => {
-                await signOut();
-                window.location.href = '/';
-              }}
+              onClick={() => window.location.href = '/'}
               size="lg"
             >
-              Cerrar Sesión
+              Ir al Inicio
             </Button>
           </div>
 
