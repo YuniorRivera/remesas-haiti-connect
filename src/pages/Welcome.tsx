@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocale } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -9,14 +8,7 @@ const Welcome = () => {
   const navigate = useNavigate();
   const { t } = useLocale();
 
-  useEffect(() => {
-    // Auto-redirect to dashboard after 5 seconds
-    const timer = setTimeout(() => {
-      navigate("/dashboard");
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [navigate]);
+  // No auto-redirect - let user choose to go to dashboard
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent/5 via-background to-secondary/5 flex items-center justify-center p-4">
@@ -88,9 +80,6 @@ const Welcome = () => {
             </Button>
           </div>
 
-          <p className="text-center text-xs text-muted-foreground">
-            {t("welcomeAutoRedirect")}
-          </p>
         </CardContent>
       </Card>
     </div>
