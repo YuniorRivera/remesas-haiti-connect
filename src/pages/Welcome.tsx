@@ -7,31 +7,16 @@ import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
-    // If not authenticated, go to auth
-    if (!authLoading && !user) {
-      navigate("/auth");
-      return;
-    }
-
     // Auto-redirect to dashboard after 5 seconds
     const timer = setTimeout(() => {
       navigate("/dashboard");
     }, 5000);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]);
-
-  if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Cargando...</p>
-      </div>
-    );
-  }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent/5 via-background to-secondary/5 flex items-center justify-center p-4">
@@ -116,4 +101,3 @@ const Welcome = () => {
 };
 
 export default Welcome;
-
