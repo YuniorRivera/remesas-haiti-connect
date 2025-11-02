@@ -1,11 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { useLocale } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 
 const Welcome = () => {
-  const navigate = useNavigate();
   const { t } = useLocale();
 
   // No auto-redirect - let user choose to go to dashboard
@@ -64,7 +62,7 @@ const Welcome = () => {
 
           <div className="flex gap-3">
             <Button 
-              onClick={() => navigate("/dashboard")} 
+              onClick={() => window.location.href = '/dashboard'}
               className="flex-1"
               size="lg"
             >
