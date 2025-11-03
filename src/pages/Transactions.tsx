@@ -4,17 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { TransactionsTable } from "@/components/transactions/TransactionsTable";
-import { useLocale } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { toast } from "sonner";
 
 const Transactions = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isComplianceOfficer } = useUserRole(user?.id);
-  const { t } = useLocale();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Admin and compliance can see platform margins
@@ -40,7 +37,7 @@ const Transactions = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setTransactions(data || []);
+      setTransactions((data || []) as any);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -48,21 +45,23 @@ const Transactions = () => {
     }
   };
 
+  if (authLoading || loading) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+          <p>Cargando...</p>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
-      <LoadingOverlay isLoading={authLoading || loading} message={t('loading')}>
-        <div className="min-h-screen bg-muted/30">
-          <PageHeader
-            title={t('myTransactions')}
-            backUrl="/dashboard"
-            backLabel={t('dashboard')}
-          />
-
-          <main className="container mx-auto p-6">
-            <TransactionsTable transactions={transactions} showPlatformMargin={showPlatformMargin} />
-          </main>
-        </div>
-      </LoadingOverlay>
+      <div className="min-h-screen bg-muted/30">
+        <main className="container mx-auto p-6">
+          <TransactionsTable transactions={transactions} showPlatformMargin={showPlatformMargin} />
+        </main>
+      </div>
     </AppLayout>
   );
 };

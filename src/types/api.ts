@@ -10,15 +10,19 @@ export interface Remittance {
   emisor_telefono?: string | null;
   emisor_documento?: string | null;
   beneficiario_nombre: string;
-  beneficiario_telefono: string;
+  beneficiario_telefono?: string | null;
   beneficiario_documento?: string | null;
   principal_dop: number;
-  channel: 'MONCASH' | 'SPIH';
+  channel?: 'MONCASH' | 'SPIH' | null;
   payout_city?: string | null;
   origin_ip?: string | null;
-  status: string;
+  state?: string | null;
+  htg_to_beneficiary?: number | null;
   created_at: string;
   updated_at?: string | null;
+  total_client_pays_dop?: number | null;
+  fx_client_sell?: number | null;
+  receipt_hash?: string | null;
 }
 
 // Quote response from pricing-quote function

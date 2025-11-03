@@ -21,13 +21,13 @@ interface RemittanceEvent {
   event: string;
   event_at: string;
   actor_type: string;
-  meta?: Record<string, unknown>;
+  meta?: Record<string, unknown> | null;
 }
 
 interface Remittance {
   id: string;
   codigo_referencia: string;
-  state: string;
+  state?: string | null;
   emisor_nombre: string;
   emisor_telefono?: string;
   emisor_documento?: string;
@@ -86,32 +86,26 @@ const RemittanceDetail = () => {
       const { data: remittanceData, error: remittanceError } = await supabase
         .from("remittances")
         .select("*")
-        .eq("id", id)
+        .eq("id", id!)
         .maybeSingle();
 
       if (remittanceError) throw remittanceError;
-      setRemittance(remittanceData);
+      setRemittance(remittanceData as any);
 
       const { data: eventsData, error: eventsError } = await supabase
         .from("remittance_events")
         .select("*")
-        .eq("remittance_id", id)
+        .eq("remittance_id", id!)
         .order("event_at", { ascending: true });
 
       if (eventsError) throw eventsError;
-      setEvents(eventsData || []);
+      setEvents((eventsData || []) as any);
     } catch (error) {
       const err = error as { message?: string };
       toast.error(err.message || "Error al cargar eventos");
     } finally {
       setLoading(false);
     }
-  };
-
-  const isValidDate = (dateString: string | undefined): boolean => {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date.getTime());
   };
 
   const getStateColor = (state: string) => {
@@ -329,8 +323,8 @@ const RemittanceDetail = () => {
               <h1 className="text-2xl font-bold text-primary">
                 {t('reference')}: {remittance.codigo_referencia}
               </h1>
-              <Badge className={`mt-2 ${getStateColor(remittance.state)}`}>
-                {remittance.state}
+              <Badge className={`mt-2 ${getStateColor(remittance.state || 'CREATED')}`}>
+                {remittance.state || 'CREATED'}
               </Badge>
             </div>
             <Button onClick={handlePrintReceipt} variant="outline" className="gap-2">

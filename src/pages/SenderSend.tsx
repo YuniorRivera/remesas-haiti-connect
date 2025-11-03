@@ -10,8 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Send, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { PricingQuote } from "@/types/api";
-import { CreateRemittanceResponse, Remittance } from "@/types/api";
+import { PricingQuote, CreateRemittanceResponse } from "@/types/api";
 
 export default function SenderSend() {
   const navigate = useNavigate();
@@ -225,7 +224,7 @@ export default function SenderSend() {
                   <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
                     <span>Total a pagar:</span>
                     <span className="text-primary">
-                      ${quote.total_charge_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
+                      ${quote.total_client_pays_dop?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} DOP
                     </span>
                   </div>
                 </div>
@@ -234,13 +233,13 @@ export default function SenderSend() {
                   <div className="flex justify-between text-sm">
                     <span>Tipo de cambio:</span>
                     <span className="font-medium">
-                      1 DOP = {quote.client_rate_dop_to_htg?.toFixed(4)} HTG
+                      1 DOP = {quote.fx_client_sell?.toFixed(4)} HTG
                     </span>
                   </div>
                   <div className="flex justify-between font-semibold text-primary">
                     <span>El beneficiario recibirá:</span>
                     <span>
-                      {quote.amount_htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG
+                      {quote.htg_to_beneficiary?.toLocaleString('es-DO', { minimumFractionDigits: 2 })} HTG
                     </span>
                   </div>
                 </div>

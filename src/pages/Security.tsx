@@ -5,7 +5,7 @@ import { useLocale } from "@/lib/i18n";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 export default function Security() {
-  const { t, locale } = useLocale();
+  const { } = useLocale();
 
   const isSecureConnection = window.location.protocol === 'https:';
 

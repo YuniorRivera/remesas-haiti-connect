@@ -14,13 +14,13 @@ interface RemittanceEvent {
   event: string;
   event_at: string;
   actor_type: string;
-  meta?: Record<string, unknown>;
+  meta?: Record<string, unknown> | null;
 }
 
 interface Remittance {
   id: string;
   codigo_referencia: string;
-  state: string;
+  state?: string | null;
   emisor_nombre: string;
   beneficiario_nombre: string;
   principal_dop: number;
@@ -62,7 +62,7 @@ export default function Track() {
         return;
       }
 
-      setRemittance(remittanceData);
+      setRemittance(remittanceData as any);
 
       const { data: eventsData, error: eventsError } = await supabase
         .from("remittance_events")
@@ -71,7 +71,7 @@ export default function Track() {
         .order("event_at", { ascending: true });
 
       if (eventsError) throw eventsError;
-      setEvents(eventsData || []);
+      setEvents((eventsData || []) as any);
     } catch (_error) {
       setRemittance(null);
       setEvents([]);
@@ -113,7 +113,7 @@ export default function Track() {
         return;
       }
 
-      setRemittance(remittanceData);
+      setRemittance(remittanceData as any);
 
       // Cargar eventos
       const { data: eventsData, error: eventsError } = await supabase
@@ -123,7 +123,7 @@ export default function Track() {
         .order("event_at", { ascending: true });
 
       if (eventsError) throw eventsError;
-      setEvents(eventsData || []);
+      setEvents((eventsData || []) as any);
 
       toast.success("Remesa encontrada");
     } catch (error) {
@@ -241,8 +241,8 @@ export default function Track() {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <span className="text-2xl font-mono">{remittance.codigo_referencia}</span>
-                      <Badge className={getStateColor(remittance.state)}>
-                        {getStateLabel(remittance.state)}
+                      <Badge className={getStateColor(remittance.state || 'CREATED')}>
+                        {getStateLabel(remittance.state || 'CREATED')}
                       </Badge>
                     </CardTitle>
                     <CardDescription className="mt-2">

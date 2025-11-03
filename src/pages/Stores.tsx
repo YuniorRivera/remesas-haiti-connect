@@ -77,7 +77,7 @@ const Stores = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setAgents(data || []);
+      setAgents((data || []) as any);
     } catch (error: any) {
       toast.error("Error al cargar tiendas");
       console.error(error);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,7 @@ const OnboardingSender = () => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const firstError = error.issues[0];
-        toast.error(firstError.message);
+        toast.error(firstError?.message || "Error de validación");
       } else {
         const err = error as { message?: string };
         toast.error("Error al guardar el perfil: " + (err.message || "desconocido"));

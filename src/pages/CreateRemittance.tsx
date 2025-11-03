@@ -441,7 +441,7 @@ export default function CreateRemittance() {
             </CardHeader>
             <CardContent>
               <RemittanceReceipt 
-                remittance={confirmedRemittance}
+                remittance={confirmedRemittance as any}
                 agentName={agentName}
               />
               
