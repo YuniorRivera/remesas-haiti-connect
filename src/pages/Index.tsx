@@ -1,7 +1,6 @@
-import { useEffect, Suspense, lazy } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useLite } from "@/contexts/LiteModeContext";
 import { useLocale } from "@/lib/i18n";
 import { SkipLinks } from "@/components/SkipLink";
 import { Button } from "@/components/ui/button";
@@ -12,14 +11,11 @@ import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { StablecoinsInfo } from "@/components/StablecoinsInfo";
 import { Footer } from "@/components/Footer";
 import { LanguageSelector } from "@/components/LanguageSelector";
-
-// Lazy load heavy p5.js animation only when needed
-const HeroBackground = lazy(() => import("@/components/animations/HeroBackground").then(module => ({ default: module.HeroBackground })));
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isLite = useLite();
   const { t } = useLocale();
 
   useEffect(() => {
@@ -31,25 +27,21 @@ const Index = () => {
   return (
     <>
       <SkipLinks />
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* P5.js animated background - hidden in lite mode, lazy loaded for performance */}
-        {!isLite && (
-          <Suspense fallback={null}>
-            <HeroBackground />
-          </Suspense>
-        )}
-        
-        {/* Red gradient overlay - hidden in lite mode */}
-        {!isLite && (
-          <div 
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(0_85%_50%_/_0.2),_hsl(0_0%_5%))] pointer-events-none hidden md:block"
-            aria-hidden="true"
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <OptimizedImage
+            src="/images/hero-background.jpg"
+            alt=""
+            priority={true}
+            className="w-full h-full object-cover opacity-20 dark:opacity-10"
           />
-        )}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
+        </div>
         <header className="container mx-auto px-4 py-6 relative z-10" role="banner">
         <div className="flex items-center justify-between">
           <h1 
-            className={`text-2xl font-bold text-accent cursor-pointer ${isLite ? '' : 'md:drop-shadow-[0_0_10px_hsl(0_85%_72%_/_0.5)]'}`}
+            className="text-2xl font-bold text-accent cursor-pointer"
             onClick={() => navigate("/")}
             role="button"
             tabIndex={0}
@@ -89,7 +81,7 @@ const Index = () => {
             <Button 
               onClick={() => navigate("/auth")} 
               size="lg" 
-              className={isLite ? '' : 'shadow-lg'}
+              className="shadow-lg"
               aria-label={`${t("ctaPrimary")} - ir a registro o inicio de sesión`}
             >
               {t("ctaPrimary")}
@@ -127,11 +119,11 @@ const Index = () => {
           <h2 id="features-heading" className="sr-only">{t("features")}</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" role="list">
             <article 
-              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
+              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Send 
-                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
+                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureFast")}</h3>
@@ -141,11 +133,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
+              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Shield 
-                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
+                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureSecure")}</h3>
@@ -155,11 +147,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
+              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Clock 
-                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
+                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("feature24h")}</h3>
@@ -169,11 +161,11 @@ const Index = () => {
             </article>
 
             <article 
-              className={`rounded-lg border border-accent/30 ${isLite ? 'bg-card p-6' : 'bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70'}`}
+              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <TrendingUp 
-                className={`mb-4 h-10 w-10 text-accent ${isLite ? '' : 'md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]'}`}
+                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureBest")}</h3>
