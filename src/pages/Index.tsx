@@ -11,7 +11,6 @@ import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 import { StablecoinsInfo } from "@/components/StablecoinsInfo";
 import { Footer } from "@/components/Footer";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { OptimizedImage } from "@/components/OptimizedImage";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,13 +26,13 @@ const Index = () => {
   return (
     <>
       <SkipLinks />
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen bg-background relative overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <OptimizedImage
+          <img
             src="/images/hero-background.jpg"
             alt=""
-            priority={true}
+            loading="eager"
             className="w-full h-full object-cover opacity-20 dark:opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
@@ -119,11 +118,11 @@ const Index = () => {
           <h2 id="features-heading" className="sr-only">{t("features")}</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" role="list">
             <article 
-              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
+              className="rounded-lg border border-accent/30 bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Send 
-                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
+                className="mb-4 h-10 w-10 text-accent drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureFast")}</h3>
@@ -133,11 +132,11 @@ const Index = () => {
             </article>
 
             <article 
-              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
+              className="rounded-lg border border-accent/30 bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Shield 
-                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
+                className="mb-4 h-10 w-10 text-accent drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureSecure")}</h3>
@@ -147,11 +146,11 @@ const Index = () => {
             </article>
 
             <article 
-              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
+              className="rounded-lg border border-accent/30 bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <Clock 
-                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
+                className="mb-4 h-10 w-10 text-accent drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("feature24h")}</h3>
@@ -161,11 +160,11 @@ const Index = () => {
             </article>
 
             <article 
-              className="rounded-lg border border-accent/30 bg-card/50 md:backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
+              className="rounded-lg border border-accent/30 bg-card/50 backdrop-blur-sm p-6 shadow-sm transition-all hover:shadow-[0_0_20px_hsl(0_85%_72%_/_0.3)] hover:border-accent/60 hover:bg-card/70"
               role="listitem"
             >
               <TrendingUp 
-                className="mb-4 h-10 w-10 text-accent md:drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
+                className="mb-4 h-10 w-10 text-accent drop-shadow-[0_0_8px_hsl(0_85%_72%_/_0.6)]"
                 aria-hidden="true"
               />
               <h3 className="mb-2 text-xl font-semibold text-foreground">{t("featureBest")}</h3>
